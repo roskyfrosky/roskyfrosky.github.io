@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" />
+    <title>Pluck VulnHub Boot2Root - Roskyfrosky Blog</title>
+    <meta name="author" content="Roskyfrosky" />
+    <meta name="description" content="Pluck VulnHub Boot2Root" />
+    <meta name="keywords" content="Pluck VulnHub Boot2Root, Roskyfrosky Blog, vulnhub" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+    <meta content="" property="fb:app_id">
+    <meta content="Roskyfrosky Blog" property="og:site_name">
+
+    
+
+    
+      <meta content="Pluck VulnHub Boot2Root" property="og:title">
+      <meta content="article" property="og:type">
+    
+
+    
+      <meta content="This is my personal blog" property="og:description">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/vulnhub/2017/03/28/Pluck-vulnhub.html" property="og:url">
+    
+
+    
+      <meta content="2017-03-28T20:11:34+01:00" property="article:published_time">
+      <meta content="https://blog.roskyfrosky.com/about/" property="article:author">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/static/img/posts//images/avatares/pluck.png" property="og:image">
+    
+
+    
+      
+        <meta content="vulnhub" property="article:section">
+      
+    
+
+    
+      
+        <meta content="boot2root" property="article:tag">
+      
+    
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@roskyfrosky">
+    <meta name="twitter:creator" content="@roskyfrosky">
+
+    
+      <meta name="twitter:title" content="Pluck VulnHub Boot2Root">
+    
+
+    
+      <meta name="twitter:url" content="https://blog.roskyfrosky.com/vulnhub/2017/03/28/Pluck-vulnhub.html">
+    
+
+    
+      <meta name="twitter:description" content="This is my personal blog">
+    
+
+    
+
+    <!-- Font awesome icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    <!-- syntax highlighting CSS -->
+    <link rel="stylesheet" href="/static/css/syntax.css">
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300italic,300,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/super-search.css">
+    <link rel="stylesheet" href="/static/css/thickbox.css">
+    <link rel="stylesheet" href="/static/css/projects.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-sm-3">
+        <div class="fixed-condition">
+          <a href="/"><img class="profile-avatar" src="/static/img/avatar.jpg" height="75px" width="75px" /></a>
+          <h1 class="author-name">Roskyfrosky</h1>
+          
+          <div class="social">
+            <ul>
+              
+                <li><a href="https://twitter.com/roskyfrosky" target="_blank"><i class="fa fa-twitter"></i></a></li>
+              
+                <li><a href="https://github.com/roskyfrosky" target="_blank"><i class="fa fa-github"></i></a></li>
+              
+            </ul>
+          </div>
+          <div class="search" id="js-search">
+            <input type="text" placeholder="(sitemap)~$ type to search" class="search__input form-control" id="js-search__input">
+            <ul class="search__results" id="js-search__results"></ul>
+          </div>
+          <hr />
+          <ul class="sidebar-nav">
+            <strong>Navigation</strong>
+            <li><a href="/">Home</a></li>
+            
+              <li><a class="about" href="/about/">About Me</a></li>
+            
+              <li><a class="about" href="/feed.xml">XML Feed</a></li>
+            
+          </ul>
+        </div>
+        <!-- end /.fixed-condition -->
+      </div>
+      <div class="col-sm-8 col-offset-1 main-layout">
+        <header class="post-header">
+  <h1 class="post-title">Pluck VulnHub Boot2Root</h1>
+</header>
+
+<span class="time">28 Mar 2017</span>
+
+  <span class="categories">
+    &raquo; <a href="/category/vulnhub">vulnhub</a>
+  </span>
+
+
+<div class="content">
+  <div class="post"><h1 id="pluck-boot2root-vulnhub">Pluck Boot2Root Vulnhub</h1>
+<p><strong>URL de la máquina:</strong> <a href="https://www.vulnhub.com/entry/pluck-1,178/">https://www.vulnhub.com/entry/pluck-1,178/</a><br />
+<strong>Descripción:</strong> “Enjoy” — @ryanoberto</p>
+
+<h2 id="solución">Solución</h2>
+
+<p>Lo primero que hacemos siempre, es realizar un escaneo de puertos de la máquina para ver que servicios están corriendo.</p>
+
+<p><img src="/images/Vulnhub/pluck/escaneo.png" alt="" class="img-responsive" /></p>
+
+<p>Vemos que tiene abiertos los puertos 80, 22, 3306 y el 5355.</p>
+
+<p>Empezamos por mirar el puerto 80 accediendo a la IP de la máquina a través del navegador.</p>
+
+<p>Hacemos una vuelta de reconocimiento por la página para ver que funcionalidades presenta, buscamos el fichero robots.txt, etc.
+Vemos que el fichero robots.txt no existe.Pasamos a analizar las funcionalidades de la página y comprobamos que existe un apartado para dejar comentarios y un login.Lo primero que probamos es meter la típica comilla y vemos que nos arroja un error de SQL.
+<img src="/images/Vulnhub/pluck/SQLI.png" alt="" class="img-responsive" /></p>
+
+<p>Parece que hay un SQLinjection, por lo que probamos a intentar explotarlo pero sin éxito. Más tarde volveremos a este punto.
+También vemos que en la página de index.php hay un parámetro page donde se referencian archivos.
+Es la tipología clásica del local file inclusión, por lo que probamos a ver si podemos ver el fichero  /etc/passwd y efectivamente existe la vulnerabilidad.
+<img src="/images/Vulnhub/pluck/LFI.png" alt="" class="img-responsive" /></p>
+
+<p>Al final del fichero de /etc/passwd , se puede observar como se crea un backup de la máquina mediante un script en bash.
+Accedemos también a él para comprobar que es lo que hace el script.
+<img src="/images/Vulnhub/pluck/backup_sh.png" alt="" class="img-responsive" /></p>
+
+<p>Nos indica que se realiza un backup y la ruta donde se almacena por lo que vamos a bajarnos el backup a ver que encontramos en él.
+<img src="/images/Vulnhub/pluck/download_backup.png" alt="" class="img-responsive" /></p>
+
+<p>Una vez descargado el backup, para poder descomprimirlo hay que eliminar la parte de HTML que hay tanto por el principio como por el final, porque sino no seremos capaces de descomprimirlo,ya que nos dará errores.</p>
+
+<p>Dentro de la carpeta de home se puede observar que hay 3 usuarios, y en uno de ellos hay una carpeta keys con varias claves.</p>
+
+<p><img src="/images/Vulnhub/pluck/directory_listing.png" alt="" class="img-responsive" /></p>
+
+<p>Anteriormente, mediante el escaneo de puertos hemos visto que se encontraba el puerto del ssh abierto, por lo que intentamos loguearnos con la claves en ese servicio viendo que tenemos suerte con la clave id_key4</p>
+
+<p><code class="highlighter-rouge">ssh -i id_key4 paul@192.168.1.115</code></p>
+
+<p>Una vez conectados por ssh a la máquina nos aparece una especie de menu, con el que podemos interactuar con la máquina.</p>
+
+<p><img src="/images/Vulnhub/pluck/menu.png" alt="" class="img-responsive" /></p>
+
+<p>Trás estar probando las diferentes opciones, vemos que en varias funciones se realizan ejecución de comando en la máquina ya sea un cd para cambiar de directorio, un ls para listarlo o el uso del editor vim para editar un fichero.
+Vamos a comprobar el contenido del fichero login.php para comprobar que tipo de petición se realiza y comprobar porque no hemos podido explotar el sqlinjection antior.</p>
+
+<p><img src="/images/Vulnhub/pluck/fake_sqli.png" alt="" class="img-responsive" /></p>
+
+<p>No lo habíamos podido explotar ya que se trataba de un fake, por lo que nos dedicamos a jugar un poco con el menu que nos proporciona la sesión ssh.
+Trás un rato jugando con las opciones que proporciona el menu de la sesión ssh, intentamos ejecutar comandos en la consola concatenandolos con el uso de ;.
+Vemos que en la opción de editar fichero, podemos ejecutar comandos por lo que ejecutamos un shell para salir del menu y poder trabajar más comodamente.</p>
+
+<p><img src="/images/Vulnhub/pluck/getting_shell.png" alt="" class="img-responsive" /></p>
+
+<p>Una vez que tenemos la shell, buscamos para ver si hay algún fichero con el bit suid activo que nos pudiera ser útil.</p>
+
+<p><img src="/images/Vulnhub/pluck/find_suid.png" alt="" class="img-responsive" /></p>
+
+<p>No encontramos nada fuera de lo normal, por lo que vamos a ver si hubiera algua vulnerabilidad pública para el kernel de la máquina</p>
+
+<p><img src="/images/Vulnhub/pluck/uname.png" alt="" class="img-responsive" /></p>
+
+<p>Tenemos suerte y la versión del kernel de la máquina es vulnerable a DirtyCow, por lo que descargamos el exploit en la máquina, lo compilamos tal y como indican y lo ejecutamos.</p>
+
+<p><img src="/images/Vulnhub/pluck/cow.png" alt="" class="img-responsive" /></p>
+
+<p>Dado que hemos comprobado que efectivamente somos root ya solo queda mostrar el contenido del fichero flag.txt.</p>
+
+<p><img src="/images/Vulnhub/pluck/flag.png" alt="" class="img-responsive" /></p>
+</div>
+  <div class="share-page">
+  <span style="float: left;">Share this on &rarr;&nbsp;&nbsp;</span>
+
+  <!-- Twitter -->
+  <a href="https://twitter.com/share" class="twitter-share-button" data-via="roskyfrosky">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+  <!-- Google + -->
+  <div class="g-plus" data-action="share" data-annotation="bubble"></div>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+  <!-- Facebook -->
+  <div class="fb-share-button" data-href="https://blog.roskyfrosky.com/vulnhub/2017/03/28/Pluck-vulnhub.html" data-layout="button_count" style="position: relative; top: -8px; left: 3px;"></div>
+</div>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+</div>
+
+
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+            <div class="panel-body">
+              <h4>Related Posts</h4>
+              <ul>
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2018/03/15/Fristileak-vulnhub.html">Vulnhub FristiLeak</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html">Vulnhub RickdiculouslyEasy</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html">Vulnhub VulnerableDocker Easy mode</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html">Vulnhub HackFest Orcus</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/05/08/Hackfest-quaoar.html">Vulnhub HackFest Quaoar</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html">Kioptrix Level 3 (1.2) VulnHub Boot2Root</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+  
+  </ul>
+</div>
+
+
+<div class="PageNavigation">
+  
+    <a class="prev" href="/vulnhub/2017/03/15/64base-vulnhub.html">&laquo; 64Base VulnHub Boot2Root</a>
+  
+  
+    <a class="next" href="/vulnhub/2017/04/01/Kioptrix1.0-vulnhub.html">Kioptrix Level 1 VulnHub Boot2Root &raquo;</a>
+  
+</div>
+
+<div class="disqus-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    /* <![CDATA[ */
+    var disqus_shortname = "roskyfrosky";
+    var disqus_identifier = "https://blog.roskyfrosky.com_Pluck VulnHub Boot2Root";
+    var disqus_title = "Pluck VulnHub Boot2Root";
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    /* ]]> */
+  </script>
+</div>
+
+        <footer>
+          &copy; Roskyfrosky
+          
+            - <a href="https://github.com/roskyfrosky">https://github.com/roskyfrosky</a> - Powered by Jekyll.
+          
+        </footer>
+      </div>
+      <!-- end /.col-sm-8 -->
+    </div>
+    <!-- end /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/super-search.js"></script>
+    <script src="/static/js/thickbox-compressed.js"></script>
+    <script src="/static/js/projects.js"></script>
+  </body>
+</html>
+

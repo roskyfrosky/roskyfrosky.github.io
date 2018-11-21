@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" />
+    <title>Vulnhub RickdiculouslyEasy - Roskyfrosky Blog</title>
+    <meta name="author" content="Roskyfrosky" />
+    <meta name="description" content="Vulnhub RickdiculouslyEasy" />
+    <meta name="keywords" content="Vulnhub RickdiculouslyEasy, Roskyfrosky Blog, vulnhub" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+    <meta content="" property="fb:app_id">
+    <meta content="Roskyfrosky Blog" property="og:site_name">
+
+    
+
+    
+      <meta content="Vulnhub RickdiculouslyEasy" property="og:title">
+      <meta content="article" property="og:type">
+    
+
+    
+      <meta content="This is my personal blog" property="og:description">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html" property="og:url">
+    
+
+    
+      <meta content="2018-03-09T11:11:34+00:00" property="article:published_time">
+      <meta content="https://blog.roskyfrosky.com/about/" property="article:author">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/static/img/posts//images/avatares/rickdiculously.png" property="og:image">
+    
+
+    
+      
+        <meta content="vulnhub" property="article:section">
+      
+    
+
+    
+      
+        <meta content="boot2root" property="article:tag">
+      
+        <meta content="vulnhub" property="article:tag">
+      
+    
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@roskyfrosky">
+    <meta name="twitter:creator" content="@roskyfrosky">
+
+    
+      <meta name="twitter:title" content="Vulnhub RickdiculouslyEasy">
+    
+
+    
+      <meta name="twitter:url" content="https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html">
+    
+
+    
+      <meta name="twitter:description" content="This is my personal blog">
+    
+
+    
+
+    <!-- Font awesome icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    <!-- syntax highlighting CSS -->
+    <link rel="stylesheet" href="/static/css/syntax.css">
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300italic,300,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/super-search.css">
+    <link rel="stylesheet" href="/static/css/thickbox.css">
+    <link rel="stylesheet" href="/static/css/projects.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-sm-3">
+        <div class="fixed-condition">
+          <a href="/"><img class="profile-avatar" src="/static/img/avatar.jpg" height="75px" width="75px" /></a>
+          <h1 class="author-name">Roskyfrosky</h1>
+          
+          <div class="social">
+            <ul>
+              
+                <li><a href="https://twitter.com/roskyfrosky" target="_blank"><i class="fa fa-twitter"></i></a></li>
+              
+                <li><a href="https://github.com/roskyfrosky" target="_blank"><i class="fa fa-github"></i></a></li>
+              
+            </ul>
+          </div>
+          <div class="search" id="js-search">
+            <input type="text" placeholder="(sitemap)~$ type to search" class="search__input form-control" id="js-search__input">
+            <ul class="search__results" id="js-search__results"></ul>
+          </div>
+          <hr />
+          <ul class="sidebar-nav">
+            <strong>Navigation</strong>
+            <li><a href="/">Home</a></li>
+            
+              <li><a class="about" href="/about/">About Me</a></li>
+            
+              <li><a class="about" href="/feed.xml">XML Feed</a></li>
+            
+          </ul>
+        </div>
+        <!-- end /.fixed-condition -->
+      </div>
+      <div class="col-sm-8 col-offset-1 main-layout">
+        <header class="post-header">
+  <h1 class="post-title">Vulnhub RickdiculouslyEasy</h1>
+</header>
+
+<span class="time">09 Mar 2018</span>
+
+  <span class="categories">
+    &raquo; <a href="/category/vulnhub">vulnhub</a>
+  </span>
+
+
+<div class="content">
+  <div class="post"><h1 id="rickdiculouslyeasy">RickdiculouslyEasy</h1>
+<p><strong>URL de la máquina:</strong> <a href="https://www.vulnhub.com/entry/rickdiculouslyeasy-1,207/">https://www.vulnhub.com/entry/rickdiculouslyeasy-1,207/</a><br />
+<strong>Descripción:</strong> This is a fedora server vm, created with virtualbox.</p>
+
+<p>It is a very simple Rick and Morty themed boot to root.</p>
+
+<p>There are 130 points worth of flags available (each flag has its points recorded with it), you should also get root.</p>
+
+<p>It’s designed to be a beginner ctf, if you’re new to pen testing, check it out!</p>
+
+<h2 id="solución">Solución</h2>
+
+<p>Nada más iniciar la máquina, podemos observar que nos indica la IP que ha asignado a la máquina y un puerto (https://172.16.199.128:9090) por lo que accedemos a través del navegador y nos encontramos con la primera flag.</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/flag_zeus.png" alt="" class="img-responsive" /></p>
+
+<p><code class="highlighter-rouge">FLAG{THERE IS NO ZEUS, IN YOUR FACE} - 10/130 puntos.</code></p>
+
+<p>Dado que la flag nos indica que no existe ningún framework Zeus, realizamos un escaneo de puertos para comprobar que servicios hay corriendo en la máquina.</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/nmap.png" alt="" class="img-responsive" /></p>
+
+<p>La salida de nmap nos indica que existe un FTP en el puerto 21 en el cuál se permite el login con el usuario anonymous y vemos que hay un fichero FLAG.txt.
+Entramos y vemos la segunda flag.</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/flag_ftp.png" alt="" class="img-responsive" /></p>
+
+<p><code class="highlighter-rouge">FLAG{Whoa this is unexpected} - 20/130 puntos.</code></p>
+
+<p>Seguimos por el puerto 80 ya que vemos que hay un apache. Vemos que existe el fichero robots.txt que contiene varias entradas interesantes.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>They're Robots Morty! It's ok to shoot them! They're just Robots!
+
+/cgi-bin/root_shell.cgi
+/cgi-bin/tracertool.cgi
+/cgi-bin/*
+</code></pre></div></div>
+
+<p>Probamos ambas entradas y vemos que en tracertool se trata de una herramienta que ejecuta el comando traceroute sobre la entrada de usuario, por lo que intentamos realizar un command injection y vemos que es vulnerable. Intenamos mostrar el fichero /etc/host mediante el comand “cat” y vemos que han cambiado el binario por uno que muestra un gato.</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/cat.png" alt="" class="img-responsive" /></p>
+
+<p>Por lo que utilizamos el comando more para visualizar el contenido del fichero y así poder ver que usuarios existen en la máquina.</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/command_injection.png" alt="" class="img-responsive" /></p>
+
+<p>Dado que ya no hay más entradas en el fichero robots.txt decido lanzar un dirb para ver si conseguimos descubrir algún directorio o fichero interesante en el sistema.</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/dirb.png" alt="" class="img-responsive" /></p>
+
+<p>el dirb nos muestra que existe la carpeta password, por lo que accedemos a ella y podemos ver dos ficheros:</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/Dirlist_password.png" alt="" class="img-responsive" /></p>
+
+<p>Uno de ellos es una flag,por lo que la visitamos y ya tenemos otros 10 puntos.</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/flag_password.png" alt="" class="img-responsive" /></p>
+
+<p><code class="highlighter-rouge">FLAG{ Yeah d- just dont do it.} 30/130 puntos.</code></p>
+
+<p>El otro fichero, es un fichero html que si vemos el codigo fuente podemos encontrar la contraseña “winter”</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+<span class="nt">&lt;title&gt;</span>Morty's Website<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;body&gt;</span>Wow Morty real clever. Storing passwords in a file called passwords.html? You've really done it this time Morty. Let me at least hide them.. I'd delete them entirely but I know you'd go bitching to your mom. That's the last thing I need.<span class="nt">&lt;/body&gt;</span>
+<span class="c">&lt;!--Password: winter--&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<p>Antes hemos visto en el fichero /etc/hosts que existia un usuario cuyo nombre era Summer, por lo que probamos a loguearnos en el servicio ssh del puerto 22222, ya que el del 22 es fake, con el usuario Summer y contraseña winter.</p>
+
+<p>Yay!! ya tenemos acceso al servidor, y en el directorio del usuario Summer encontramos la siguiente flag</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/flag_summer.png" alt="" class="img-responsive" /></p>
+
+<p><code class="highlighter-rouge">FLAG{Get off the high road Summer!} 40/130 puntos</code></p>
+
+<p>Mirando distintos directorios del servidor vemos que existen ficheros interesantes en los disintos homes de otros usuarios como puede ser Morty y RickSanchez, por lo que como solo tenemos permisos de lectura, vamos a bajarnos los ficheros a nuestra máquina para analizarlos. Para ello ejecutamos los siguientes comando scp.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>scp -P 22222  Summer@172.16.199.128:/home/Morty/Safe_Password.jpg .  
+scp -P 22222  Summer@172.16.199.128:/home/Morty/journal.txt.zip .  
+scp -P 22222  Summer@172.16.199.128:/home/RickSanchez/RICKS_SAFE/safe .  
+</code></pre></div></div>
+
+<p>Empezamos analizando el fichero journal.txt.zip y vemos que para descomprimirlo necesitamos una contraseña, por lo que pasamos a analizar el fichero Safe_Password.jpg.
+Sacando los strings de dicha imagen podemos obtener la contraseña del fichero zip.(MeeSeek)</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/pass_zip.png" alt="" class="img-responsive" /></p>
+
+<p>Descomprimimos el fichero y obtenemos el fichero journal.txt cuyo contenido es</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Monday: So today Rick told me huge secret. He had finished his flask and was on to commercial grade paint solvent. He spluttered something about a safe, and a password. Or maybe it was a safe password... Was a password that was safe? Or a password to a safe? Or a safe password to a safe?
+
+Anyway. Here it is:
+
+FLAG: {131333} - 20 Points 
+</code></pre></div></div>
+
+<p>Ya tenemos otra flag. 60/130 puntos.</p>
+
+<p>Vamos ahora a por el otro fichero que nos hemos descargado, el binario safe. Lo ejecutamos y vemos que nos pide que pasemos un parámetro, por lo que ponemos el parámetro 131333 tal y como nos lo indican en la última flag encontrada y obtenemos la siguiente flag.</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/flag_safe.png" alt="" class="img-responsive" /></p>
+
+<p><code class="highlighter-rouge">FLAG{And Awwwaaaaayyyy we Go!} 80/130 puntos</code></p>
+
+<p>En esta pista, el mensaje nos indica que para obtener la contraseña del usuario Rick tenemos que generar un diccionario con las siguientes caracteristicas:<br />
+    - 1 letra mayuscula<br />
+    - 1 número<br />
+    - una palabra del nombre de la vieja banda de Rick</p>
+
+<p>Buscamos el nombre de la antigua banda de Rick y vemos que el nombre es The Flesh Curtains</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/bad_name.png" alt="" class="img-responsive" /></p>
+
+<p>por lo que elaboramos un pequeño script que cumpla todas las condiciones que tiene que tener la contraseña:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#! /usr/bin/env python  </span>
+<span class="n">upercase</span><span class="o">=</span><span class="s">"ABCDEFGHIJKLMNOPQRSTUVWXYZ"</span>  
+<span class="n">numbers</span> <span class="o">=</span> <span class="s">"0123456789"</span>  
+<span class="n">old_band</span><span class="o">=</span><span class="p">[</span><span class="s">"The"</span><span class="p">,</span><span class="s">"Flesh"</span><span class="p">,</span><span class="s">"Curtains"</span><span class="p">]</span>  
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"passwords.txt"</span><span class="p">,</span><span class="s">'a'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>  
+    <span class="k">for</span> <span class="n">uper</span> <span class="ow">in</span> <span class="n">upercase</span><span class="p">:</span>  
+        <span class="k">for</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">numbers</span><span class="p">:</span>  
+            <span class="k">for</span> <span class="n">one</span> <span class="ow">in</span> <span class="n">old_band</span><span class="p">:</span>  
+                <span class="n">password</span> <span class="o">=</span> <span class="n">uper</span> <span class="o">+</span> <span class="n">number</span> <span class="o">+</span> <span class="n">one</span>  
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">password</span> <span class="o">+</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>  
+</code></pre></div></div>
+
+<p>Con el diccionario generado,ahora lo único que queda es realizar fuerza bruta contra el servicio ssh con el usuario RickSanchez.Para ello utilizamos la tool patator y ejecutamos el siguiente comando:</p>
+
+<p><code class="highlighter-rouge">python patator.py ssh_login host=172.16.199.128 user=RickSanchez port=22222 password=FILE0 0=passwords.txt -x ignore:mesg='Authentication failed.' </code></p>
+
+<p>Trás un rato la herramienta encuentra una contraseña valida (P7Curtains)</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/patator_ssh.png" alt="" class="img-responsive" /></p>
+
+<p>Nos logueamos en el servicio ssh con el usuario RickSanchez y la contraseña encontrada mediante la fuerza bruta. Miramos dentro de la carpeta home del usuario RickSanchez
+y vemos que hay una carpeta con nombre “ThisDoesntContainAnyFlag” pero entramos por si acaso y efectivamente…ahí no hay ninguna flag.</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/not_flag.png" alt="" class="img-responsive" /></p>
+
+<p>Seguimos con la pista que nos habían proporcionado para generar el diccionario de contraseñas y recordamos la siguiente parte “also sudo is wheely good”, por lo que 
+ejecutamos “sudo -su root” y ponemos la misma contraseña que hemos utilizado para loguearnos en el ssh.</p>
+
+<p>Ya somos usuario root. :D</p>
+
+<p>Trás ello, mostramos la flag que se encuentra dentro de la carpeta root</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/root_flag.png" alt="" class="img-responsive" /></p>
+
+<p><code class="highlighter-rouge">FLAG{Ionic Defibrillator} 30 puntos 110/130 puntos</code></p>
+
+<p>Nos quedan 20 puntos, que los conseguimos accediendo a los servicios que están en el puerto 60000.</p>
+
+<p><img src="/images/Vulnhub/rickdiculously/flag_60000.png" alt="" class="img-responsive" /></p>
+
+<p><code class="highlighter-rouge">FLAG{Flip the pickle Morty!} 10 puntos 110/120 puntos.</code></p>
+
+<p>Y al puerto 13337 consiguiendo así los últimos 10 puntos que nos faltan.</p>
+
+<p><img src="images/Vulnhub/rickdiculously/flag_60000.png" alt="_config.yml" /></p>
+
+<p><code class="highlighter-rouge">FLAG{TheFoundMyBackdoorMorty} 10 puntos 130/130 puntos.</code></p>
+</div>
+  <div class="share-page">
+  <span style="float: left;">Share this on &rarr;&nbsp;&nbsp;</span>
+
+  <!-- Twitter -->
+  <a href="https://twitter.com/share" class="twitter-share-button" data-via="roskyfrosky">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+  <!-- Google + -->
+  <div class="g-plus" data-action="share" data-annotation="bubble"></div>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+  <!-- Facebook -->
+  <div class="fb-share-button" data-href="https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html" data-layout="button_count" style="position: relative; top: -8px; left: 3px;"></div>
+</div>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+</div>
+
+
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+            <div class="panel-body">
+              <h4>Related Posts</h4>
+              <ul>
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2018/03/15/Fristileak-vulnhub.html">Vulnhub FristiLeak</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html">Vulnhub VulnerableDocker Easy mode</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html">Vulnhub HackFest Orcus</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/05/08/Hackfest-quaoar.html">Vulnhub HackFest Quaoar</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html">Kioptrix Level 3 (1.2) VulnHub Boot2Root</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/04/01/Kioptrix2.0-vulnhub.html">Kioptrix Level 2 VulnHub Boot2Root</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+  
+  </ul>
+</div>
+
+
+<div class="PageNavigation">
+  
+    <a class="prev" href="/vulnhub/2017/10/24/VulnerableDocker_Easymode.html">&laquo; Vulnhub VulnerableDocker Easy mode</a>
+  
+  
+    <a class="next" href="/malware/presentacion/2018/03/12/RootedCon-2018.html">RootedCon 2018 - Iniciación al análisis de malware &raquo;</a>
+  
+</div>
+
+<div class="disqus-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    /* <![CDATA[ */
+    var disqus_shortname = "roskyfrosky";
+    var disqus_identifier = "https://blog.roskyfrosky.com_Vulnhub RickdiculouslyEasy";
+    var disqus_title = "Vulnhub RickdiculouslyEasy";
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    /* ]]> */
+  </script>
+</div>
+
+        <footer>
+          &copy; Roskyfrosky
+          
+            - <a href="https://github.com/roskyfrosky">https://github.com/roskyfrosky</a> - Powered by Jekyll.
+          
+        </footer>
+      </div>
+      <!-- end /.col-sm-8 -->
+    </div>
+    <!-- end /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/super-search.js"></script>
+    <script src="/static/js/thickbox-compressed.js"></script>
+    <script src="/static/js/projects.js"></script>
+  </body>
+</html>
+

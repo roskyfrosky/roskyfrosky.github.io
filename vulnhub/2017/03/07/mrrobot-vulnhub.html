@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" />
+    <title>Mr.Robot VulnHub Boot2Root - Roskyfrosky Blog</title>
+    <meta name="author" content="Roskyfrosky" />
+    <meta name="description" content="Mr.Robot VulnHub Boot2Root" />
+    <meta name="keywords" content="Mr.Robot VulnHub Boot2Root, Roskyfrosky Blog, vulnhub" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+    <meta content="" property="fb:app_id">
+    <meta content="Roskyfrosky Blog" property="og:site_name">
+
+    
+
+    
+      <meta content="Mr.Robot VulnHub Boot2Root" property="og:title">
+      <meta content="article" property="og:type">
+    
+
+    
+      <meta content="This is my personal blog" property="og:description">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/vulnhub/2017/03/07/mrrobot-vulnhub.html" property="og:url">
+    
+
+    
+      <meta content="2017-03-07T12:11:34+00:00" property="article:published_time">
+      <meta content="https://blog.roskyfrosky.com/about/" property="article:author">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/static/img/posts//images/avatares/mrrobot.jpg" property="og:image">
+    
+
+    
+      
+        <meta content="vulnhub" property="article:section">
+      
+    
+
+    
+      
+        <meta content="boot2root" property="article:tag">
+      
+    
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@roskyfrosky">
+    <meta name="twitter:creator" content="@roskyfrosky">
+
+    
+      <meta name="twitter:title" content="Mr.Robot VulnHub Boot2Root">
+    
+
+    
+      <meta name="twitter:url" content="https://blog.roskyfrosky.com/vulnhub/2017/03/07/mrrobot-vulnhub.html">
+    
+
+    
+      <meta name="twitter:description" content="This is my personal blog">
+    
+
+    
+
+    <!-- Font awesome icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    <!-- syntax highlighting CSS -->
+    <link rel="stylesheet" href="/static/css/syntax.css">
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300italic,300,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/super-search.css">
+    <link rel="stylesheet" href="/static/css/thickbox.css">
+    <link rel="stylesheet" href="/static/css/projects.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-sm-3">
+        <div class="fixed-condition">
+          <a href="/"><img class="profile-avatar" src="/static/img/avatar.jpg" height="75px" width="75px" /></a>
+          <h1 class="author-name">Roskyfrosky</h1>
+          
+          <div class="social">
+            <ul>
+              
+                <li><a href="https://twitter.com/roskyfrosky" target="_blank"><i class="fa fa-twitter"></i></a></li>
+              
+                <li><a href="https://github.com/roskyfrosky" target="_blank"><i class="fa fa-github"></i></a></li>
+              
+            </ul>
+          </div>
+          <div class="search" id="js-search">
+            <input type="text" placeholder="(sitemap)~$ type to search" class="search__input form-control" id="js-search__input">
+            <ul class="search__results" id="js-search__results"></ul>
+          </div>
+          <hr />
+          <ul class="sidebar-nav">
+            <strong>Navigation</strong>
+            <li><a href="/">Home</a></li>
+            
+              <li><a class="about" href="/about/">About Me</a></li>
+            
+              <li><a class="about" href="/feed.xml">XML Feed</a></li>
+            
+          </ul>
+        </div>
+        <!-- end /.fixed-condition -->
+      </div>
+      <div class="col-sm-8 col-offset-1 main-layout">
+        <header class="post-header">
+  <h1 class="post-title">Mr.Robot VulnHub Boot2Root</h1>
+</header>
+
+<span class="time">07 Mar 2017</span>
+
+  <span class="categories">
+    &raquo; <a href="/category/vulnhub">vulnhub</a>
+  </span>
+
+
+<div class="content">
+  <div class="post"><h1 id="mrrobot-boot2root-vulnhub">Mr.Robot Boot2Root Vulnhub</h1>
+<p><strong>URL de la máquina:</strong> <a href="https://www.vulnhub.com/entry/mr-robot-1,151/">https://www.vulnhub.com/entry/mr-robot-1,151/</a><br />
+<strong>Descripción:</strong> Based on the show, Mr. Robot. 
+This VM has three keys hidden in different locations. Your goal is to find all three. Each key is progressively difficult to find.
+The VM isn’t too difficult. There isn’t any advanced exploitation or reverse engineering. The level is considered beginner-intermediate.</p>
+
+<h2 id="solución">Solución</h2>
+
+<p>Lo primero que hacemos siempre, es realizar un escaneo de puertos de la máquina para ver que servicios están corriendo.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/scaneo.png" alt="Nmap" class="img-responsive" /></p>
+
+<p>Vemos que tiene abiertos los puertos 80, y 443.</p>
+
+<p>Accedemos a la ip por el navegador para comprobar que nos encontramos</p>
+
+<p><img src="/images/Vulnhub/mrrobot/flag1_1.png" alt="Flag 1" class="img-responsive" /></p>
+
+<p>Nos aparece una intro y nos aparece una shell en la cuál podemos introducir los comandos que aparecen en pantalla. Jugamos un rato con los comando y vemos que no son de utilidad, que son solo una distración, por lo que pasamos a empezar a analizar la página.
+En primer lugar, una de las cosas que suelo hacer siempre en una web es comprobar si existe el fichero robots.txt</p>
+
+<p><img src="/images/Vulnhub/mrrobot/flag1_2.png" alt="Flag 2" class="img-responsive" /></p>
+
+<p>Y nos encontramos con la primera flag de las tres que hay. Accedemos al fichero “key-1-of-3.txt” y obtenemos <strong>073403c8a58a1f80d943455fb30724b9</strong>.
+El otro fichero “fsociety.doc” parece ser un diccionario que tendremos que utilizar más tarde.</p>
+
+<p>Acto seguido, trás mirar el código fuente de la página, las cabeceras de las peticiones y demás cosas básicas, lanzamos un dirbuster para ver si encontramos algún directorio o fichero interesante.Para ello utilizamos el diccionario por defecto “commont.txt” que viene con la propia herramienta.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/dirbuster.png" alt="Dirbuster" class="img-responsive" /></p>
+
+<p>Encontramos un par de directorios interesantes que son “admin” y “dashboard” por lo que intentamos entrar en ellos.
+Al intentar entrar en el directorío dashboard nos hace una redirección como bien se ha marcado en la imagen del Dirbuster y nos redirige al login de un wordpress.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/wordpress_1.png" alt="Wordpress" class="img-responsive" /></p>
+
+<p>Comprobamos si existe enumeración de usuarios y comprobamos que es correcto. Trás probar varios usuarios típicos como admin,root,administrador,administrator,etc siempre obtenemos el mensaje “Usuario o contraseña inválidos” por lo que pensamos en empezar a poner nombres de personajes de la serie de MrRobot, que para eso se llama así la máquina.<br />
+Y en seguida encontramos que existe un usuario con nombre “elliot”.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/wordpress_login.png" alt="Wordpress Login" class="img-responsive" /></p>
+
+<p>Entonces pensamos que el diccionario que hemos encontrado en primer lugar, tiene que ser para hacer fuerza bruta al login.Dado que es un wordpress, utilizamos la herramienta por excelencia con este cms, wpscan, y trás un largo rato conseguimos encontrar la contraseña.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/bruteforce_login.png" alt="Wordpress Bruteforce" class="img-responsive" /></p>
+
+<p>Procedemos a entrar al wordpress con usuario “elliot” y contraseña “ER28-0652”.
+Una vez dentro lo primero que hacemos es comprobar que nivel de privilegios tiene el usuario con el que hemos conseguido acceder.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/users_wordpress.png" alt="Wordpress users" class="img-responsive" /></p>
+
+<p>Tenemos suerte ya que nuestro usuario tiene permisos de administrador, por lo que el siguiente paso es editar un fichero existente en el servidor para conectarnos con una reverse shell a nuestra máquina y hacernos las cosas algo más sencillas.</p>
+
+<p>Para ello, accedemos a nuestra página preferida para hacer pentesting donde podemos encontrar una reverse shell en php:
+<a href="http://pentestmonkey.net/tools/web-shells/php-reverse-shell">http://pentestmonkey.net/tools/web-shells/php-reverse-shell</a></p>
+
+<p>Nos las descargamos y copiamos el código habiendo modificado la IP y el puerto donde queremos que se conecte la máquina y lo copiamos en un fichero del wordpress.
+Nosotros hemos elegido el fichero 404.php.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/reverse_shell.png" alt="Reverse Shell" class="img-responsive" /></p>
+
+<p>Una vez que hemos modificado el fichero con la reverse shell, lanzamos un netcat en nuestra máquina local, en modo listen(parámetro -l) en el puerto que hemos elegido en el fichero de la reverse shell y accedemos al fichero 404.php para que se produzca la conexión.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/conexion_inversa.png" alt="Conexión inversa" class="img-responsive" /></p>
+
+<p>Una vez realiza la conexión inversa, comprobamos que usuario somos con el comando “whoami” y después pasamos a la búsqueda de la siguiente flag.
+Para ello en estos caso suele estar en el home de algún usuario, por lo que entro en el único usuario que hay en la máquina “home/robot” y listamos los ficheros que se encuentran en el directorio.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/flag2_1.png" alt="Flag 2" class="img-responsive" /></p>
+
+<p>Vemos que existen dos ficheros entre los cuales se encuentra la segunda flag que estabamos buscando.
+Por desgracia ambos ficheros pertenencen al usuario y grupo robot, pero por suerte el segudon fichero “password.raw-md5” tiene permisos de lectura habilitado para todos los usuarios.
+Hacemos un cat al fichero y nos arroja un usuario “robot” y el hash md5 de su contraseña, que debemos buscar por internet para comprobar si está crackeado.
+Accedemos a <a href="https://hashkiller.co.uk/">https://hashkiller.co.uk/</a> e introduccimos el hash que hemos obtenido, y por suerte está crackeado :D.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/hash_md5.png" alt="Hash MD5" class="img-responsive" /></p>
+
+<p>Ahora para leer la key 2 solo tenemos que loguearnos como usuario robot y hacer un cat al fichero “key-2-of-3.txt”</p>
+
+<p>Al intentar loguearnos con el usuario robot, nos indica que tenemos que hacerlo desde un terminal, por lo que vamos a invocar una shell mediante python.
+Para ello utilizamos la siguiente porción de código:</p>
+
+<p class="code">echo “import pty; pty.spawn(‘/bin/bash’)” &gt; /tmp/asdf.py
+python /tmp/asdf.py</p>
+
+<p><img src="/images/Vulnhub/mrrobot/flag2_2.png" alt="Flag 2" class="img-responsive" /></p>
+
+<p>Ahora toca buscar la tercera clave.Por norma general la última clave solo puede ser accesible por el usuario root, por lo que vamos a ver si podemos elevar privilegios en el sistema. Para ello realizamos una busqueda para ver si existe algún fichero que tengo el bit suid activo.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/flag3_1.png" alt="Flag 3" class="img-responsive" /></p>
+
+<p>Vaya parece ser que hay suerte y encontramos la herramienta nmap con el bit suid activo, lo que significa que si lanzamos la herramienta en modo interactivo nos permitirá ejecutar comandos.La idea ahora es invocar una shell mediante comando que se ejecutara con usuario root.</p>
+
+<p>Para ello lanzamos la herramienta en modo interactivo con el commando</p>
+
+<p><code class="highlighter-rouge">nmap -\-interactive</code></p>
+
+<p>Dado que no me acuerdo que parámetro se utiliza para lanzar comandos en el modo interactivo, utilizo “h” para que me muestre la ayuda.
+Vemos que para ejecutar comandos debe de ir acompañados con el carácter “!” al principio.
+Ejecutamos !/bin/sh para para obtener una shell y comprobamos que somos el usuairo root.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/help_nmap.png" alt="Help Nmap" class="img-responsive" /></p>
+
+<p>Dado que ya somos usuario root, ahora solo queda entrar en el directorio root y hacerle un cat al fichero “key-3-of-3.txt”.</p>
+
+<p><img src="/images/Vulnhub/mrrobot/flag3_2.png" alt="Flag 3" class="img-responsive" /></p>
+
+<p>Además del fichero “key-3-of-3.txt” nos encontramos un fichero “firstboot_done” que nos indica que hemos terminado la máquina.</p>
+
+</div>
+  <div class="share-page">
+  <span style="float: left;">Share this on &rarr;&nbsp;&nbsp;</span>
+
+  <!-- Twitter -->
+  <a href="https://twitter.com/share" class="twitter-share-button" data-via="roskyfrosky">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+  <!-- Google + -->
+  <div class="g-plus" data-action="share" data-annotation="bubble"></div>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+  <!-- Facebook -->
+  <div class="fb-share-button" data-href="https://blog.roskyfrosky.com/vulnhub/2017/03/07/mrrobot-vulnhub.html" data-layout="button_count" style="position: relative; top: -8px; left: 3px;"></div>
+</div>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+</div>
+
+
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+            <div class="panel-body">
+              <h4>Related Posts</h4>
+              <ul>
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2018/03/15/Fristileak-vulnhub.html">Vulnhub FristiLeak</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html">Vulnhub RickdiculouslyEasy</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html">Vulnhub VulnerableDocker Easy mode</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html">Vulnhub HackFest Orcus</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/05/08/Hackfest-quaoar.html">Vulnhub HackFest Quaoar</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html">Kioptrix Level 3 (1.2) VulnHub Boot2Root</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+  
+  </ul>
+</div>
+
+
+<div class="PageNavigation">
+  
+    <a class="prev" href="/web/2017/02/21/writeup-web-ctf-fwhibbit.html">&laquo; Writeup [Web] FWHIBBIT 2017</a>
+  
+  
+    <a class="next" href="/vulnhub/2017/03/15/64base-vulnhub.html">64Base VulnHub Boot2Root &raquo;</a>
+  
+</div>
+
+<div class="disqus-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    /* <![CDATA[ */
+    var disqus_shortname = "roskyfrosky";
+    var disqus_identifier = "https://blog.roskyfrosky.com_Mr.Robot VulnHub Boot2Root";
+    var disqus_title = "Mr.Robot VulnHub Boot2Root";
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    /* ]]> */
+  </script>
+</div>
+
+        <footer>
+          &copy; Roskyfrosky
+          
+            - <a href="https://github.com/roskyfrosky">https://github.com/roskyfrosky</a> - Powered by Jekyll.
+          
+        </footer>
+      </div>
+      <!-- end /.col-sm-8 -->
+    </div>
+    <!-- end /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/super-search.js"></script>
+    <script src="/static/js/thickbox-compressed.js"></script>
+    <script src="/static/js/projects.js"></script>
+  </body>
+</html>
+

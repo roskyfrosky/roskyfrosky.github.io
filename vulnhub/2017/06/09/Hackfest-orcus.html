@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" />
+    <title>Vulnhub HackFest Orcus - Roskyfrosky Blog</title>
+    <meta name="author" content="Roskyfrosky" />
+    <meta name="description" content="Vulnhub HackFest Orcus" />
+    <meta name="keywords" content="Vulnhub HackFest Orcus, Roskyfrosky Blog, vulnhub" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+    <meta content="" property="fb:app_id">
+    <meta content="Roskyfrosky Blog" property="og:site_name">
+
+    
+
+    
+      <meta content="Vulnhub HackFest Orcus" property="og:title">
+      <meta content="article" property="og:type">
+    
+
+    
+      <meta content="This is my personal blog" property="og:description">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html" property="og:url">
+    
+
+    
+      <meta content="2017-06-09T08:11:34+01:00" property="article:published_time">
+      <meta content="https://blog.roskyfrosky.com/about/" property="article:author">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/static/img/posts//images/avatares/hackfest_orcus.png" property="og:image">
+    
+
+    
+      
+        <meta content="vulnhub" property="article:section">
+      
+    
+
+    
+      
+        <meta content="boot2root" property="article:tag">
+      
+        <meta content="vulnhub" property="article:tag">
+      
+    
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@roskyfrosky">
+    <meta name="twitter:creator" content="@roskyfrosky">
+
+    
+      <meta name="twitter:title" content="Vulnhub HackFest Orcus">
+    
+
+    
+      <meta name="twitter:url" content="https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html">
+    
+
+    
+      <meta name="twitter:description" content="This is my personal blog">
+    
+
+    
+
+    <!-- Font awesome icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    <!-- syntax highlighting CSS -->
+    <link rel="stylesheet" href="/static/css/syntax.css">
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300italic,300,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/super-search.css">
+    <link rel="stylesheet" href="/static/css/thickbox.css">
+    <link rel="stylesheet" href="/static/css/projects.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-sm-3">
+        <div class="fixed-condition">
+          <a href="/"><img class="profile-avatar" src="/static/img/avatar.jpg" height="75px" width="75px" /></a>
+          <h1 class="author-name">Roskyfrosky</h1>
+          
+          <div class="social">
+            <ul>
+              
+                <li><a href="https://twitter.com/roskyfrosky" target="_blank"><i class="fa fa-twitter"></i></a></li>
+              
+                <li><a href="https://github.com/roskyfrosky" target="_blank"><i class="fa fa-github"></i></a></li>
+              
+            </ul>
+          </div>
+          <div class="search" id="js-search">
+            <input type="text" placeholder="(sitemap)~$ type to search" class="search__input form-control" id="js-search__input">
+            <ul class="search__results" id="js-search__results"></ul>
+          </div>
+          <hr />
+          <ul class="sidebar-nav">
+            <strong>Navigation</strong>
+            <li><a href="/">Home</a></li>
+            
+              <li><a class="about" href="/about/">About Me</a></li>
+            
+              <li><a class="about" href="/feed.xml">XML Feed</a></li>
+            
+          </ul>
+        </div>
+        <!-- end /.fixed-condition -->
+      </div>
+      <div class="col-sm-8 col-offset-1 main-layout">
+        <header class="post-header">
+  <h1 class="post-title">Vulnhub HackFest Orcus</h1>
+</header>
+
+<span class="time">09 Jun 2017</span>
+
+  <span class="categories">
+    &raquo; <a href="/category/vulnhub">vulnhub</a>
+  </span>
+
+
+<div class="content">
+  <div class="post"><h1 id="hackfest-orcus-boot2root-vulnhub">HackFest Orcus Boot2Root Vulnhub</h1>
+<p><strong>URL de la máquina:</strong> <a href="https://www.vulnhub.com/entry/hackfest2016-orcus,182/">https://www.vulnhub.com/entry/hackfest2016-orcus,182/</a><br />
+<strong>Descripción:</strong> Welcome to Orcus</p>
+
+<p>This is a vulnerable machine i created for the Hackfest 2016 CTF http://hackfest.ca/<br />
+<strong>Difficulty:</strong> Hard<br />
+<strong>Tips:</strong> If youre stuck enumerate more! Seriously take each service running on the system and enumerate them more!<br />
+<strong>Goals:</strong> This machine is intended to take a lot of enumeration and understanding of Linux system.There are 4 flags on this machine 1. Get a shell 2. Get root access 3. There is a post exploitation flag on the box 4. There is something on this box that is different from the others from this series (Quaoar and Sedna) find why its different.<br />
+<strong>Feedback:</strong> This is my third vulnerable machine, please give me feedback on how to improve ! @ViperBlackSkull on Twitter simon.nolet@hotmail.com<br />
+Special Thanks to madmantm for testing this machine<br />
+<strong>SHA-256:</strong> 79B1D93C60E664D70D8EB3C0CDF1AD98BF2B95036C84F87EEF065FA71C1AE51E</p>
+
+<h2 id="solución">Solución</h2>
+
+<p>En primer lugar, y como en todas las máquinas que estamos realizando, lo primero en realizar siempre es un escaneo de puertos de la máquina para comprobar que servicios están corriendo en ella.</p>
+
+<p><img src="/images/Vulnhub/hackfest_orcus/escaneo.png" alt="" class="img-responsive" /></p>
+
+<p>Vemos que hay varios servicios corriendo en el servidor, pero primero de todo vamos a ver que podemos encontrar en el servicio web que está corriendo.</p>
+
+<p>Como en los casos anteriores vemos la imagen de un planeta que al pinchar sobre ella, redirige a otra imagen.
+Comprobamos si existe el fichero robots.txt y vemos que contiene muchas entradas, vamos a mirar alguna de ellas y lanzamos también un dirb para ver si encontramos alguna carpeta o fichero que no esté reflejado en el fichero robots.txt</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./dirb http://10.32.6.104 wordlists/big.txt 
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Wed Jun 14 06:38:25 2017
+URL_BASE: http://10.32.6.104/
+WORDLIST_FILES: wordlists/big.txt
+
+-----------------
+
+GENERATED WORDS: 20458                                                         
+
+---- Scanning URL: http://10.32.6.104/ ----
+==&gt; DIRECTORY: http://10.32.6.104/FCKeditor/
++ http://10.32.6.104/LICENSE (CODE:200|SIZE:15437)
+==&gt; DIRECTORY: http://10.32.6.104/admin/
+==&gt; DIRECTORY: http://10.32.6.104/backups/
+==&gt; DIRECTORY: http://10.32.6.104/cron/
+==&gt; DIRECTORY: http://10.32.6.104/external/
+==&gt; DIRECTORY: http://10.32.6.104/files/
+==&gt; DIRECTORY: http://10.32.6.104/framework/
+==&gt; DIRECTORY: http://10.32.6.104/install/
+==&gt; DIRECTORY: http://10.32.6.104/javascript/
+==&gt; DIRECTORY: http://10.32.6.104/phpmyadmin/
++ http://10.32.6.104/robots.txt (CODE:200|SIZE:1347)
++ http://10.32.6.104/server-status (CODE:403|SIZE:299)
+==&gt; DIRECTORY: http://10.32.6.104/themes/
++ http://10.32.6.104/webalizer (CODE:200|SIZE:0)
+==&gt; DIRECTORY: http://10.32.6.104/zenphoto/
+
+</code></pre></div></div>
+
+<p>Revisando los outputs que hemos obtenido con dirb, vemos que dentro de la carpeta backups se encuentra un fichero zip con nombre “SimplePHPQuiz-Bakcupz.tar.gz” el cual descargamos.Revisando el contenido del backup nos encontramos un fichero “SimplePHPQuiz/includes/db_conn.php”con las siguientes credenciales:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;?php 
+
+//Set the database access information as constants
+DEFINE ('DB_USER', 'dbuser');
+DEFINE ('DB_PASSWORD', 'dbpassword');
+DEFINE ('DB_HOST', 'localhost');
+DEFINE ('DB_NAME', 'quizdb');
+
+@ $dbc = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+
+if (mysqli_connect_error()){
+	echo "Could not connect to MySql. Please try again";
+	exit();
+}
+
+?&gt;
+</code></pre></div></div>
+
+<p>Vemos que son credenciales para una base de datos y recordamos que en la salida del dirb había una referencia a phpmyadmin, por lo que probamos las password y vemos que funciona.</p>
+
+<p><img src="/images/Vulnhub/hackfest_orcus/phpmyadmin.png" alt="" class="img-responsive" /></p>
+
+<p>En las bases de datos que hay disponibles en el gestor phpmyadmin, observamos que hay una con nombre zenphoto que está vacía. Buscando por internet descubrimos que zenphoto se trata de un CMS, por lo que al estar vacío posiblemente puede que se encuenten los ficheros en el servidor pero que no esté instalado.
+Vemos que en el output del comando dirb, aparece una salida con una carpeta zenphoto, accedemos a ella y nos aparecerá el panel de instalación.
+Introducimos las crendenciales de la base de datos obtenidas anteriormente y seguimos el gestor de instalación.</p>
+
+<p><img src="/images/Vulnhub/hackfest_orcus/zenphoto_install.png" alt="" class="img-responsive" /></p>
+
+<p>Una vez instalado el CMS, te pedirá que reestablezcas las claves de administrador.<br />
+Pon las que quieras y logueate.<br />
+Si has hecho todo correctamente, una vez logueado verás lo siguiente:</p>
+
+<p><img src="/images/Vulnhub/hackfest_orcus/zenphoto_admin.png" alt="" class="img-responsive" /></p>
+
+<p>Mirando las distintas funcionalidades que ofrece el CMS, observamos que en la pestaña de uploads, hay una opción, llamda elFinder, que está deshabilitada.Esa opción permite subir ficheros como si se tratase de un FTP.</p>
+
+<p><img src="/images/Vulnhub/hackfest_orcus/zenphoto_upload_setting.png" alt="" class="img-responsive" /></p>
+
+<p>La habilitamos y vamos a la pestaña de upload. Seleccionamos  Upload folder(uploaded) y subimos una reverse shell para que la máquina se conecte a nuestra máquina local.</p>
+
+<p>Para ello hemos hecho click en el número 1 de la siguiente imagen y trás seleccionar el fichero que queremos subir debe de aparecer el número 2.</p>
+
+<p><img src="/images/Vulnhub/hackfest_orcus/zenphoto_shell.png" alt="" class="img-responsive" /></p>
+
+<p>Vamos a visitar el fichero para que se produzca la conexión inversa.</p>
+
+<p><img src="/images/Vulnhub/hackfest_orcus/zenphoto_reverse.png" alt="" class="img-responsive" /></p>
+
+<p>Una vez dentro de la máquina lo primero que hacemos es buscar la primer flag que indica el enunciado.Se encuntra en /var/www/flag.txt y el contenido es 868c889965b7ada547fae81f922e45c4.</p>
+
+<p>Ahora tenemos que realizar la elevación de privilegios.</p>
+
+<p>Lo primero que realizamos es que version de kernel tenemos instalada</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$uname -a  
+Linux Orcus 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:05 UTC 2016 i686 i686 i686 GNU/Linux  
+</code></pre></div></div>
+
+<p>buscando por internet vemos que existe este exploit <a href="https://www.exploit-db.com/exploits/40871/">https://www.exploit-db.com/exploits/40871/</a> pero es para un kernel de 64 bits y no de 32…luego no nos funciona.<br />
+Buscamos por si dentro del sistema hubiera algun binario con el bit suid activo, pero no encontramos nada interesante.Trás un buen rato mirando cosas y algo perdido decido volver a mirar el resultado del escaneo de puertos a la máquina y caigo en la cuenta de que hay un nfs abierto.
+Cogemos y montamos el nfs con el siguiente comando:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo mount 10.32.6.104:/ folder_mount/
+</code></pre></div></div>
+<p>vemos que la carpeta que nos monta es tmp, por lo que para elevar privilegios realizamos las siguientes acciones.</p>
+
+<p>En la máquina donde tenemos la conexión inversa creada, copiamos el binario de shell a la carpeta /tmp</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd/tmp  
+cp /bin/bash root_me 
+</code></pre></div></div>
+
+<p>y ahora desde nuestra máquina ejecutamos:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd folder_mount/tmp/  
+sudo chown root:root root_me  
+chmod s+u root_me  
+</code></pre></div></div>
+
+<p>Ahora que ya tenemos la shell  creada con el bit suid activo, la ejecutamos y ya somos usuario root</p>
+
+<p><img src="/images/Vulnhub/hackfest_orcus/root.png" alt="" class="img-responsive" /></p>
+
+<p>Para aquellos que no conozcan el parámetro p, la definición del man es la siguiente:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-p  Turned on whenever the real and effective user ids do not match.
+    Disables processing of the $ENV file and importing of shell functions.
+    Turning this option off causes the effective uid and gid to be set to the real uid and gid.
+</code></pre></div></div>
+
+<p>Según el enunciado existen otra flag y una cosa distinta a las otras dos máquinas pero yo no las he buscado, seguramente en otros writeups podáis encontrar la solución para esas dos cosas.</p>
+
+</div>
+  <div class="share-page">
+  <span style="float: left;">Share this on &rarr;&nbsp;&nbsp;</span>
+
+  <!-- Twitter -->
+  <a href="https://twitter.com/share" class="twitter-share-button" data-via="roskyfrosky">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+  <!-- Google + -->
+  <div class="g-plus" data-action="share" data-annotation="bubble"></div>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+  <!-- Facebook -->
+  <div class="fb-share-button" data-href="https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html" data-layout="button_count" style="position: relative; top: -8px; left: 3px;"></div>
+</div>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+</div>
+
+
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+            <div class="panel-body">
+              <h4>Related Posts</h4>
+              <ul>
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2018/03/15/Fristileak-vulnhub.html">Vulnhub FristiLeak</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html">Vulnhub RickdiculouslyEasy</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html">Vulnhub VulnerableDocker Easy mode</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/05/08/Hackfest-quaoar.html">Vulnhub HackFest Quaoar</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html">Kioptrix Level 3 (1.2) VulnHub Boot2Root</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/04/01/Kioptrix2.0-vulnhub.html">Kioptrix Level 2 VulnHub Boot2Root</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+  
+  </ul>
+</div>
+
+
+<div class="PageNavigation">
+  
+    <a class="prev" href="/vulnhub/2017/05/08/Hackfest-quaoar.html">&laquo; Vulnhub HackFest Quaoar</a>
+  
+  
+    <a class="next" href="/vulnhub/2017/10/24/VulnerableDocker_Easymode.html">Vulnhub VulnerableDocker Easy mode &raquo;</a>
+  
+</div>
+
+<div class="disqus-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    /* <![CDATA[ */
+    var disqus_shortname = "roskyfrosky";
+    var disqus_identifier = "https://blog.roskyfrosky.com_Vulnhub HackFest Orcus";
+    var disqus_title = "Vulnhub HackFest Orcus";
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    /* ]]> */
+  </script>
+</div>
+
+        <footer>
+          &copy; Roskyfrosky
+          
+            - <a href="https://github.com/roskyfrosky">https://github.com/roskyfrosky</a> - Powered by Jekyll.
+          
+        </footer>
+      </div>
+      <!-- end /.col-sm-8 -->
+    </div>
+    <!-- end /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/super-search.js"></script>
+    <script src="/static/js/thickbox-compressed.js"></script>
+    <script src="/static/js/projects.js"></script>
+  </body>
+</html>
+

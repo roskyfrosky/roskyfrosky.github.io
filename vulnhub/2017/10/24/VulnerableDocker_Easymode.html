@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" />
+    <title>Vulnhub VulnerableDocker Easy mode - Roskyfrosky Blog</title>
+    <meta name="author" content="Roskyfrosky" />
+    <meta name="description" content="Vulnhub VulnerableDocker Easy mode" />
+    <meta name="keywords" content="Vulnhub VulnerableDocker Easy mode, Roskyfrosky Blog, vulnhub" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+    <meta content="" property="fb:app_id">
+    <meta content="Roskyfrosky Blog" property="og:site_name">
+
+    
+
+    
+      <meta content="Vulnhub VulnerableDocker Easy mode" property="og:title">
+      <meta content="article" property="og:type">
+    
+
+    
+      <meta content="This is my personal blog" property="og:description">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html" property="og:url">
+    
+
+    
+      <meta content="2017-10-24T11:11:34+01:00" property="article:published_time">
+      <meta content="https://blog.roskyfrosky.com/about/" property="article:author">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/static/img/posts//images/avatares/vulnerableDocker_easy_cover.png" property="og:image">
+    
+
+    
+      
+        <meta content="vulnhub" property="article:section">
+      
+    
+
+    
+      
+        <meta content="boot2root" property="article:tag">
+      
+        <meta content="vulnhub" property="article:tag">
+      
+        <meta content="notsosecure" property="article:tag">
+      
+    
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@roskyfrosky">
+    <meta name="twitter:creator" content="@roskyfrosky">
+
+    
+      <meta name="twitter:title" content="Vulnhub VulnerableDocker Easy mode">
+    
+
+    
+      <meta name="twitter:url" content="https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html">
+    
+
+    
+      <meta name="twitter:description" content="This is my personal blog">
+    
+
+    
+
+    <!-- Font awesome icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    <!-- syntax highlighting CSS -->
+    <link rel="stylesheet" href="/static/css/syntax.css">
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300italic,300,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/super-search.css">
+    <link rel="stylesheet" href="/static/css/thickbox.css">
+    <link rel="stylesheet" href="/static/css/projects.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-sm-3">
+        <div class="fixed-condition">
+          <a href="/"><img class="profile-avatar" src="/static/img/avatar.jpg" height="75px" width="75px" /></a>
+          <h1 class="author-name">Roskyfrosky</h1>
+          
+          <div class="social">
+            <ul>
+              
+                <li><a href="https://twitter.com/roskyfrosky" target="_blank"><i class="fa fa-twitter"></i></a></li>
+              
+                <li><a href="https://github.com/roskyfrosky" target="_blank"><i class="fa fa-github"></i></a></li>
+              
+            </ul>
+          </div>
+          <div class="search" id="js-search">
+            <input type="text" placeholder="(sitemap)~$ type to search" class="search__input form-control" id="js-search__input">
+            <ul class="search__results" id="js-search__results"></ul>
+          </div>
+          <hr />
+          <ul class="sidebar-nav">
+            <strong>Navigation</strong>
+            <li><a href="/">Home</a></li>
+            
+              <li><a class="about" href="/about/">About Me</a></li>
+            
+              <li><a class="about" href="/feed.xml">XML Feed</a></li>
+            
+          </ul>
+        </div>
+        <!-- end /.fixed-condition -->
+      </div>
+      <div class="col-sm-8 col-offset-1 main-layout">
+        <header class="post-header">
+  <h1 class="post-title">Vulnhub VulnerableDocker Easy mode</h1>
+</header>
+
+<span class="time">24 Oct 2017</span>
+
+  <span class="categories">
+    &raquo; <a href="/category/vulnhub">vulnhub</a>
+  </span>
+
+
+<div class="content">
+  <div class="post"><h1 id="down-by-the-dockereasy-mode">Down By The Docker(Easy mode)</h1>
+<p><strong>URL de la máquina:</strong> <a href="https://www.vulnhub.com/entry/vulnerable-docker-1,208/">https://www.vulnhub.com/entry/vulnerable-docker-1,208/</a><br />
+<strong>Descripción:</strong> Down By The Docker
+Ever fantasized about playing with docker misconfigurations, privilege escalation, etc. within a container?</p>
+
+<p>Download this VM, pull out your pentest hats and get started</p>
+
+<p>We have 2 Modes:</p>
+<ul>
+  <li>HARD: This would require you to combine your docker skills as well as your pen-testing skills to achieve host compromise.</li>
+  <li>EASY: Relatively easier path, knowing docker would be enough to compromise the machine and gain root on the host machines.</li>
+</ul>
+
+<p>We have planted 3 flag files across the various machines / systems that are available to you. Your mission if you choose to accept would be as following:</p>
+
+<p>Identify all the flags (2 in total: flag_1 and flag_3) (flag_2 was inadvertently left out)</p>
+
+<p>Gain id=0 shell access on the host machine.</p>
+
+<h2 id="solución">Solución</h2>
+
+<p>Tal y como indica el enunciado hay que buscar 2 flags y conseguir root en la máquina, ya que una de ellas no se incluyo debido a un error.</p>
+
+<p>Lo primero que hacemos, como en todas las máquinas es realizar un escaneo de puertos para comprobar que servicios hay corriendo en la máquina.</p>
+
+<p><img src="/images/Vulnhub/vulnerable_docker/easy/port_scanning.png" alt="" class="img-responsive" /></p>
+
+<p>Vemos que hay 3 puertos abiertos, el 22 (ssh) , el 2375 (unknown) y el 8000 (Apache)</p>
+
+<p>Vamos a empezar por el Apache, como siempre.Ponemos la ip:puerto en el navegador y la primera imagen que vemos nos indica que se trata de un Wordpress.</p>
+
+<p><img src="/images/Vulnhub/vulnerable_docker/easy/wordpress.png" alt="" class="img-responsive" /></p>
+
+<p>Dado que se trata de un wordpress, vamos a hacer uso de la herramienta wpscan para comprobar si contiene vulnerabilidades por la que podamos ganar acceso.
+Para ellos ejecutamos el siguiente comando</p>
+
+<p><code class="highlighter-rouge">./wpscan.rb --url http://192.168.1.36:8000/ </code></p>
+
+<p>Nos muestra varia información sobre un posible SQLInjection, un XSS con autenticación, etc pero nada útil. Por lo que vamos a comprobar si podemos enumerar usuarios.</p>
+
+<p><code class="highlighter-rouge">./wpscan.rb --url http://192.168.1.36:8000/ --enumerate u</code></p>
+
+<p>Y obtenemos el usuario bob
+<img src="/images/Vulnhub/vulnerable_docker/easy/username.png" alt="" class="img-responsive" /></p>
+
+<p>Dado que tenemos el nombre de usuario vamos a intentar hacer bruteforce al login con el diccionario rockyout.txt para ver si tenemos suerte</p>
+
+<p><code class="highlighter-rouge">./wpscan.rb --url http://192.168.1.36:8000/ --wordlist /usr/share/wordlist/rockyou.txt  --username bob</code></p>
+
+<p>Y efectivamente conseguimos encontrar la contraseña para el usuario bob, en este caso Password1</p>
+
+<p><img src="/images/Vulnhub/vulnerable_docker/easy/password.png" alt="" class="img-responsive" /></p>
+
+<p>Nos conectamos al wordpress y dando una vuelta por los distintos Pages, themes y Post, nos encontramos con la primera flag que se encuentra en un borrador de los Post.
+<img src="/images/Vulnhub/vulnerable_docker/easy/flag_1.png" alt="" class="img-responsive" /></p>
+
+<p>Subimos una reverse shell susituyendo uno de los ficheros 404 de los themes y nos conectamos a nuestra máquina host, pero trás un rato buscando ficheros con el bit suid activo o alguna forma de escalar privilegios abandonamos ese camino.</p>
+
+<p>Volvemos a mirar el escaneo de puerto que habíamos hecho al principio y observamos que en el puerto 2375 no se ha podido comprobar que servicio está corriendo en él por lo que hacemos una pequeña búsqueda en google.</p>
+
+<p>Dado que el título de la máquina es “Vulnerable Docker” buscamos por “Docker port 2375” y el primer enlace de google nos lleva a:
+<a href="https://docs.docker.com/engine/reference/commandline/dockerd/">https://docs.docker.com/engine/reference/commandline/dockerd/</a></p>
+
+<p>Donde la información importante es:</p>
+
+<p><em>If you need to access the Docker daemon remotely, you need to enable the tcp Socket. Beware that the default setup provides un-encrypted and un-authenticated direct access to the Docker daemon - and should be secured either using the built in HTTPS encrypted socket, or by putting a secure web proxy in front of it. You can listen on port 2375 on all network interfaces with -H tcp://0.0.0.0:2375, or on a particular network interface using its IP address: -H tcp://192.168.59.103:2375. It is conventional to use port 2375 for un-encrypted, and port 2376 for encrypted communication with the daemon.</em></p>
+
+<p>Lo que significa que hay un socket de docker escuchando en ese puerto, lo que nos permitirá ejecutar comandos docker.
+Hacemos la prueba para listar los containers que están activos como podemos ver en la siguiente imagen:</p>
+
+<p><img src="/images/Vulnhub/vulnerable_docker/easy/docker_socket.png" alt="" class="img-responsive" /></p>
+
+<p>Y efectivamente funciona, por lo que vamos a ejecutar una imagen alpine lo que nos dará accesso root a la máquina.
+Para ello ejecutaremos el siguiente comando:</p>
+
+<p><code class="highlighter-rouge">docker -H tcp://192.168.1.36:2375 run -itv /:/host alpine /bin/sh</code></p>
+
+<p>Y como comprobamos en la siguiente imagen, somos root:</p>
+
+<p><img src="/images/Vulnhub/vulnerable_docker/easy/root.png" alt="" class="img-responsive" /></p>
+
+<p>Lo único que queda ya es buscar la otra flag que indicaba el enunciado, en este caso con nombre “flag_3”.
+La primera pista nos indicaba que estaba en los ficheros por lo que con un comando find la encontramos:</p>
+
+<p><img src="/images/Vulnhub/vulnerable_docker/easy/flag_3.png" alt="" class="img-responsive" /></p>
+
+<p>Ya hemos conseguido el objetivo de la máquina que era obtener las dos flags y ser usuario root. En la siguiente entrada resolveremos la máquina en el modo hard.</p>
+
+</div>
+  <div class="share-page">
+  <span style="float: left;">Share this on &rarr;&nbsp;&nbsp;</span>
+
+  <!-- Twitter -->
+  <a href="https://twitter.com/share" class="twitter-share-button" data-via="roskyfrosky">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+  <!-- Google + -->
+  <div class="g-plus" data-action="share" data-annotation="bubble"></div>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+  <!-- Facebook -->
+  <div class="fb-share-button" data-href="https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html" data-layout="button_count" style="position: relative; top: -8px; left: 3px;"></div>
+</div>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+</div>
+
+
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+            <div class="panel-body">
+              <h4>Related Posts</h4>
+              <ul>
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2018/03/15/Fristileak-vulnhub.html">Vulnhub FristiLeak</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html">Vulnhub RickdiculouslyEasy</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html">Vulnhub HackFest Orcus</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/05/08/Hackfest-quaoar.html">Vulnhub HackFest Quaoar</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html">Kioptrix Level 3 (1.2) VulnHub Boot2Root</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/04/01/Kioptrix2.0-vulnhub.html">Kioptrix Level 2 VulnHub Boot2Root</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+  
+  </ul>
+</div>
+
+
+<div class="PageNavigation">
+  
+    <a class="prev" href="/vulnhub/2017/06/09/Hackfest-orcus.html">&laquo; Vulnhub HackFest Orcus</a>
+  
+  
+    <a class="next" href="/vulnhub/2018/03/09/Rickdiculously-vulnhub.html">Vulnhub RickdiculouslyEasy &raquo;</a>
+  
+</div>
+
+<div class="disqus-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    /* <![CDATA[ */
+    var disqus_shortname = "roskyfrosky";
+    var disqus_identifier = "https://blog.roskyfrosky.com_Vulnhub VulnerableDocker Easy mode";
+    var disqus_title = "Vulnhub VulnerableDocker Easy mode";
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    /* ]]> */
+  </script>
+</div>
+
+        <footer>
+          &copy; Roskyfrosky
+          
+            - <a href="https://github.com/roskyfrosky">https://github.com/roskyfrosky</a> - Powered by Jekyll.
+          
+        </footer>
+      </div>
+      <!-- end /.col-sm-8 -->
+    </div>
+    <!-- end /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/super-search.js"></script>
+    <script src="/static/js/thickbox-compressed.js"></script>
+    <script src="/static/js/projects.js"></script>
+  </body>
+</html>
+

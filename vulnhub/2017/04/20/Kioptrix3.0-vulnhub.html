@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" />
+    <title>Kioptrix Level 3 (1.2) VulnHub Boot2Root - Roskyfrosky Blog</title>
+    <meta name="author" content="Roskyfrosky" />
+    <meta name="description" content="Kioptrix Level 3 (1.2) VulnHub Boot2Root" />
+    <meta name="keywords" content="Kioptrix Level 3 (1.2) VulnHub Boot2Root, Roskyfrosky Blog, vulnhub" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+    <meta content="" property="fb:app_id">
+    <meta content="Roskyfrosky Blog" property="og:site_name">
+
+    
+
+    
+      <meta content="Kioptrix Level 3 (1.2) VulnHub Boot2Root" property="og:title">
+      <meta content="article" property="og:type">
+    
+
+    
+      <meta content="This is my personal blog" property="og:description">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html" property="og:url">
+    
+
+    
+      <meta content="2017-04-20T20:11:34+01:00" property="article:published_time">
+      <meta content="https://blog.roskyfrosky.com/about/" property="article:author">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/static/img/posts//images/avatares/kioptrix_3.png" property="og:image">
+    
+
+    
+      
+        <meta content="vulnhub" property="article:section">
+      
+    
+
+    
+      
+        <meta content="boot2root" property="article:tag">
+      
+        <meta content="kioptrix" property="article:tag">
+      
+    
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@roskyfrosky">
+    <meta name="twitter:creator" content="@roskyfrosky">
+
+    
+      <meta name="twitter:title" content="Kioptrix Level 3 (1.2) VulnHub Boot2Root">
+    
+
+    
+      <meta name="twitter:url" content="https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html">
+    
+
+    
+      <meta name="twitter:description" content="This is my personal blog">
+    
+
+    
+
+    <!-- Font awesome icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    <!-- syntax highlighting CSS -->
+    <link rel="stylesheet" href="/static/css/syntax.css">
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300italic,300,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/super-search.css">
+    <link rel="stylesheet" href="/static/css/thickbox.css">
+    <link rel="stylesheet" href="/static/css/projects.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-sm-3">
+        <div class="fixed-condition">
+          <a href="/"><img class="profile-avatar" src="/static/img/avatar.jpg" height="75px" width="75px" /></a>
+          <h1 class="author-name">Roskyfrosky</h1>
+          
+          <div class="social">
+            <ul>
+              
+                <li><a href="https://twitter.com/roskyfrosky" target="_blank"><i class="fa fa-twitter"></i></a></li>
+              
+                <li><a href="https://github.com/roskyfrosky" target="_blank"><i class="fa fa-github"></i></a></li>
+              
+            </ul>
+          </div>
+          <div class="search" id="js-search">
+            <input type="text" placeholder="(sitemap)~$ type to search" class="search__input form-control" id="js-search__input">
+            <ul class="search__results" id="js-search__results"></ul>
+          </div>
+          <hr />
+          <ul class="sidebar-nav">
+            <strong>Navigation</strong>
+            <li><a href="/">Home</a></li>
+            
+              <li><a class="about" href="/about/">About Me</a></li>
+            
+              <li><a class="about" href="/feed.xml">XML Feed</a></li>
+            
+          </ul>
+        </div>
+        <!-- end /.fixed-condition -->
+      </div>
+      <div class="col-sm-8 col-offset-1 main-layout">
+        <header class="post-header">
+  <h1 class="post-title">Kioptrix Level 3 (1.2) VulnHub Boot2Root</h1>
+</header>
+
+<span class="time">20 Apr 2017</span>
+
+  <span class="categories">
+    &raquo; <a href="/category/vulnhub">vulnhub</a>
+  </span>
+
+
+<div class="content">
+  <div class="post"><h1 id="kioptrix-level-3-boot2root-vulnhub">Kioptrix Level 3 Boot2Root Vulnhub</h1>
+<p><strong>URL de la máquina:</strong> <a href="https://www.vulnhub.com/entry/kioptrix-level-12-3,24/">https://www.vulnhub.com/entry/kioptrix-level-12-3,24/</a><br />
+<strong>Descripción:</strong> It’s been a while since the last Kioptrix VM challenge. Life keeps getting the way of these things you know.</p>
+
+<p>After the seeing the number of downloads for the last two, and the numerous videos showing ways to beat these challenges. I felt that 1.2 (or just level 3) needed to come out. Thank you to all that downloaded and played the first two. And thank you to the ones that took the time to produce video solutions of them. Greatly appreciated.</p>
+
+<p>As with the other two, this challenge is geared towards the beginner. It is however different. Added a few more steps and a new skill set is required. Still being the realm of the beginner I must add. The same as the others, there’s more then one way to “pwn” this one. There’s easy and not so easy. Remember… the sense of “easy” or “difficult” is always relative to ones own skill level. I never said these things were exceptionally hard or difficult, but we all need to start somewhere. And let me tell you, making these vulnerable VMs is not as easy as it looks…</p>
+
+<p>Important thing with this challenge. Once you find the IP (DHCP Client) edit your hosts file and point it to kioptrix3.com</p>
+
+<h2 id="solución">Solución</h2>
+
+<p>En primer lugar, y como en todas las máquinas que estamos realizando, lo primero en realizar siempre es un escaneo de puertos de la máquina para comprobar que servicios están corriendo en ella.</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/escaneo.png" alt="" class="img-responsive" /></p>
+
+<p>Vemos que hay un apache corriendo en el puerto 80 y el servicio ssh en el puerto 22. Vamos a empezar mirando por el apache.<br />
+Introduccimos la dirección IP en el navegador y lo primero que nos encontramos es con una especia de blog.Trás un rato dando vueltas por la página, vemos una frase que nos llama la atención indicandonos que se trata de un CMS.</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/cms.png" alt="" class="img-responsive" /></p>
+
+<p>Buscamos un poco por internet y parece ser que hay un exploit para el cms, que permite la ejecución de comandos.
+<a href="https://github.com/Hood3dRob1n/LotusCMS-Exploit">https://github.com/Hood3dRob1n/LotusCMS-Exploit</a></p>
+
+<p>Descargamos el exploit del github de arriba y lo ejecutamos con el siguiente comando (recordar que hemos apuntado la IP de la máquina a un dominio tal y como indican en la descripción, en este caso, kioptrix3.com)</p>
+
+<p><code class="highlighter-rouge">bash lotusRCE.sh kioptrix3.com /</code></p>
+
+<p>Ponemos a escuchar un netcat en nuestra máquina local en el puerto 4444 y rellenamos los datos de la máquina a la que se tiene que conectar y el puerto</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/netcat.png" alt="" class="img-responsive" /></p>
+
+<p>Una vez que podemos ejecutar comando,vemos que hay una carpeta gallery, por lo que entramos en ella mediante la web y trás consultar unos cuantos ficheros a través del navegador nos topamos con mensaje de error de sql.</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/sql_error.png" alt="" class="img-responsive" /></p>
+
+<p>Ponemos el parámetro que le falta a la url y se ve correctamente como se muestra en la siguiente imagen:</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/gallery.png" alt="" class="img-responsive" /></p>
+
+<p>Dado que parece haber un sqlinjection, utilizamos la herramienta sqlmap para que la explotación sea rápida y obtenemos las siguientes bases de datos y las tablas de la que realmente nos interesa, en este caso gallery:</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/sqlmap.png" alt="" class="img-responsive" /></p>
+
+<p>En las tablas de gallery,vemos que hay dos tablas que pueden ser interesantes,dev_accounts y gallerific_users  por lo que procedemos a dumpearlas con el siguiente comando:</p>
+
+<p><code class="highlighter-rouge">python sqlmap.py --url http://kioptrix3.com/gallery/gallery.php\?id\=1 --dump --dbs gallery </code></p>
+
+<p>La tabla de gallerific_users contiene un usuario para loguearnos en la aplicación web, y la tabla dev_accounts contiene dos usuarios como muestra la siguiente imagen:</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/users.png" alt="" class="img-responsive" /></p>
+
+<p>Vamos a <a href="https://hashkiller.co.uk/">https://hashkiller.co.uk/</a> para comprobar si alguno de los hashes md5 que nos arroja la tabla está crakeado y tenemos suerte:</p>
+
+<p><code class="highlighter-rouge">
+dreg		0d3eccfb887aabd50f243b3f155c0f85 : Mast3r  
+loneferret	5badcaf789d3d1d09794d8f021f40f0e : starwars
+</code></p>
+
+<p>Probamos a conectarnos con estos dos usuarios y vemos que tenemos suerte con el usuario loneferret y la contraseña starwars.</p>
+
+<p>Una vez dentro de la máquina lo primero que hacemos es listar los ficheros del directorio, donde vemos que hay un readme.</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/ssh.png" alt="" class="img-responsive" /></p>
+
+<p>Mostramos el fichero del readme</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/readme.png" alt="" class="img-responsive" /></p>
+
+<p>y este nos indica que utilicemos el comando “sudo ht” que es un editor de ficheros. Comprobamos que permisos tiene ese fichero y vemos que tiene el bit suid activado, por lo que al ejecutarse será como root.</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/ht_1.png" alt="" class="img-responsive" /></p>
+
+<p>Por lo que vamos a modificar el fichero sudoers para asignar permisos de root al usuario loneferret. Para ello lo que hacemos es añadir el binario /bin/bash para que cuando se ejecute sea con permisos de root.</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/ht_2.png" alt="" class="img-responsive" /></p>
+
+<p>Trás guardar los cambios, comprobamos que comandos de superusuario podemos ejecutar con el usuario loneferret y comprobamos que se ha añadido correctamente /bin/bash, por lo que ejecutamos el comando y comprobamos que efectivamente ahora somos el usuario root.</p>
+
+<p><img src="/images/Vulnhub/kioptrix_3/root.png" alt="" class="img-responsive" /></p>
+
+</div>
+  <div class="share-page">
+  <span style="float: left;">Share this on &rarr;&nbsp;&nbsp;</span>
+
+  <!-- Twitter -->
+  <a href="https://twitter.com/share" class="twitter-share-button" data-via="roskyfrosky">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+  <!-- Google + -->
+  <div class="g-plus" data-action="share" data-annotation="bubble"></div>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+  <!-- Facebook -->
+  <div class="fb-share-button" data-href="https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html" data-layout="button_count" style="position: relative; top: -8px; left: 3px;"></div>
+</div>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+</div>
+
+
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+            <div class="panel-body">
+              <h4>Related Posts</h4>
+              <ul>
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2018/03/15/Fristileak-vulnhub.html">Vulnhub FristiLeak</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html">Vulnhub RickdiculouslyEasy</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html">Vulnhub VulnerableDocker Easy mode</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html">Vulnhub HackFest Orcus</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/05/08/Hackfest-quaoar.html">Vulnhub HackFest Quaoar</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/vulnhub/2017/04/01/Kioptrix2.0-vulnhub.html">Kioptrix Level 2 VulnHub Boot2Root</a>
+                  
+                    (Categories: <a href="/category/vulnhub">vulnhub</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+  
+  </ul>
+</div>
+
+
+<div class="PageNavigation">
+  
+    <a class="prev" href="/vulnhub/2017/04/01/Kioptrix2.0-vulnhub.html">&laquo; Kioptrix Level 2 VulnHub Boot2Root</a>
+  
+  
+    <a class="next" href="/pentestlimited/2017/05/08/Securi-tay-pentestlimited.html">Securi-Tay 2017	PentesLimited  Boot2Root &raquo;</a>
+  
+</div>
+
+<div class="disqus-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    /* <![CDATA[ */
+    var disqus_shortname = "roskyfrosky";
+    var disqus_identifier = "https://blog.roskyfrosky.com_Kioptrix Level 3 (1.2) VulnHub Boot2Root";
+    var disqus_title = "Kioptrix Level 3 (1.2) VulnHub Boot2Root";
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    /* ]]> */
+  </script>
+</div>
+
+        <footer>
+          &copy; Roskyfrosky
+          
+            - <a href="https://github.com/roskyfrosky">https://github.com/roskyfrosky</a> - Powered by Jekyll.
+          
+        </footer>
+      </div>
+      <!-- end /.col-sm-8 -->
+    </div>
+    <!-- end /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/super-search.js"></script>
+    <script src="/static/js/thickbox-compressed.js"></script>
+    <script src="/static/js/projects.js"></script>
+  </body>
+</html>
+

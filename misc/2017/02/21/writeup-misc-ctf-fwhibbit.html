@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" />
+    <title>Writeup [Misc] FWHIBBIT 2017 - Roskyfrosky Blog</title>
+    <meta name="author" content="Roskyfrosky" />
+    <meta name="description" content="Writeup [Misc] FWHIBBIT 2017" />
+    <meta name="keywords" content="Writeup [Misc] FWHIBBIT 2017, Roskyfrosky Blog, misc" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+    <meta content="" property="fb:app_id">
+    <meta content="Roskyfrosky Blog" property="og:site_name">
+
+    
+
+    
+      <meta content="Writeup [Misc] FWHIBBIT 2017" property="og:title">
+      <meta content="article" property="og:type">
+    
+
+    
+      <meta content="This is my personal blog" property="og:description">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/misc/2017/02/21/writeup-misc-ctf-fwhibbit.html" property="og:url">
+    
+
+    
+      <meta content="2017-02-21T12:11:34+00:00" property="article:published_time">
+      <meta content="https://blog.roskyfrosky.com/about/" property="article:author">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/static/img/posts//images/avatares/fwrabbit2017.png" property="og:image">
+    
+
+    
+      
+        <meta content="misc" property="article:section">
+      
+    
+
+    
+      
+        <meta content="writeup" property="article:tag">
+      
+    
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@roskyfrosky">
+    <meta name="twitter:creator" content="@roskyfrosky">
+
+    
+      <meta name="twitter:title" content="Writeup [Misc] FWHIBBIT 2017">
+    
+
+    
+      <meta name="twitter:url" content="https://blog.roskyfrosky.com/misc/2017/02/21/writeup-misc-ctf-fwhibbit.html">
+    
+
+    
+      <meta name="twitter:description" content="This is my personal blog">
+    
+
+    
+
+    <!-- Font awesome icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    <!-- syntax highlighting CSS -->
+    <link rel="stylesheet" href="/static/css/syntax.css">
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300italic,300,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/super-search.css">
+    <link rel="stylesheet" href="/static/css/thickbox.css">
+    <link rel="stylesheet" href="/static/css/projects.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-sm-3">
+        <div class="fixed-condition">
+          <a href="/"><img class="profile-avatar" src="/static/img/avatar.jpg" height="75px" width="75px" /></a>
+          <h1 class="author-name">Roskyfrosky</h1>
+          
+          <div class="social">
+            <ul>
+              
+                <li><a href="https://twitter.com/roskyfrosky" target="_blank"><i class="fa fa-twitter"></i></a></li>
+              
+                <li><a href="https://github.com/roskyfrosky" target="_blank"><i class="fa fa-github"></i></a></li>
+              
+            </ul>
+          </div>
+          <div class="search" id="js-search">
+            <input type="text" placeholder="(sitemap)~$ type to search" class="search__input form-control" id="js-search__input">
+            <ul class="search__results" id="js-search__results"></ul>
+          </div>
+          <hr />
+          <ul class="sidebar-nav">
+            <strong>Navigation</strong>
+            <li><a href="/">Home</a></li>
+            
+              <li><a class="about" href="/about/">About Me</a></li>
+            
+              <li><a class="about" href="/feed.xml">XML Feed</a></li>
+            
+          </ul>
+        </div>
+        <!-- end /.fixed-condition -->
+      </div>
+      <div class="col-sm-8 col-offset-1 main-layout">
+        <header class="post-header">
+  <h1 class="post-title">Writeup [Misc] FWHIBBIT 2017</h1>
+</header>
+
+<span class="time">21 Feb 2017</span>
+
+  <span class="categories">
+    &raquo; <a href="/category/misc">misc</a>
+  </span>
+
+
+<div class="content">
+  <div class="post"><h1 id="information-leakage">Information Leakage</h1>
+<p><strong>Points:</strong> 75<br />
+<strong>Country:</strong> Tanzania<br />
+<strong>Link:</strong> <a href="flag.followthewhiterabbit.es">flag.followthewhiterabbit.es</a><br />
+<strong>Description:</strong> Our experts claim that we have suffered an important information leak thanks to our domain: flag.followthewhiterabbit.es
+Can you check if this is true?</p>
+
+<p>Nos dan una url, por lo intentamos acceder a ella por el navegador y nos devuelve que no es alcanzable.
+Por lo que lanzamos el comando host -a para ver toda la información del subdominio.</p>
+
+<p><img src="/images/CTFS/2017/fwhibbit/tanzania1.png" alt="Misc Tanzania" class="img-responsive" /></p>
+
+<p>Vemos que nos muestra la flag.
+fwhibbit{DnS_L3ak}</p>
+
+<h1 id="torxicity">TORxicity</h1>
+<p><strong>Points:</strong> 300<br />
+<strong>Country:</strong> Colombia<br />
+<strong>Link:</strong> <a href="http://rabbit3yfa6dcgka.onion">http://rabbit3yfa6dcgka.onion</a><br />
+<strong>Description:</strong> We recently found that a group of people are selling female rabbit extract. You need to find their real server, and deanonimize them!</p>
+
+<p>Este reto era igual que uno que salío en el CTF de la ekoparty por lo que ya sabíamos como se resolvía.
+Intentamos conectarnos por ssh al dominio facilitado para obtener el fingerprinting de la clave del host.</p>
+
+<p><img src="/images/CTFS/2017/fwhibbit/colombia1.png" alt="Misc Colombia" class="img-responsive" /></p>
+
+<p>Y probamos a buscarlo en shodan, por si acaso hubiera suerte.</p>
+
+<p><img src="/images/CTFS/2017/fwhibbit/colombia2.png" alt="Misc Colombia" class="img-responsive" /></p>
+
+<p>No lo hemos encontrado, por lo que utilizamos el comando ssh-keyscan para buscar las claves públicas.</p>
+
+<p><img src="/images/CTFS/2017/fwhibbit/colombia3.png" alt="Misc Colombia" class="img-responsive" /></p>
+
+<p>Una vez que tenemos las claves en el fichero keys, utilizamos el comando ssh-keygen para generar las claves que más tarde pasaremos a buscar</p>
+
+<p><img src="/images/CTFS/2017/fwhibbit/colombia4.png" alt="Misc Colombia" class="img-responsive" /></p>
+
+<p>Y pasamos a comprobar si alguno de los resultados se encuentra en shodan como hemos hecho anteriormente.</p>
+
+<p><img src="/images/CTFS/2017/fwhibbit/colombia5.png" alt="Misc Colombia" class="img-responsive" /></p>
+
+<p>Esta vez ha habido suerte y obtenemos una IP. Entramos a la IP con el navegador y obtenemos la flag.</p>
+
+<p><img src="/images/CTFS/2017/fwhibbit/colombia6.png" alt="Misc Colombia" class="img-responsive" /></p>
+
+</div>
+  <div class="share-page">
+  <span style="float: left;">Share this on &rarr;&nbsp;&nbsp;</span>
+
+  <!-- Twitter -->
+  <a href="https://twitter.com/share" class="twitter-share-button" data-via="roskyfrosky">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+  <!-- Google + -->
+  <div class="g-plus" data-action="share" data-annotation="bubble"></div>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+  <!-- Facebook -->
+  <div class="fb-share-button" data-href="https://blog.roskyfrosky.com/misc/2017/02/21/writeup-misc-ctf-fwhibbit.html" data-layout="button_count" style="position: relative; top: -8px; left: 3px;"></div>
+</div>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+</div>
+
+
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+  
+
+<div class="PageNavigation">
+  
+    <a class="prev" href="/forense/2017/02/21/writeup-forense-ctf-fwhibbit.html">&laquo; Writeup [Forense] FWHIBBIT 2017</a>
+  
+  
+    <a class="next" href="/reversing/2017/02/21/writeup-reversing-ctf-fwhibbit.html">Writeup [Reversing] FWHIBBIT 2017 &raquo;</a>
+  
+</div>
+
+<div class="disqus-comments">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    /* <![CDATA[ */
+    var disqus_shortname = "roskyfrosky";
+    var disqus_identifier = "https://blog.roskyfrosky.com_Writeup [Misc] FWHIBBIT 2017";
+    var disqus_title = "Writeup [Misc] FWHIBBIT 2017";
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    /* ]]> */
+  </script>
+</div>
+
+        <footer>
+          &copy; Roskyfrosky
+          
+            - <a href="https://github.com/roskyfrosky">https://github.com/roskyfrosky</a> - Powered by Jekyll.
+          
+        </footer>
+      </div>
+      <!-- end /.col-sm-8 -->
+    </div>
+    <!-- end /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/super-search.js"></script>
+    <script src="/static/js/thickbox-compressed.js"></script>
+    <script src="/static/js/projects.js"></script>
+  </body>
+</html>
+
